@@ -1,0 +1,49 @@
+---
+title: "trash"
+editor: visual
+---
+
+```{r, eval=FALSE}
+
+
+sign <- label_comma(style_positive = "plus", 
+                    style_negative = "minus", 
+                    accuracy = .01)
+sign1 <- label_comma(style_positive = "plus", 
+                     style_negative = "minus", 
+                     accuracy = 1,
+                     prefix = "$")
+
+diffs <- focus %>% 
+  mutate(Assault = sign(Assault),
+         Income = sign1(Income),
+         Unemployment = sign(Unemployment),
+         Poverty = sign(Poverty),
+         Attendance = sign(Attendance)) %>%
+  mutate(Assault = cell_spec(Assault, 
+                             background = ifelse(str_detect(Assault, "−"), 
+                                                 "#00E549", "#E60400"),
+                             color = ifelse(str_detect(Assault, "−"), 
+                                            "black", "white")),
+         Income = cell_spec(Income, 
+                            background = ifelse(str_detect(Income, "−"), 
+                                                "#E60400", "#00E549"),
+                            color = ifelse(str_detect(Income, "−"), 
+                                           "white", "black")),
+         Unemployment = cell_spec(Unemployment, 
+                                  background = ifelse(str_detect(Unemployment, "−"), 
+                                                      "#00E549", "#E60400"),
+                                  color = ifelse(str_detect(Unemployment, "−"), 
+                                                 "black", "white")),
+         Poverty = cell_spec(Poverty, 
+                             background = ifelse(str_detect(Poverty, "−"), 
+                                                 "#00E549", "#E60400"),
+                             color = ifelse(str_detect(Poverty, "−"), 
+                                            "black", "white")),
+         Attendance = cell_spec(Attendance, 
+                                background = ifelse(str_detect(Attendance, "−"), 
+                                                    "#00E549", "#E60400"),
+                                color = ifelse(str_detect(Attendance, "−"), 
+                                               "black", "white"))) 
+```
+

@@ -1,0 +1,47 @@
+---
+title: "history"
+subtitle: "historical research in the US"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+---
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/manifest.jpg){width=300 fig-alt="America Progress by John Gast (1872)"}](badmen.html)
+</div>
+
+<div style="font-size:23px">
+
+[Constructing Bad Men](badmen.html): Literary Myths and Protectionist Masculinity (December 2018)
+
+</div>
+
+<br><br><br><br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/elias.png){width=300 fig-alt="Portrait of Elias Boudinot with a Cherokee Phoenix newspaper backdrop."}](elias.html)
+</div>
+
+<div style="font-size:23px">
+
+[Elias Boudinot](elias.html): Editor in Assimilation (May 2018)
+
+</div>
+
+<br><br><br><br><br><br><br><br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/borgia.jpg){width=300 fig-alt="An image from the Codex Borgia showing a deity and human exchanging blood."}](history/identity.html)
+</div>
+
+<div style="font-size:23px">
+
+[Indigenous Identity Outside the National Narrative](history/identity.html): An Analysis of Indigenous Resilience in Mexico (December 2017)
+
+</div>

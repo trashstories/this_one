@@ -1,0 +1,156 @@
+---
+title: "DREAM Analytics: Dumpster Research for Equity with an Abolitionist Mindset"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+![](dumpsterdata.png){width="100%" fig-alt="D.R.E.A.M. Analytics Dumpster Research for Equity with an Abolitionist Mindset, an image of a raccoon next to a dumpster with data icons in and around it with the caption 'Turn your trash data into treasure!'"}
+
+
+# Who We Are
+
+<div style="font-size:20px; text-align: justify">
+
+DREAM Analytics is a trailblazing data consulting organization committed to promoting equity and justice through innovative data solutions. Our acronym, DREAM, reflects our mission: Dumpster Research for Equity with an Abolitionist Mindset. The idea of “dumpster research” comes from the broken and often discarded bits of information that make up data. Distinguishing trash from treasure is merely a matter of perspective, and I want to go treasure hunting in the data your team creates doing their important work! Rooted in an abolitionist framework, we collaborate directly with organizations, empowering them to harness the full potential of their data for meaningful impact. 
+
+DREAM Analytics envisions a world where data can be a driving force for equity, justice, and the abolition of oppressive systems. Data has the power to convey the importance and benefits of the implementation of policies and practices that utilize strategies for transformative and restorative justice. Together with the organizations we partner with, we embark on a transformative journey, turning data dreams into actionable realities that positively impact communities and contribute to a more just and equitable society.
+
+DREAM Analytics is committed to making these crucial services available to any organization with a mission aligned with our values. All services are provided on sliding scale, including pro bono when possible, depending on the services provided, the size and resources of the organization, and our own resources and capacity.
+
+</div>
+
+# Mission
+
+<div style="font-size:20px; text-align: justify">
+
+Our mission is to provide non-profit and grassroots organizations with tailored data services that not only enhance their operational efficiency but also contribute to dismantling systemic inequalities. 
+
+</div>
+
+# Values
+
+<div style="font-size:20px; text-align: justify">
+
+At DREAM Analytics, we believe in transforming data into a catalyst for positive change. We are dedicated to ensuring that every data-driven initiative aligns with our commitment to equity, justice, and abolition.
+
+- **Data Liberation for Equity**: We view data as a tool for liberation. Our services are designed to liberate valuable insights that empower organizations to identify and address disparities, including unknown implicit biases, and advance equity in their missions.
+- **Collaborative Empowerment**: DREAM Analytics collaborates directly with organizations, recognizing their expertise and unique insights into the communities they serve. Through collaborative empowerment, we aim to build sustainable data-driven practices that amplify the impact of social justice initiatives. 
+- **Abolitionist Mindset in Action**: We actively integrate an abolitionist mindset into every facet of our work. By challenging conventional data practices and dismantling oppressive norms, we strive to contribute to the broader movement for social and systemic change, and ultimately toward a society without police and prisons.
+- **Innovation and Adaptability**: We are committed to continuous innovation and adaptability. As the social landscape evolves, so do our methodologies. DREAM Analytics embraces emerging technologies and novel approaches to deliver cutting-edge data solutions.
+- **Ethical Data Practices**: Ethical considerations are at the core of our work. We uphold the highest standards of data privacy, security, and transparency. Our ethical data practices ensure that the insights derived from data are used responsibly and with the utmost respect for individual rights.
+
+</div>
+
+# Services Provided
+
+<div style="font-size:20px">
+
+:::: {.columns}
+
+::: {.column width="47.5%"}
+
+- **Optimization and sustaining services**
+  - Survey design
+  - Optimize data collection
+  - Optimize case management
+  - Best practices materials
+  - Automation
+  - Template creation
+  - Data training
+  - Data diagnostics
+  - Data cleaning
+  
+<br>
+
+- **Products**
+  - Data visualization
+  - Data dashboards
+  - Data reports
+  - Data security
+  - Accessible products for any audience
+    - Stakeholders
+    - Team members
+    - Community members
+    - Fundraising
+    - Social media
+    - Traditional media
+    
+:::
+
+::: {.column width="5%"}
+<!-- empty column to create gap -->
+:::
+
+::: {.column width="47.5%"}
+
+- **Methods and skills**
+  - Qualitative analysis
+  - Quantitative analysis
+  - Mixed-methods research
+  - Exploratory data analysis
+  - Descriptive data analysis
+  - Explanatory data analysis
+  - Impact/Program evaluation
+  - Causal inference
+  - Predictive analysis
+  - Machine learning
+  - Advanced statistical methods
+
+:::
+
+::::
+
+</div>
+
+# About
+
+<div style="font-size:20px; text-align: justify">
+
+I am Jamie Pantazi, and DREAM Analytics is my brain child. I am an accomplished recent graduate from the [Andrew Young School of Policy Studies](https://aysps.gsu.edu/) at Georgia State University with a Master's in Public Policy and a concentration in policy analytics. **I hope to utilize my advanced data skills, including analysis, interpretation, and visualization, to advocate for equity and opportunity for historically oppressed communities. The power of storytelling is great, and I strive to find those stories in data and bring them to life through data and graphic design.** 
+
+With a passion for research, data, and advocacy, I have been actively involved in activist efforts to support marginalized communities and address pressing social issues most of my life. I am passionate about working to influence change for the better in the world, but not just the world, but the most vulnerable people in it. Throughout the last few decades, I have learned, lived, and grown to believe in the fight against capitalism, patriarchy, and white supremacy in all its forms, from settler-colonialism and the legacy of enslavement to global imperialism and the prison industrial complex.
+
+"A revolutionary working class must be able to acknowledge its enemy and eschew not only capitalism but also colonialism and imperialism." — Roxanne Dunbar-Ortiz, from *Not "A Nation of Immigrants": Settler Colonialism, White Supremacy, and a History of Erasure and Exclusion* (p. 281). Beacon Press. Kindle Edition. 
+
+Beginning with Anti-Iraq War protests as a teenager, I have felt drawn to those who envision a better way to live and a better world. The pinnacle of my street activism was during the Occupy Movement; I started out in San Antonio, but I visited Austin, Houston, and New Orleans during the first month or so, and I ended up in Oakland on May Day the following year for one last tussle with riot cops. The brutality and setbacks of that winter took a toll on a lot of us. At first, it felt like the powerful moment where the spark really felt like it might light it all up, but the defeat was so slow and brutal that I (as well as many others) felt so worn down by the slow crawl of progress. 
+
+I moved away from street activism, and turned to focus on quieter issues I had identified in the chaotic movement. Mental health has always been important to me. As a survivor of trauma and my own battles with internal demons, I saw poor mental health, burnout, and toxic masculinity wreck havoc on friends and allies, and I knew that we had to learn how to create safe, quiet spaces for us to heal and support each other. Without the kind of mutual aid that can support our minds and mental health, hope of truly building a better world would always feel out of reach. 
+
+If we learned anything from the hopeful, albeit temporary, societies we were modeling in the parks we occupied, it has to be the we have do better at self-care, and that self-care must include *both* individual, personal self-care *and* community self-care. To that end, I turned my focus toward a radical mental health support group. I organized and facilitated, with several other women, a chapter of the [Icarus Project](https://fireweedcollective.org/) in Atlanta, Together, we worked to create a safe and inclusive environment for individuals struggling with their mental health, belonging, burnout, or anything else that community can help to heal. 
+
+After the 2016 election, I returned to my passion to influence change and equity on a larger scale. Recovering from the Occupy era and exhausted by the daily hustle of survival in the service industry, I sent myself back to school to finish my long abandoned bachelor's degree, in the hopes of learning how to fight this fight above the street. I enrolled at Georgia State University and qualified for a Pell Grant to pay for it. Two years later, I graduated Summa Cum Laude with a Bachelor of Arts in History in December 2018. 
+
+I returned to Texas to see if I could do anything to help with the family separation crisis at the border where I landed a job as a data clerk in the Family Detention Department of [RAICES (Refugee and Immigrant Center for Education and Legal Services](https://www.raicestexas.org/)). I fell in love with the data work and began to teach myself more advanced analysis and visualization skills, as well as learning to automate many tedious tasks. I was promoted to the Data Analysis Unit Coordinator, a position that I helped to create.
+
+As the Data Analysis Unit Coordinator, I honed my data analysis and management skills. I organized and analyzed data related to detained clients, producing comprehensive reports that aided in identifying urgent cases and advocacy. My ability to present data in a clear and concise manner, even under tight time constraints, proved invaluable in decision-making processes. Additionally, I successfully led and coordinated larger projects while effectively training colleagues in accurate data collection, entry, and reporting. 
+
+After three years with RAICES, the global pandemic and shifts in the political climate caused drastic shifts in our case load and priorities, leaving me feeling stagnated in my new skills. I decided to look in to higher education to formally develop more advanced data analysis and research skills. I was accepted to the Andrew Young School of Policy Studies at Georgia State University and awarded a graduate research assistantship to cover tuition and the Michael Mescon Public Service Leadership Scholarship. Through outstanding coursework, my GIS instructor invited me to also work as her teaching assistant.
+
+As a Graduate Research Assistant and Teaching Assistant at Georgia State University, I actively engaged in conducting extensive research and efficiently organizing data for large-scale projects, while maintaining a 4.0 GPA. I utilized coding skills to automate repetitive tasks, including web scraping, enabling a more streamlined data collection. With a commitment to academic excellence, I also exceled at and enjoyed supporting students' learning and understanding of complex concepts, especially surrounding spatial data technologies.
+
+Throughout these experiences, I have gained intimate and thorough knowledge of a variety of issues. I have personal or professional experience, or both, with asylum law and general immigration issues, housing and food insecurity, police and prison abolition, and peer-led mental health support. 
+
+As a skilled data analyst, I have experience in both academic, non-profit, and grassroots settings, utilizing various methodologies and software tools to organize and present data effectively. My commitment to social justice and dedication to using data for advocacy make my a valuable asset to any organization seeking to drive positive change. I hope to continue this work using data to advocate for marginalized communities struggling against systemic oppression. My commitment to equity in the world and passion for using data to address complex issues makes me a valuable asset in any mission aligned with creating a more equitable world.
+
+</div>
+
+# Visualization Examples
+
+![](prisoners_dash.png){width="100%"}
+
+![](prisontowns_w_memo.png){width="100%"}
+<br><br>
+
+![](map.png){width="100%"}
+<br><br>
+
+![](ai_viz.png){width="100%"}

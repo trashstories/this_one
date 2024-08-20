@@ -1,0 +1,80 @@
+---
+title: "Ending Immigrant Detention in the United States"
+subtitle: "A Policy Brief"
+author: "jamie pantazi"
+date: "April 20, 2022"
+date-format: "long"
+bibliography: imm_detention.bib
+csl: "https://raw.githubusercontent.com/citation-style-language/styles/master/apa.csl"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+---
+
+```{css, echo = FALSE}
+.justify {
+  text-align: justify !important
+}
+```
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+```
+
+# Summary
+
+<div style="float:right; margin-left: 10px; margin-bottom: 0px;">
+  [![](figures/infographic.png){width=355 fig-alt="An image of a detention facility and the text IMPACTS: Immigrant detention tears families apart, denies immigrants access to legal counsel and necessary healthcare, as well as drains the economy for a profit. Another image of protesters with signs and the text SOLUTIONS: Community based alternatives are more humane, more effective, and less costly thandetention."}](figures/infographic.png)
+</div>
+
+::: {.justify}
+
+The United States detains more immigrants than any other country in the world. The US government, specifically Immigration and Customs Enforcement (ICE), uses largely private prison institutions to lock up immigrants for indefinite amounts of time for a profit [@detentionwatchnetworkImmigrationDetention1012022]. The government denies detained immigrants access to court-appointed legal counsel and many other rights afforded to incarcerated US citizens. Because many of these prisons are private, for-profit institutions, conditions are often inhumane---lack of medical care is rampant; sexual, physical, and verbal abuse is common; and ICE often separates families with no meaningful way to communicate [@detentionwatchnetworkImmigrationDetention1012022]. There are two types of immigrant detention: those whom Customs and Border Patrol (CBP) detain at the border, often asylum seekers, and those whom ICE detains while living in the US due to being undocumented, missing a hearing or ICE check-in, or breaking the law. Immigrant detention harms many aspects of US society, including education, the economy, and healthcare. The implications of these policies harm the individuals detained and their families and communities across the nation. Though there have been some efforts to release some immigrants through parole, bond, and electronic monitoring, none of these solutions are as effective or equitable as community-based alternatives. Community-based alternatives are the best way forward. Community-based systems engage immigrants in the process and treat them with dignity while they pursue their new life in the US.
+
+::: 
+
+# Problem Significance
+
+::: {.justify}
+
+Immigration is a crucial part of the US's history and identity; immigrants have been coming to the US since before it was founded and have shaped the nation's identity. However, more and more, these individuals, mostly asylum seekers and survivors of torture, are mistreated and detained without due process, legal counsel, or access to basic human needs. Tens of thousands of immigrants are detained every day in the US, some for months or even years at a time. The US government detained over 500,000 immigrants in the Fiscal Year 2019 [@detentionwatchnetworkImmigrationDetention1012022]. Many must fight their entire immigration case and the threat of deportation from these detention centers. If they are lucky enough to afford an attorney or are detained somewhere where pro bono attorneys can assist them in detention, they may have a chance to win their freedom and fight their case outside of detention. However, arbitrarily high bonds and bond denials are common barriers to their freedom. The immigration process, like many other legal processes, is complicated and arduous; without access to legal counsel, it is nearly impossible to navigate it. Access to counsel issues are all too common, especially in ICE detention centers [@freedomforimmigrantsProblem2022].
+
+The detention of immigrants does not only affect those detained; it also negatively affects the family members of detained individuals. ICE detains many immigrants living in the US with or without status who have children living in the US, some even natural-born citizens. The trauma of imprisonment of parents negatively affects the educational outcomes for these children; studies show that the children of an incarcerated parent are more likely to miss school, fail academically, or even drop out of high school [@gonzalezEducationalConsequencesParental2021].
+
+In addition to the emotional effects of immigration detention, there are also economic effects of these practices that negatively impact the immigrant communities. The economic effects of immigrant detention are most apparent for those whom ICE detains long term (more than six months). A 2013 study surveyed over 500 immigrants detained over six months and revealed that at least 90% were employed prior to detention, equivalent to around a \$21,000 deficit to the community per person detained every six months [@patlerEconomicImpactsLongTerm2013]. Detention not only separates families, but it also often pulls the primary financial support provider out of the workforce, making the individual unable to provide for the rest of the family. The same study showed that at least nine out of ten of the people surveyed had families that relied on them for financial and emotional support [@patlerEconomicImpactsLongTerm2013]. Detention needlessly pulls individuals away from their families and jobs, taking money out of the community and worsening the hardships of already marginalized groups.
+
+Health care inside the facilities where ICE detains immigrants is often inadequate and sometimes fatal. In FY 2020, 21 individuals died in ICE custody [@usimmigrationandcustomsenforcementDetaineeDeathReporting2022]. Though ICE contracts with facilities require them to provide adequate medical treatment, many facilities fall short of this requirement. Chronic illnesses, like diabetes and hypertension, are common and often ignored by staff; most complaints, no matter the severity, are treated only with ibuprofen and water [@eunicehyunhyechoShadowPrisonsImmigrant2016]. Throughout the COVID-19 pandemic, ICE facilities have failed to comply with the Centers for Disease Control's (CDC) guidance and, in some cases, tried to prevent detainees from even learning about the pandemic on the news by changing the station on the television [@peelerPrayingHandSoap2021]. There is no question that health care inside these facilities is inadequate, and the COVID-19 pandemic has only worsened the situation.
+
+::: 
+
+# Policy Alternatives
+
+::: {.justify}
+
+For years, advocates for immigrant rights have been fighting for an end to immigrant detention. However, the US government has co-opted the phrase "Alternatives to Detention" to include electronic monitoring of immigrants through electronic ankle shackles, in-person check-ins, and home visits [@detentionwatchnetworkGovernmentAlternativesDetention2022]. This practice still restricts immigrants within the carceral system as they cannot freely move around without constant supervision and funds the same for-profit private prison corporations [@freedomforimmigrantsAlternativesDetention2022]. This type of monitoring and control only increases the number of immigrants subject to punitive measures and government surveillance [@detentionwatchnetworkGovernmentAlternativesDetention2022].
+
+Electronic monitoring may seem like a reasonable alternative to detention; however, it is truly part of the carceral system. Electronic shackles have been known to cause health issues and sometimes even electrocution [@raicesAnkleBraceletsAre2022]. These shackles also bring with them a stigma that can make it hard for immigrants to find work or even be accepted in their communities due to the fear that they have committed crimes or that they may bring ICE to the community since ICE is constantly monitoring them [@raicesAnkleBraceletsAre2022]. The same for-profit prison companies are responsible for supplying these ankle bracelets, so the same players continue to profit from electronically detaining immigrants.
+
+Another alternative to detention is release on bond or parole. While this may sound like a reasonable alternative, ICE grants parole arbitrarily, and bonds are often too high for detained immigrants and their families to afford. The average bond for detained immigrants is \$14,500, and there is no upper limit [@freedomforimmigrantsNationalBondFund2022]. High bonds also affect immigrants differently based on their race; Black immigrants must pay bonds that are, on average, 54 percent higher than the average immigration bond [@raicesBlackImmigrantLives2020]. Families and individuals that have traveled across multiple countries, leaving most of their belongings and assets behind for fear of their lives, often cannot afford these high bonds and thus must remain in detention indefinitely. 
+
+Many advocate groups for immigrant rights have argued that immigrant detention must end in full, including the government's "alternatives" to allow for a community-based system. Not only would this approach be much cheaper, but it is also more humane and gives immigrants dignity and a fighting chance to win their case. As one organization, Freedom for Immigrants, articulated in their report on alternatives to detention: "Rather than be incarcerated for months and years, immigrants arriving at the border would go through customs, receive screenings and assessments, a temporary ID, an immigration appointment and/or hearing date, and be assigned a community-based organization to help acclimate and/or guide them through the country's immigration system and laws" [@humanrightswatchAlternativesImmigrationDetention2021]. This approach would save taxpayer money, give immigrants access to the tools they need to fight a fair case, and uphold the dignity of all human life. It is important to remember that ICE has only existed for about two decades, and mandatory immigrant detention has been in practice for not much longer; immigrant detention is still a novel practice. For centuries, the US had managed immigration without the use of mass detention.
+
+::: 
+
+# Policy Recommendations
+
+::: {.justify}
+
+My policy recommendation would be to end the practice of immigrant detention; the US government must rethink and reinvest in a community-based system. Community-based alternatives are more humane, more effective, and less costly than detention [@humanrightswatchAlternativesImmigrationDetention2021]. As an alternative to detention, community-based case management has a compliance rate of over 90 percent; that is, at least 90 percent of individuals appear for all their court dates and ICE check-ins [@secorBetterWayCommunityBased2019]. Studies show that when immigrants are treated with dignity and support, they will engage and comply with the proceedings required to maintain legal status in the US [@secorBetterWayCommunityBased2019]. The US government should stop detaining immigrants, both at the border and in the interior, and instead fund community organizations that offer case management for immigrants to ensure they stay in compliance with their proceedings.
+
+::: 
+
+# References

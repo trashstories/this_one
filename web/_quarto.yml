@@ -1,0 +1,63 @@
+project:
+  type: website
+
+website:
+  title: "jamie pantazi"
+  navbar:
+    pinned: true
+    right:
+      - href: index.qmd
+        text: home
+      - about.qmd
+      - text: "abolition"
+        file: abolition/abolition.qmd
+      - text: "immigration"
+        file: immigration/immigration.qmd
+      - text: "history"
+        file: history/history.qmd
+      - text: "miscellaneous"
+        file: misc/misc.qmd
+      - text: "readings"
+        file: books.qmd
+      - text: "resume"
+        file: resume.qmd
+      - href: http://dream.jamiepantazi.com
+        text: "DREAM Analytics"
+        
+      
+  sidebar:
+    - title: "abolition"
+      style: "docked"
+      background: light
+      contents:
+        - text: "abolition home"
+          file: abolition/abolition.qmd
+        - abolition/prisoners.qmd
+        - abolition/Bail_Impact.qmd
+        - abolition/bail.qmd
+        - abolition/Bail_Reform.qmd
+        - abolition/prisontowns.qmd
+    - title: "immigration"
+      style: "docked"
+      background: light
+      contents:
+        - text: "immigration home"
+          file: immigration/immigration.qmd
+        - immigration/detention.qmd
+    - title: "history"
+      style: "docked"
+      background: light
+      contents:
+        - text: "history home"
+          file: history/history.qmd
+        - history/badmen.qmd
+        - history/elias.qmd
+        - history/identity.qmd
+
+format:
+  html:
+    theme: custom.scss
+    toc: true
+    link-external-newwindow: true
+
+

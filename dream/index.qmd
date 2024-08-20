@@ -1,0 +1,109 @@
+---
+title: "DREAM Analytics: Dumpster Research for Equity with an Abolitionist Mindset"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+![](dumpsterdata.png){width="100%" fig-alt="D.R.E.A.M. Analytics Dumpster Research for Equity with an Abolitionist Mindset, an image of a raccoon next to a dumpster with data icons in and around it with the caption 'Turn your trash data into treasure!'"}
+
+# Who We Are
+
+<div style="font-size:20px; text-align: justify">
+
+DREAM Analytics is a trailblazing data consulting organization committed to promoting equity and justice through innovative data solutions. Our acronym, DREAM, reflects our mission: Dumpster Research for Equity with an Abolitionist Mindset. The idea of “dumpster research” comes from the broken and often discarded bits of information that make up data. Distinguishing trash from treasure is merely a matter of perspective, and I want to go treasure hunting in the data your team creates doing their important work! Rooted in an abolitionist framework, we collaborate directly with organizations, empowering them to harness the full potential of their data for meaningful impact. 
+
+DREAM Analytics envisions a world where data can be a driving force for equity, justice, and the abolition of oppressive systems. Data has the power to convey the importance and benefits of the implementation of policies and practices that utilize strategies for transformative and restorative justice. Together with the organizations we partner with, we embark on a transformative journey, turning data dreams into actionable realities that positively impact communities and contribute to a more just and equitable society.
+
+DREAM Analytics is committed to making these crucial services available to any organization with a mission aligned with our values. All services are provided on sliding scale, including pro bono when possible, depending on the services provided, the size and resources of the organization, and our own resources and capacity.
+
+</div>
+
+# Mission
+
+<div style="font-size:20px; text-align: justify">
+
+Our mission is to provide non-profit and grassroots organizations with tailored data services that not only enhance their operational efficiency but also contribute to dismantling systemic inequalities. 
+
+</div>
+
+# Values
+
+<div style="font-size:20px; text-align: justify">
+
+At DREAM Analytics, we believe in transforming data into a catalyst for positive change. We are dedicated to ensuring that every data-driven initiative aligns with our commitment to equity, justice, and abolition.
+
+- **Data Liberation for Equity**: We view data as a tool for liberation. Our services are designed to liberate valuable insights that empower organizations to identify and address disparities, including unknown implicit biases, and advance equity in their missions.
+- **Collaborative Empowerment**: DREAM Analytics collaborates directly with organizations, recognizing their expertise and unique insights into the communities they serve. Through collaborative empowerment, we aim to build sustainable data-driven practices that amplify the impact of social justice initiatives. 
+- **Abolitionist Mindset in Action**: We actively integrate an abolitionist mindset into every facet of our work. By challenging conventional data practices and dismantling oppressive norms, we strive to contribute to the broader movement for social and systemic change, and ultimately toward a society without police and prisons.
+- **Innovation and Adaptability**: We are committed to continuous innovation and adaptability. As the social landscape evolves, so do our methodologies. DREAM Analytics embraces emerging technologies and novel approaches to deliver cutting-edge data solutions.
+- **Ethical Data Practices**: Ethical considerations are at the core of our work. We uphold the highest standards of data privacy, security, and transparency. Our ethical data practices ensure that the insights derived from data are used responsibly and with the utmost respect for individual rights.
+
+</div>
+
+# Services Provided
+
+<div style="font-size:20px">
+
+:::: {.columns}
+
+::: {.column width="47.5%"}
+
+- **Optimization and sustaining services**
+  - Survey design
+  - Optimize data collection
+  - Optimize case management
+  - Best practices materials
+  - Automation
+  - Template creation
+  - Data training
+  - Data diagnostics
+  - Data cleaning
+
+- **Products**
+  - Data visualization
+  - Data dashboards
+  - Data reports
+  - Data security
+  - Accessible products for any audience
+    - Stakeholders
+    - Team members
+    - Community members
+    - Fundraising
+    - Social media
+    - Traditional media
+    
+:::
+
+::: {.column width="5%"}
+<!-- empty column to create gap -->
+:::
+
+::: {.column width="47.5%"}
+
+- **Methods and skills**
+  - Qualitative analysis
+  - Quantitative analysis
+  - Mixed-methods research
+  - Exploratory data analysis
+  - Descriptive data analysis
+  - Explanatory data analysis
+  - Impact/Program evaluation
+  - Causal inference
+  - Predictive analysis
+  - Machine learning
+  - Advanced statistical methods
+
+:::
+
+::::
+
+</div>

@@ -1,0 +1,59 @@
+---
+title: "trash"
+---
+
+``` {r interact, eval=FALSE}
+#| fig-height: 6.5
+
+ggplotly(actual19, tooltip = "text") 
+
+```
+
+
+```{r funds22, eval=FALSE, echo=FALSE}
+#| fig-height: 5
+#| fig-width: 10
+
+funds22_ %>% 
+  drop_na(fy2020adopt) %>% 
+  filter(source != "General Fund",
+         source != "Pension Obligation Bond - Series 2003B",
+         source != "Police Officer and Fire Fighters Consolidated Retirement Fund",
+         source != "Florida Building Code Enforcement Fund",
+         source != "Miscellaneous Grants Fund") %>%
+  ggplot(aes(fy2020adopt, reorder(use, fy2020adopt), fill = source)) +
+  geom_col() +
+  scale_x_continuous(labels = label_dollar()) +
+  scale_fill_manual(values = colors) +
+  labs(x = "Dollars Spent",
+       y = NULL,
+       fill = NULL,
+       title = "City of Gainsville Adopted Budget 2020") +
+  th_dream +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "right")
+
+funds22_ %>% 
+  drop_na(fy2020actual) %>% 
+  filter(source != "General Fund",
+         source != "Pension Obligation Bond - Series 2003B",
+         source != "Police Officer and Fire Fighters Consolidated Retirement Fund",
+         source != "Florida Building Code Enforcement Fund",
+         source != "Miscellaneous Grants Fund") %>%
+  ggplot(aes(fy2020actual, reorder(use, fy2020actual), fill = source)) +
+  geom_col() +
+  scale_x_continuous(labels = label_dollar()) +
+  scale_fill_manual(values = colors) +
+  labs(x = "Dollars Spent",
+       y = NULL,
+       fill = NULL,
+       title = "City of Gainsville Actual Spending 2020") +
+  th_dream +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "right")
+
+```
+
+

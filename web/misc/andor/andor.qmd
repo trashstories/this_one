@@ -1,0 +1,490 @@
+---
+title: "Climb!"
+subtitle: "And Other Amazing Stuff from Andor"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+editor: source
+---
+
+# Climb!
+
+## Episode 6 - The Eye
+
+Go and get us ready!\
+Cover me!\
+Now!\
+( *Both grunting* )\
+( *Groaning* )\
+( *Blaster fires* )\
+( *Both grunting* )\
+( *Gasping* )\
+( *Beeping, whirring* )\
+( *Whirring* )\
+( *Grunting* )\
+( *Both straining* )\
+( *Cassian grunting* )\
+( *Cassian chokes* )\
+( *Blasters firing* )\
+I'm pinned down!\
+( *Growls* )\
+Cover me!\
+( *Taramyn grunting* )\
+( *Groaning* )\
+No!\
+( *Grunting* )\
+( *Gasping, grunting* )\
+( *Breathing heavily* )\
+( *Blaster fires* )\
+( *Grunts* )\
+( *Yells* )\
+( *Soldier groans* )\
+Where's Taramyn?\
+( *Ship whirring* )\
+( *Dramatic music playing* )\
+( *Breathing heavily* )\
+( *Blasts ricocheting* )\
+( *Whirring* )\
+( *Whooshing* )\
+Get this thing in the air!\
+Go! Go! Go!\
+( *Beeping, whirring* )\
+( *Powering up* )\
+Hang on!\
+( *Whooshing* )\
+( *Guards screaming* )\
+( *Skeen and nemik grunting* )\
+( *Grunts* )\
+( *Breathing heavily* )\
+( *Whooshing* )\
+( *All gasping* )\
+Skeen: No!\
+Vel: Nemik!\
+( *Nemik groaning* )\
+( *Grunts* )\
+Skeen: No! No! No!\
+Lift him!\
+( *Nemik groans* )\
+I can't feel my legs. I can't, I can't feel my legs.\
+Vel: Nemik.\
+Skeen: Hey.\
+Vel: Nemik, can you hear me?\
+( *Whimpers* )\
+Vel: Can you hear me?\
+I need a flight path.\
+Skeen: He's hurt! Hold on!\
+What are you doing?\
+Hold him still.\
+What is that?\
+Med-spike. Keep him still.\
+Skeen: ( *Shushes* ) Go, go, go.\
+No. ( *Whimpers* )\
+( *Grunts, gasps* )\
+( *Vel breathing heavily* )\
+( *Gasps* )\
+Where am I heading? I need numbers!\
+Hold on!\
+( *Dramatic music playing* )\
+( *Vel and skeen grunt* )\
+Cassian: I'm flying blind!\
+( *Beeping, whirring* )\
+( *Whooshing* )\
+( *Beeping* )\
+**Climb**!\
+**Climb**? Look out the window.\
+**Climb**. Full **climb** now!\
+What did you give him?\
+I'm pegged here!\
+I don't have the speed to make it!\
+And now you want me to **climb**?\
+( *Screaming* ) **Climb**!\
+( *Vel and skeen grunt* )\
+( *Whirring, beeping* )\
+( *Whooshing* )\
+( *Beeping* )\
+Dive!\
+( *Whooshing* )\
+Vector six-five-five-five-one.\
+Full boost thrust on level!\
+Come on!\
+( *Glass breaking* )\
+( *Yelling* )\
+( *Whooshing* )\
+( *Explosion* )\
+( *Pilot yelling* )\
+( *Breathing heavily* )\
+( *Pilgrims gasp* )\
+( *Crying* )\
+( *Whooshes* )\
+( *Thuds* )
+
+## Episode 10 - One Way Out
+
+Announcer: On-Program. New man on the floor. Everyone hold positions.\
+Kino: New man on the floor!\
+Hold your positions!\
+Lift engaged.\
+( *Lift clicks* )\
+( *Lift whirring* )\
+What'd you say to me?\
+Ham: I said nothing.\
+If you wanna say something, you should say it now.\
+You start...\
+( *Both yelling* )\
+Hey! You lot, back on program!\
+( *Prisoners yelling indistinctly* )\
+You lot, back on program!\
+Get back on program!\
+( *Grunts* )\
+( *Rattles* )\
+Whoa, what's going on? What's that?\
+Kino: Now!\
+( *Electricity crackling* )\
+( *Air hissing* )\
+What's going on out there?\
+Go! Go!\
+Clear the target.\
+What are you doing?\
+( *Electrical buzzing* )\
+( *Creaking* )\
+( *Thudding* )\
+( *Groans* )\
+( *Electrical buzzing* )\
+( *Grunting* )\
+( *Prisoner grunts* )\
+Prisoner 1: Come on! Help them!\
+Prisoner 2: Let's go!\
+Attack!\
+( *Prisoners roaring* )\
+( *Grunts* )\
+( *Birnok yells* )\
+( *Blasters firing* )\
+( *Prisoners yelling* )\
+( *Yells, grunting* )\
+Spark the floor! Spark the floor!\
+Get on the tables!\
+Get on the tables! Get up on the tables!\
+Guard: Spark the floor!\
+( *Electrical buzzing* )\
+( *Prisoner screaming* )\
+( *Prisoners screaming* )\
+Prisoner 1: Talk to me!\
+( *Breathing heavily* )\
+( *Clicking button frantically* )\
+Prisoner 2: Right, are you all right?\
+Prisoner 3: You all right? You good?\
+Prisoner 4: I'm okay.\
+Attack!\
+( *Prisoners yelling* )\
+We have a situation on 5-2-D.\
+Repeat, we have a situation...\
+( *Blasters firing* )\
+( *Prisoners screaming* )\
+( *Grunting* )\
+No! Xaul!\
+Prisoner 5: Come on!\
+( *Blasters firing* )\
+Guard: Hey!\
+( *Grunts, groans* )\
+They're down!\
+Kino: Come on! **Climb**!\
+( *Prisoners yelling* )\
+Kino: We're in!\
+( *Guard grunts* )\
+( *Guard grunts* )\
+( *Alarm blaring* )\
+( *Panting* )\
+Prisoner 6: Right.\
+Gimme a hand.\
+Man: That's it. Go.\
+( *Drilling, whirring* )\
+Prisoner 1: Got it.\
+Prisoner 2: Hey, did you see that?\
+Prisoner 3: Yeah, hold up.\
+Prisoner 4: What's that?\
+Prisoner 5: Where's that coming from?\
+( *Prisoners yelling* )\
+Hand it off.\
+Cassian: Move!\
+( *Blasters firing* )\
+Kino, come on!\
+Kino: We need to hold the level!\
+Let someone else do that.\
+Ham: Go! Go!\
+Cassian: Blow the consoles!\
+Keep the doors open!\
+Guard: What's going on down there?\
+I'm not sure, Sir...\
+Guard: I'm looking at a water break.\
+I've got service warnings on every panel.\
+Guard: Get over there and check it out. Now.\
+Check out 5-2-D. Now!\
+Prisoner 1: Let's go. Okay.\
+Prisoner 2: Go, go.\
+Jemboc!\
+Jemboc: Taga, come on, let's go!\
+Let's go!\
+Guard: Let's go. Fall in. Come on.\
+Go! Go! Go!\
+( *Blasters firing* )\
+( *Indistinct chatter* )\
+( *Guard screaming, grunts* )\
+One way out!\
+Come and fight!\
+What?\
+( *Panting* )\
+( *Buzzing* )\
+Ham: Come on.\
+( *Prisoners cheering* )\
+( *Cassian panting* )\
+( *Blasters firing* )\
+( *Pants* )\
+Ah!\
+We're leaving! Join us!\
+**Climb**! Use whatever you can!\
+( *Blasters firing* )\
+Go!\
+Announcer: This is a facility-wide emergency announcement. Complete program protocol will commence in 40 seconds.\
+Any deviation or failure to comply will result in unit-wide activation.\
+Start the count.\
+Count engaged.\
+Announcer: How much longer to find the water break?\
+Techs waiting for a secure floor.\
+Isolate Five.\
+Tech: Locked in.\
+5-5, 5-3, 5-6. Burn a firewall around it.\
+Fry the whole Level. Make the epicenter 5-2.\
+Too late.\
+There's nobody there.\
+You shouldn't be here.\
+Turn it off.\
+Announcer: Excuse me?\
+Kino: Turn it off!\
+That could mean so many things.\
+( *Grunts* )\
+I... I'll turn it off.\
+Cassian: Step away.\
+Now!\
+Shut down the floors. Everywhere.\
+Do it.\
+Cassian: No.\
+Don't just turn it off.\
+Cut the power.\
+It's all hydro.\
+Once we turn it off it takes months to get it back up and running ag...\
+I don't have it.\
+He has the Hydro Gens.\
+( *Electricity powering down* )\
+( *Whirring* )\
+( *Prisoners chattering indistinctly* )\
+( *Electricity powering up* )\
+That's the backup power supply.\
+Get out of there.\
+There.\
+With him.\
+Move!\
+On-Program! Now!\
+All yours.\
+Kino.\
+( *Digital beeping* )\
+Tell them what to do.\
+It has to be you.\
+Come on, Kino.\
+You do this every day.\
+Tell them what to do.\
+( *Buzzer sounds* )\
+My name is Kino Loy.\
+I'm the day shift manager on Level Five. I'm speaking to you from the command center on Level Eight.\
+We are, at this moment, in control of the facility.\
+( *Breathes heavily* )\
+Is that the best you got?\
+How long we hang on, how far we get, how many of us make it out, all of that is now up to us.\
+We have deactivated every floor in the facility. All floors are cold. Wherever you are right now, get up, stop the work. Get out of your cells, take charge and start **climb**ing. They don't have enough guards and they know it. If we wait until they figure that out, it'll be too late.\
+( *Shudders* )\
+We will never have a better chance than this and "I would rather die trying to take them down"than giving them what they want."\
+We know they fried a hundred men on Level Two.\
+We know that they are making up our sentences as we go along.\
+We know that no one outside here knows what's happening. And now we know, that when they say we are being released, we are being transferred to some other prison to go and die and that ends today!\
+There is one way out.\
+Right now, the building is ours.\
+You need to run, **climb**, kill!\
+( *Prisoners yelling* )\
+Kino: You need to help each other. You see someone who's confused, someone who is lost, you get them moving and you keep them moving until we put this place behind us.\
+There are 5,000 of us. If we can fight half as hard as we've been working, we will be home in no time. One way out! One way out!\
+One way out!\
+Prisoners ( *chanting* ): One way out!\
+Kino: One way out! One way out!\
+Prisoners ( *chanting* ): One way out! One way out! One way out...\
+Cassian: Come on!\
+Let's get out of here!\
+( *Prisoners continue chanting* )\
+( *Softly* ) Quiet.\
+( *Prisoners continue chanting* )\
+One way out!\
+Whatever happens now, we made it!\
+What's wrong?\
+Can't swim.\
+What?\
+What did he say?\
+I can't swim!\
+( *Sighs* )
+
+## Episode 11 - Daughter of Ferrix
+
+( *Cassian grunting, panting* )\
+( *Panting* )\
+( *Whooshing* )\
+I can't feel my hands.\
+( *Breath trembling* )\
+They're leaving.\
+Stop sayin' that.\
+They're leaving.\
+Melshi: I can't **climb** back up.\
+You hear me?\
+Cassian: I hear you.\
+Melshi: My hands won't work.\
+I said, "I hear you."\
+( *Panting* )\
+Tell me they're leaving.\
+They're leaving. They're leaving.
+
+## Episode 12 - Rix Road
+
+( *Barking* )\
+B2EMO: C-C-Cassian.\
+Pegla: Get it going!\
+Almost there.\
+( *Bix whimpering* )\
+Hey.\
+Help her up.\
+Bix: Brasso.\
+She's coming around. Come on.\
+Let's get moving!\
+Brasso: Come. Come with me.\
+( *Bix breathing heavily* )\
+( *Whirs* )\
+Hey, Jezz.\
+Hey, Cass.\
+Can they make it to Gangi Moon?\
+If they ever make it out of here.\
+You're not coming?\
+Stay low all the way to Farside Sea.\
+The moment you get over the water, you **climb**.\
+Straight home, full pump, hand throttle, no comms.\
+All in. You understand?\
+Yeah.\
+B2EMO: You're n-n-not coming?\
+Not today, Bee.\
+B2EMO: I n-n-never got to see you.\
+You take care of Bix until I get there.\
+I'm counting on you.\
+B2EMO: You always say that.\
+( *Scoffs* )\
+And you always come through.\
+Get them out of here! ( *Claps* )\
+He'll find us.\
+( *Tense music playing* )\
+Cassian will find us.\
+I will.\
+( *Sighs* )\
+I'll find you.\
+Now, go! Go, go!\
+( *Whirs* )\
+( *Engine starts* )\
+( *Metal rattling* )\
+( *Groans* )\
+( *Engine whirring* )\
+( *Exhales* )
+
+# Nemik's Manifesto
+
+There will be times when the struggle seems impossible. I know this already. Alone, unsure, dwarfed by the scale of the enemy.\
+**Remember** this. Freedom is a pure idea.\
+It occurs spontaneously and without instruction. Random acts of insurrection are occurring constantly throughout the galaxy. There are whole armies, battalions that have no idea that they've already enlisted in the cause.\
+**Remember** that the frontier of the Rebellion is everywhere. And even the smallest act of insurrection pushes our lines forward.\
+And then **remember** this. The Imperial need for control is so desperate because it is so unnatural. Tyranny requires constant effort. It breaks, it leaks. Authority is brittle. Oppression is the mask of fear.\
+**Remember** that. And know this, the day will come when all these skirmishes and battles, these moments of defiance will have flooded the banks of the Empire's authority and then there will be one too many. One single thing will break the siege.\
+**Remember** this. Try.
+
+# Luthen's Monologue
+
+Lonni: And what do you sacrifice?
+
+Luthen: Calm. Kindness. Kinship. Love.\
+I've given up all chance at inner peace.\
+I've made my mind a sunless space.\
+I share my dreams with ghosts.\
+I wake up every day to an equation I wrote 15 years ago from which there's only one conclusion, I'm damned for what I do.\
+My anger, my ego, my unwillingness to yield, my eagerness to fight, they've set me on a path from which there is no escape.\
+I yearned to be a savior against injustice without contemplating the cost and by the time I looked down there was no longer any ground beneath my feet.\
+What is my sacrifice?\
+I'm condemned to use the tools of my enemy to defeat them.\
+I burn my decency for someone else's future.\
+I burn my life to make a sunrise that I know I'll never see.\
+And the ego that started this fight will never have a mirror or an audience or the light of gratitude.\
+So what do I sacrifice?\
+Everything!\
+You'll stay with me, Lonni. I need all the heroes I can get.
+
+# Maarva's Funeral
+
+My name is Maarva Carassi Andor.
+
+I'm honored to stand before you. I'm honored to be a Daughter of Ferrix, and honored to be worthy of the stone. Strange, I... feel as if I can see it. I was six, I think, first time I touched a funerary stone. Heard our music, felt our history. Holding my sister's hand as we walked all the way from Fountain Square. Where you stand now, I've been more times than I can remember. I always wanted to be lifted. I was always eager, always waiting to be inspired. I remember every time it happened, every time the dead lifted me...With their truth.
+
+And now I'm dead. And I yearn to lift you. Not because I want to shine or even be remembered. It's because I want you to go on. I want Ferrix to continue. In my waning hours, that's what comforts me most. But I fear for you. We've been sleeping. We've had each other, and Ferrix, our work, our days. We had each other, and they left us alone. We kept the trade lanes open, and they left us alone. We took their money and ignored them, we kept their engines churning, and the moment they pulled away, we forgot them.
+
+Because we had each other. We had Ferrix. But we were sleeping. I've been sleeping. And I've been turning away from the truth I wanted not to face. There is a wound that won't heal at the center of the galaxy. There is a darkness reaching like rust ( *Glitches* ) into everything around us. We let it grow, and now it's here. It's here, and it's not visiting anymore. It wants to stay. The Empire is a disease that thrives in darkness, it is never more alive than when we sleep.
+
+It's easy for the dead to tell you to fight, and maybe it's true, maybe fighting is useless.
+
+Perhaps it's too late. But I'll tell you this... If I could do it again, I'd wake up early and be fighting these bastards...from the start.
+
+Fight the Empire!
+
+# Maarva's Message to Cassian
+
+Tell him, none of this is his fault. It was already burning. He's just the first spark of the fire. Tell him, he knows everything he needs to know and feels everything he needs to feel. And when the day comes, and those two pull together, he will be an unstoppable force for good. Tell him... I love him more than anything he could ever do wrong.
+
+# Cassian and Nemik
+
+Cassian: That's an old one.
+
+Nemik: Old and true. And sturdy. One of the best navigational tools ever built. Can't be jammed or intercepted. Something breaks, you can fix it yourself.
+
+Cassian: Hard to learn.
+
+Nemik: Yes, but once you've mastered it, you're free. We've grown reliant on Imperial tech, and we've made ourselves vulnerable. There's a growing list of things we've known and forgotten, things they've pushed us to forget. Things like freedom.
+
+Skeen: Nemik sees oppression everywhere.
+
+Nemik: Skeen pretends not to listen, but I know the message is sinking in.
+
+Skeen: He's writin' a manifesto.
+
+Cassian: Did he tell you?
+
+Skeen: Apparently, the only thing keepin' us from liberty is a few more ideas.
+
+Cassian: Few more ideas. ( *Chuckles* )
+
+Nemik: It's so confusing, isn't it? So much going wrong, so much to say, and all of it happening so quickly. The pace of repression outstrips our ability to understand it. And that is the real trick of the Imperial thought machine. It's easier to hide behind 40 atrocities than a single incident. But they have a fight on their hands, don't they? Our elemental rights are such a simple thing to hold, they will have to shake the galaxy hard to loosen our grip.
+
+Skeen: I'd like to hear what Clem believes.
+
+Cassian: I know what I'm against. Everything else will have to wait.
+
+Nemik: You're my ideal reader.
+
+( *Skeen scoffs* )
+
+Cassian: Now you've done it.
+
+Haven't titled it yet. I've been waiting. It's a work in progress, and I know that there's a great deal left to say. I mean, look. Right here. Fresh inspiration. Two seemingly random objects, and yet this charts an astral path, this maps the trail of political consciousness. Both systems based on truth, both navigating toward clear and achievable outcomes. Basic facts expanded to...
+
+Taramyn: ( *Interrupting* ) Clem.

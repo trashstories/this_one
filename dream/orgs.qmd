@@ -1,0 +1,109 @@
+---
+title: "Social Justice Organizations"
+format: 
+  html: 
+    include-in-header: 
+    - file: submit_form.md
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+    
+form:
+  id: orgs
+  submit: "Submit"
+  action: "https://hooks.airtable.com/workflows/v1/genericWebhook/appQIXqkNG9WF6H58/wflOFWnXer7SxAlCL/wtroG3ltn8U0I7VKR"
+  method: "POST"
+  fields:
+  - name: name_
+    type: text
+    id: name_
+    label: "Organization Name"
+    required: true
+  - name: web
+    type: text
+    id: web
+    label: "Webpage (optional)"
+  - name: contact
+    type: text
+    id: contact
+    label: "Do you have any personal contacts who might best to reach out to? If so, can you provide their name(s)? (optional)"
+  - name: contact_email
+    type: text
+    id: contact_email
+    label: "Best email? (optional)"
+  - name: location
+    type: text
+    id: location
+    label: "Location or Scope (i.e. National, Georgia only, East Coast, etc.) (optional)"
+  - name: mission
+    type: text
+    id: mission
+    label: "Focus or mission of the organization (i.e. immigration, PIC abolition, social justice and advocacy generally, etc.) (optional)"
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(googlesheets4)
+library(gt)
+
+gs4_deauth()
+
+orgs <- read_sheet("https://docs.google.com/spreadsheets/d/1J8n3pb-HKtEdTG8rOuHd4rx88LpR_epDtl9JxYvjC1U/edit#gid=0") %>% 
+  drop_na(link)
+
+```
+
+## Recommend an Organazation
+
+{{< form >}}
+
+## Organizations on My Radar
+
+::: column-page
+```{r orgs}
+
+orgs %>% 
+  select(org, link, abolitionist, imm, cj, mission, books) %>%
+  filter(books == FALSE) %>% 
+  mutate(link = paste0("[", org, "](", link, ")"), 
+         link = map(link, gt::md)) %>%
+  select(-c(org, books)) %>% 
+  mutate(abolitionist = ifelse(abolitionist == TRUE, 1, 0)) %>% 
+  mutate(cj = ifelse(cj == FALSE & imm == FALSE, 1, 0)) %>% 
+  mutate(imm = ifelse(imm == TRUE, 1, 0)) %>% 
+  gt() %>% 
+  tab_header(md("**Social Justice Organizations**")) %>% 
+  tab_spanner(md("*Organizations with a focus **other than Criminal Jusice or Immigration** in Pink*"),
+              columns = everything()) %>% 
+  sub_missing(columns = mission) %>% 
+  tab_row_group(label = md("**PIC Abolition Mission**"),
+                rows = abolitionist > 0) %>% 
+  tab_row_group(label = md("**Immigration Focused**"),
+                rows = imm > 0) %>% 
+  tab_row_group(label = md("**Other Orgs**"),
+                rows = imm < 1 & abolitionist < 1) %>% 
+  row_group_order(groups = c("**PIC Abolition Mission**",
+                             "**Immigration Focused**",
+                             "**Other Orgs**")) %>% 
+  cols_align(align = c("center"),
+             columns = everything()) %>% 
+  cols_label(link = md("**Organization**"),
+             mission = md("**Mission Statement**")) %>% 
+  cols_width(link ~ pct(15),
+             abolitionist ~ pct(0),
+             cj ~ pct(0),
+             imm ~ pct(0),
+             mission ~ pct(85)) %>% 
+  data_color(columns = cj,
+             target_columns = everything(),
+             method = "auto",
+             palette = c("white", "#FFD1F9"))
+
+```
+:::

@@ -1,0 +1,381 @@
+---
+title: "Empty Promises of Prosperity"
+subtitle: "Prison Towns and Quality of Life in Rural Georgia"
+author: "jamie pantazi"
+date: "November 27, 2022"
+date-format: "long"
+bibliography: PrisonTowns.bib
+csl: "https://raw.githubusercontent.com/citation-style-language/styles/master/apa.csl"
+format: 
+   html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+    tbl-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{css, echo = FALSE}
+.justify {
+  text-align: justify !important
+}
+```
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(modelsummary)
+library(readr)
+library(summarytools)
+library(kableExtra)
+library(scales)
+library(stringr)
+library(extrafont)
+library(gt)
+
+prisons <- read_csv("data/prisons.csv")
+counties <- read_csv("data/counties.csv")
+
+colors <- c("#CC0AA4", "#CCAC14", "#7400CC", "#3ACC14", "#0E0ACC")
+
+```
+
+# Introduction
+
+::: {.justify}
+
+In 2022, the federal, state, and local governments of the United States held almost two million people in some form of detention in over 6,300 facilities [@sawyerMassIncarcerationWhole2023]. The systems that contribute to this large number of incarcerated people in the US have been growing steadily over the past half-century. In 1998, activist and former political prisoner Angela Davis was the first to use the term “prison industrial complex” to refer to the massive industrialized profit-driven systems that make up the penal system in the US. She said the “prison industrial system materially and morally impoverishes its inhabitants and devours the social wealth needed to address the very problems that have led to spiraling numbers of prisoners” [@davisMaskedRacismReflections1998]. As the prison industrial complex has continued to expand, much has been written about its effects on prisoners and the justice system itself as it has experienced exponential growth and more focus on profit opportunities instead of reducing harm or supporting public safety. However, the focus of this research is the effects that the privatization of prisons has on the local communities that host them. 
+
+Private prison corporations like GEO Group and CoreCivic (CCA) build prisons in rural communities with the promise to bring jobs and a better quality of life to their residents. Rural communities often compete for these facilities in their towns because of these optimistic claims. However, the literature on the effects of these types of facilities does not necessarily agree that outcomes like employment growth are likely to occur due to new private prison constructions [@genterPrisonsJobsPrivatization2013]. Privatizing prisons, or any industry, converts the service from a public good to a private good; this commodification requires the extensive use of profit-driven tactics, and lowering costs becomes the top priority. @genterPrisonsJobsPrivatization2013 argue that the profit-driven, cost-saving methods of private prisons do not stimulate the economy of host counties but instead divert local resources away from more effective solutions to promote economic growth. 
+
+There are currently fifty-nine prisons operating in Georgia, according to the Georgia Department of Corrections and Immigration and Customs Enforcement (ICE). Most of them are located in rural areas. The expansion of the prison systems peaked in the 1980s and 1990s with the rise of privatization and the popularity of tough-on-crime politics (See @fig-timeline). Of the fifty-nine facilities, all but seven are operated by the state or local government. Three are privately run facilities with contracts with ICE to detain non-citizens. The remaining four are privately run facilities with contracts with the state of Georgia to detain adult male felons (See @fig-map1). Approximately half of all facilities in Georgia are state prisons, and county correctional institutions make up most of the remaining half. County institutions have the smallest average capacity, detaining approximately 266 adult felons. State prisons are significantly larger, with an average of 1,084 capacity for adult felons. However, the average capacity for private prisons was almost double that of state prisons at 2,069 (See @tbl-cap). 
+
+:::
+
+```{r timeline}
+#| label: fig-timeline
+#| fig-cap: "Construction Timeline of Prisons in Georgia" 
+#| fig-align: 'center'
+#| fig-width: 7.5
+#| fig-height: 4
+
+prisons %>% 
+  ggplot(aes(Construction, fill = Facility_Type)) +
+  geom_histogram(binwidth = 10, boundary = 0, color = "white") +
+  geom_hline(yintercept = seq(1,16,1), color = "white", linewidth = 1.25) +
+  geom_vline(xintercept = seq(1920,2010,10), color = "white", linewidth = 2.75) +
+  scale_fill_manual(values = colors) +
+  scale_x_continuous(breaks = seq(1900,2020,10)) +
+  labs(x = "Year of Construction",
+       y = NULL,
+       fill = NULL,
+       title = "Construction Timeline of Prisons in Georgia") +
+  theme_light() +
+    theme(panel.border = element_blank(),
+          plot.title = element_text(family = "Changa",
+                                    color = "#310873",
+                                    size = 14, 
+                                    hjust = .5),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_blank(),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          axis.title = element_text(family = "Changa", 
+                                    color = "#310873"),
+          axis.text = element_text(family = "Cambria", 
+                                   color = "#310873", 
+                                   size = 11),
+          axis.text.y = element_blank(),
+          legend.position = "top",
+          legend.text = element_text(family = "Changa", 
+                                     color = "#310873"))
+
+
+```
+
+```{r capacity}
+#| label: tbl-cap
+#| tbl-cap: "Average Capacity and Type of Prison" 
+#| tbl-align: 'center'
+
+cap_prisons <- prisons %>% 
+  group_by(Facility_Type) %>% 
+  summarize(mean_cap = mean(Capacity, na.rm = TRUE))
+
+cap_prisons %>% 
+  gt() %>% 
+  tab_header(md("**Average Capacity and Type of Prison**")) %>% 
+  cols_label(Facility_Type = md("*Type of Facility*"),
+             mean_cap = md("*Average Capacity*")) %>% 
+  fmt_number(columns = mean_cap,
+             decimals = 0) %>% 
+  cols_align(align = "center",
+             columns = mean_cap)
+
+```
+
+```{r map1}
+#| label: fig-map1
+#| fig-cap: "Prisons in Georgia by Type and Capacity" 
+#| fig-align: 'center'
+
+knitr::include_graphics("figures/overviewmap.png")
+
+```
+
+::: {.justify}
+
+In Georgia, two private prisons were recently constructed; one in Baldwin County in 2011 and another in Jenkins County in 2012. The GEO Group, who constructed and continues to maintain the Riverbend Correctional Facility in Baldwin County, boasted about the opening of the new facility in their publication for employees and their families. They claimed to bring “significant employment opportunities to Milledgeville and Baldwin County” [@josephGEOGroupOpens2012]. When the construction of the first prison was announced in 2010 for Baldwin County, Jenkins County was also bidding for that prison but would later get a contract through CCA to build a prison the next year [@bennettMilledgevilleGettingNew2010; @grantCCAAwardedCorrections2010]. In both cases, the private prison corporations promised jobs and investment in the local communities as a result of the new prison.
+
+This analysis will compare these two counties to other rural counties in Georgia over the years following the construction of the prison using several quality-of-life indicators to assess whether these new prisons did improve the quality of life for the residents of these areas. For this analysis, counties are considered rural if they are more than 30% rural, according to the 2020 County Health Rankings data. The indicators analyzed involve crime (specifically aggravated assault), median income, unemployment rate, child poverty rate, and school attendance.
+
+:::
+
+# Data
+
+::: {.justify}
+
+A variety of data was used to answer these questions about the change in the quality of life in these counties. Some of the data used were already formatted for use in ArcGIS as a feature layer. Other data needed to be combined with spatial information to represent it in the maps. 
+
+The Georgia Early Education Alliance for Ready Students 2020 is a compilation of data from different sources related to factors that may influence educational outcomes developed by the Research & Analytics Group of the Atlanta Regional Commission into a feature layer for ArcGIS. Data sources include Georgia's Department of Early Care and Learning (DECAL) KOALA, Georgia Department of Public Health Online Analytical Statistical Information System (DPH OASIS), Fostering Court Improvement, Georgia Department of Education (GA DOE), Georgia Bureau of Investigation (GBI), and American Community Survey and Small Area Health Insurance Estimates (SAHIE) Program from U.S. Census Bureau. This data includes many variables ranging from basic population parameters and birth rates to economic indicators and crime reports. This analysis uses the following variables from this feature layer: 
+
+:::
+
+-	Number of Violent crimes reported: Aggravated assault 2010 and 2017 (AggAssault_2010 and AggAssault_2017, Long)
+-	Change, % Children under 18 years below poverty, 2010-18 (chpPopPovU18_e1018, Double)
+
+::: {.justify}
+
+Data from the United States Census Bureau's American Community Survey (ACS) was used to assess each county’s median income change between 2010 and 2020. The data for 2020 was available as a feature layer from Esri Demographics; however, the data for 2010 was acquired directly from the Census Bureau and joined to the 2020 feature layer to be analyzed spatially and over time.
+
+The County Health Rankings 2020 is available from Esri Demographics and contains many relevant variables. The Robert Wood Johnson Foundation and the University of Wisconsin Population Health Institute worked together to compile this data that measures health factors and outcomes of nearly all counties in the nation. In this analysis, the variables used were the Percentage of Unemployed (v023_rawvalue, Double) and the Rural Percentage (v058_rawvalue, Double) for each county. The County Health Rankings 2010 was accessed directly from the County Health Rankings organization; it was joined with the 2020 feature layer to assess the change in unemployment over time.
+
+The Governor’s Office of Student Achievement publishes data on various educational metrics for Georgia schools and school districts. However, much of the school testing data covers only a short period since the tests often change every few years, and college admission tests only gauge high school students. To better understand school quality over a more extended period, attendance data is used for students of all ages for every school in each school district. The 2010-2011 school year data is combined with the 2018-2019 school year data to assess the change over time, then joined with school districts polygons (Ersi US Federal Data) for display. 
+
+Though this analysis focuses on Baldwin and Jenkins County and the private prison recently constructed, other prisons in Georgia are included as a reference and to control for the difference between rural counties without and with prisons to determine if there is an overall difference. Data for all correctional facilities in Georgia was found on the Department of Corrections (DOC) website. Data attributes for all correctional facilities were obtained from the DOC website, including facility name, physical address, population, construction year, capacity, security level, and facility type. Only data for prisons and correctional institutions were collected; rehabilitation, probation, and transitional centers were excluded from this analysis. Also, it should be noted that the Georgia Department of Corrections does not oversee the three privately run facilities in Georgia that have contracts with ICE; these were added separately to the list of facilities in Georgia with the limited information available publicly from the ICE website.
+
+:::
+
+# Methods
+
+::: {.justify}
+
+Because the data comes from several different sources, various methods were used to clean and organize the data. The first variable analyzed was crime using data from the Georgia Early Education Alliance for Ready Students 2020 data, specifically aggravated assault crimes in 2010 and 2017. A new field was generated to calculate the difference in aggravated assault crime reports between each year for each county in Georgia (Change # of Aggravated Assault Crimes 2010-2017, Chg_Assault, Long). 
+
+The next three variables are related to the economic indicators of the counties. The change in median income from 2010 to 2020 was determined by joining attribute values from the ACS for each year and calculating the difference after adjusting the 2010 values for inflation (Change in Median Income 2010 – 2020, Chg_Median_Income, Double). The values representing the change in the percentage of unemployed people for each county were calculated from the County Health Rankings 2010 and 2020 (Change in % Unemployed 2010-2020, Chg_Unempoyment, Long). The Georgia Early Education Alliance for Ready Students 2020 data included the attribute for the change in the rate of child poverty calculated from 2010 to 2018 (chpPopPovU18_e1018, Double).
+
+The final variable concerns education. School attendance data was collected from the Governor’s Office of Student Achievement for the school year 2010-2011 and 2018-2019 separately and then combined to calculate the change in the percentage absent over fifteen days (Chg_Over15Percent, Double). This data included an aggregate percentage of students absent more than fifteen days for all grades and all schools for each school district. The school districts were apportioned with the county boundaries to measure the expected average for each county, weighing the area of the school district encompassed within the county.
+
+For reference and control over the variables, data about the rural percentage of each county was obtained from the County Health Rankings 2020 and was combined with the data collected from the Georgia Department of Corrections about prison locations. By isolating the counties that are more than 30% rural and those with or without prisons, the analysis could evaluate the differences between these types of counties and the two counties with new private prisons (See @tbl-counties). After all the 2010 data had been updated and combined with the data from the later year, the field with the change in the statistics for each rural county was combined into a single layer for analysis. 
+
+:::
+
+```{r counties}
+#| label: tbl-counties
+#| tbl-cap: "Summary of Georgia Counties" 
+#| tbl-align: 'center'
+
+countsum <- data.frame(x = c("All Counties", 
+                             "Rural Counties (>30% rural)",
+                             "Rural Counties without Prisons",
+                             "New Private Prisons"),
+                       y = c(159,135,90,2))
+
+countsum %>% 
+  gt() %>% 
+  tab_header(md("**Summary of Georgia Counties**")) %>% 
+  cols_label(x = md(""),
+             y = md("")) %>% 
+  fmt_number(columns = y,
+             decimals = 0) %>% 
+  cols_align(align = "center",
+             columns = y)
+
+```
+
+# Findings
+
+::: {.justify}
+
+Though nothing about reducing crime is explicitly expressed in the promises made by private prison corporations, residents may expect that an increase in jobs and an economic boost would lower violent crime rates in the area [@ouimetWorldHomicidesEffect2012]. On the other hand, it is hypothesized that a new prison could affect assault crimes in the area. Aggravated assault includes domestic violence. Because people employed as correctional officers may be more exposed to a culture of violence within the prison in their work life, they may bring that home with them in the form of elevated violent crime such as aggravated assault [@valentineCorrectionalOfficersDomestic2012]. The analysis of the data from the Georgia Early Education Alliance for Ready Students 2020 shows that the overall change in aggravated assault crimes across all rural counties was an increase of an average of 9.81 reported incidents; for rural counties without prisons, the change was an increase of an average of 6.38 reported incidents. However, in Baldwin County, in the years following the construction of the Riverbend Correctional Facility, the number of reported aggravated assault crimes rose by 82 reported crimes from 2010 to 2017. In Jenkins County, the increase was slightly less than the rural county average at only four more crimes reported in 2017 than in 2010 (See @fig-map2).
+
+:::
+
+```{r map2}
+#| label: fig-map2
+#| fig-cap: "Change in Aggravated Assault by County 2010-2017" 
+#| fig-align: 'center'
+
+knitr::include_graphics("figures/assaultmap.png")
+
+```
+
+::: {.justify}
+
+When it comes to the economic impacts on the communities hosting prisons in their county, this is where the corporations made explicit promises to make improvements. With the promise of adding hundreds of good new jobs, the new industry was expected to raise the median income of the county. However, because the lowest-paying jobs, such as janitorial positions, are often filled by the prisoners themselves; this can lower the average wages for the area since the most menial jobs can be underbid by the free or cheap labor of the prisoners [@genterPrisonsJobsPrivatization2013]. The analysis found that the change in the median income for all rural counties in Georgia from 2010 through 2020 was an increase of an average of \$1,726 in 2020 dollars. Rural counties without prisons saw a slightly higher increase in earnings at an average of \$2,203 from 2010 through 2020. Baldwin County fell right between these two averages, with an increase of \$1,938 from 2010 to 2020. However, Jenkins County saw a sharp decrease of $7,234 in median income over the same ten-year period (See @fig-map3).
+
+:::
+
+```{r map3}
+#| label: fig-map3
+#| fig-cap: "Change in Median Income by County 2010-2020" 
+#| fig-align: 'center'
+
+knitr::include_graphics("figures/incomemap.png")
+
+```
+
+::: {.justify}
+
+Campaigners for private prisons cite job creation as the number one incentive to build in depressed rural areas. Counties bid for these contracts specifically to bring new jobs to their communities, but is the impact on unemployment rates better in these counties than in other rural counties in the state? This analysis shows that, overall, in rural counties in Georgia, the percentage of unemployed fell by an average of 2.56 percentage points between 2010 and 2020. Rural counties without prisons saw a similar drop in unemployment rates on average. Baldwin County was also right on track with the county average for Georgia, with a 3-percentage point drop from 2010 to 2020. However, Jenkins County did much better than the average and better than any other rural county in Georgia, dropping 11 percentage points from 2010 to 2020 (See @fig-map4).
+
+:::
+
+```{r map4}
+#| label: fig-map4
+#| fig-cap: "Change in Percent Unemployed by County 2010-2020" 
+#| fig-align: 'center'
+
+knitr::include_graphics("figures/unempmap.png")
+
+```
+
+::: {.justify}
+
+Aside from income and employment, the rate of children in poverty is another economic metric by which to gauge the well-being of a community. With the economic stimulation promised by prison corporations, the goal would be to help lift families out of poverty. This analysis shows that the overall change in the rate of children in poverty in rural counties in Georgia was an increase of 2.69 percentage points from 2010 to 2018. Rural counties without prisons had a similar increase of 2.25 percentage points. In Baldwin County, the change in the rate of children in poverty grew only a small amount more than in rural counties overall. However, in Jenkins County, the rate of children in poverty grew by 21.9 percentage points, well over the average for rural counties in Georgia (See @fig-map5). 
+
+:::
+
+```{r map5}
+#| label: fig-map5
+#| fig-cap: "Change in Percent of Children in Poverty by County 2010-2018" 
+#| fig-align: 'center'
+
+knitr::include_graphics("figures/povertymap.png")
+
+```
+
+::: {.justify}
+
+Private prison corporations not only promise economic stimulation to communities that host their facilities, but they also promise to invest in the local community (Joseph, 2012). As a result of these promised investments, these communities should see an additional boost to educational and youth outcomes. This analysis demonstrates that the average change in the percentage of students absent more than 15 days for rural counties in Georgia was an increase of 2.86 percentage points from 2011 to 2019. Rural counties without prisons had an almost identical rate. The change in the chronic absenteeism rate in Baldwin County was just above the average for rural Georgia at a 3.49 percentage point increase. However, Jenkins County’s change in the rate was well above the average with a 4.9 percentage point increase (See @fig-map6).
+
+:::
+
+```{r map6}
+#| label: fig-map6
+#| fig-cap: "Change in Percent Absent More than 15 Days by County 2011-2019" 
+#| fig-align: 'center'
+
+knitr::include_graphics("figures/attendmap.png")
+
+```
+
+# Discussion
+
+::: {.justify}
+
+Overall, in rural counties in Georgia, the number of aggravated assault crimes reported went up between 2010 and 2017. The economic factors were inconsistent. The median income rose from 2010 to 2020, and the unemployment rate fell from 2010 to 2020; however, the rate of children in poverty rose between 2010 and 2018. Chronic absenteeism for students also increased between the 2010-2011 and 2018-2019 school years. The findings for four out of five of these variables showed that Baldwin and Jenkins Counties fared worse or about the same as other rural counties in Georgia. The only variable that showed a positive impact was the unemployment rate, which was just a bit better than the average in Baldwin County but far better than the average in Jenkins County. Baldwin County’s changes were close to the average for rural counties for every variable except for the crime variable for aggravated assault crimes which was much worse. Jenkins County’s changes were worse than the average for three of the variables, median income, children in poverty, and attendance. The only variable for Jenkins County consistent with the rural average was aggravated assault crimes. In sum, it seems these new prisons did little to affect most variables and, in some cases, negatively affected them, except for unemployment rates (See @tbl-diffs).
+
+:::
+
+```{r diffs}
+#| label: tbl-diffs
+#| tbl-cap: "Differences for Baldwin/Jenkins Counties and Rural Averages" 
+#| tbl-align: 'center'
+
+counties1 <- counties %>% 
+  mutate(ave_assault = mean(Chg_Assault, na.rm = TRUE),
+         ave_income = mean(Chg_Median_Income, na.rm = TRUE),
+         ave_unemp = mean(chpNotSchoolNotLabFor_e1018, na.rm = TRUE),
+         ave_pov = mean(chpPopPovU18_e1018, na.rm = TRUE),
+         ave_attend = mean(Chg_Over15Percent, na.rm = TRUE)) 
+
+counties2 <- counties1 %>% 
+  group_by(Join_Count) %>% 
+  mutate(prison_assault = mean(Chg_Assault, na.rm = TRUE),
+         prison_income = mean(Chg_Median_Income, na.rm = TRUE),
+         prison_unemp = mean(chpNotSchoolNotLabFor_e1018, na.rm = TRUE),
+         prison_pov = mean(chpPopPovU18_e1018, na.rm = TRUE),
+         prison_attend = mean(Chg_Over15Percent, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  select(Join_Count, Facility_Name, COUNTY,
+         Chg_Assault, Chg_Median_Income, chpNotSchoolNotLabFor_e1018, 
+         chpPopPovU18_e1018, Chg_Over15Percent,
+         ave_assault, ave_income, ave_unemp, ave_pov, ave_attend,
+         prison_assault, prison_income, prison_unemp, prison_pov, prison_attend)
+
+focus <- counties2 %>% 
+  filter(Facility_Name == "RIVERBEND CORR FACILITY" | 
+           Facility_Name == "JENKINS CORR FACILITY") %>% 
+  mutate(Assault = Chg_Assault - ave_assault,
+         Income = Chg_Median_Income - ave_income,
+         Unemployment = chpNotSchoolNotLabFor_e1018 - ave_unemp,
+         Poverty = chpPopPovU18_e1018 - ave_pov,
+         Attendance = Chg_Over15Percent - ave_attend) %>% 
+  select(COUNTY, Assault, Income, Unemployment, Poverty, Attendance) %>% 
+  rename(County = COUNTY)
+
+focus %>%
+  gt() %>% 
+  tab_header(md("**Differences for Baldwin/Jenkins Counties and Rural Averages**")) %>% 
+  fmt_number(columns = !c(County, Income),
+             decimals = 2,
+             force_sign = TRUE) %>% 
+  fmt_number(columns = Income,
+             decimals = 0,
+             force_sign = TRUE) %>% 
+  cols_align(align = "center",
+             columns = !County) %>% 
+  cols_width(Assault ~ px(100),
+             Income ~ px(100),
+             Unemployment ~ px(100),
+             Poverty ~ px(100),
+             Attendance ~ px(100))
+  
+  
+  
+  
+
+```
+
+# Conclusion and Policy Implications
+
+::: {.justify}
+
+This research helps to inform stakeholders in these communities about whether these prisons were a wise investment. Rural communities looking to attract new industries to their area should consider that the private prison industry may not be the best industry to pursue as the unintended effects of toxic prison culture and practices may undermine the economic stimulation intended. It also supports those working to hold private prison corporations responsible for the unintended effects of their prison business. 
+
+The policy implications of this project are to highlight the unintended costs of the private prison industry and the prison industrial complex as a whole. Numerous studies have shown how imprisonment can harm those incarcerated and their families. Still, this research shows that the harm is not necessarily confined to those directly affected by the penal system. The communities that are home to these facilities may also face obstacles to improved quality of life due to the presence of an industry that preys on the vulnerable and seeks profit at any cost in the name of economic stimulation and public safety.
+
+:::
+
+# Data Sources
+
+[**County Health Rankings 2010**](https://www.countyhealthrankings.org/explore-health-rankings/rankings-datadocumentation/national-data-documentation-2010-2019)
+
+[**County Health Rankings 2020**](https://gsu.maps.arcgis.com/home/item.html?id=c514eddc6d584e85bc2f90be25305fc)  
+
+[**Georgia Counties**](https://gsu.maps.arcgis.com/home/item.html?id=dc20713282734a73abe990995de40497)
+
+[**Georgia Department of Corrections**](https://gdc.ga.gov/facility-finder)
+
+[**Georgia Early Education Alliance for Ready Students 2020**](https://gsu.maps.arcgis.com/home/item.html?id=3f213ed018ba49edaedd052a07d4763b&view=list&sortOrder=desc&sortField=defaultFSOrder#overview)
+
+[**Governor’s Office of Student Achievement - Attendance Data 2011 and 2019**](https://gosa.georgia.gov/dashboards-data-report-card/downloadable-data)
+
+[**Immigration and Customs Enforcement**](https://www.ice.gov/detention-facilities)
+
+[**Unified School Districts**](https://gsu.maps.arcgis.com/home/item.html?id=79307fe73c0b48db9801d4dd54098f7e&view=list&sortOrder=desc&sortField=defaultFSOrder#overview)
+
+[**United States Census Bureau's American Community Survey 2010 and 2020**](https://gsu.maps.arcgis.com/home/item.html?id=45ede6d6ff7e4cbbbffa60d34227e462&view=list&sortOrder=desc&sortField=defaultFSOrder) 
+
+[**data.census.gov**](https://data.census.gov/)
+
+</div>
+
+# References

@@ -1,0 +1,76 @@
+---
+title: "abolition"
+subtitle: "research and data regarding police and prison abolition"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+---
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/Crisis.png){width=300 fig-alt="A map of Maryland showing imprisonment rate and distance to inpatient mental health facilities with crisis intervention."}](prisoners.html)
+</div>
+
+<div style="font-size:23px">
+
+[Prisoners of a Broken System](prisoners.html): Investigating the Relationship Between High Imprisonment Rates and Access to Inpatient Mental Health Care in Maryland - A Bayesian Analysis (February 2024)
+
+</div>
+
+<br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/mapcropped.png){width=300 fig-alt="ENTER ALT TEXT!"}](Bail_Impact.html)
+</div>
+
+<div style="font-size:23px">
+
+[Pleading Change](Bail_Impact.html): Unraveling the Impact of Bail Reform on Guilty Pleas in Harris County - An Ex-Post Policy Analysis (December 2023)
+
+</div>
+
+<br><br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/ImpactTheroy2.png){width=300 fig-alt="A diagram of bail reform influencing length of detention, reduced plea deas, and increased equality in the justice system."}](bail.html)
+</div>
+
+<div style="font-size:23px">
+
+[Equal Justice Under the Law](bail.html): Examining the Impacts of Bail Reform in Harris County - A Proposed Study Outlined (May 2023)
+
+</div>
+
+<br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/price.png){width=300 fig-alt="ENTER ALT TEXT!"}](Bail_Reform.html)
+</div>
+
+
+<div style="font-size:23px">
+
+[The Price of Pretrial Detention](Bail_Reform.html): Avoidable Impacts of Pretrial Detention on Families and Children - A Research Proposal (May 2023)
+
+</div>
+
+<br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/prisons.png){width=300 fig-alt="A map of Georgia showing the capacity and location of prisons, color coded to indicate type of facility."}](prisontowns.html)
+</div>
+
+
+<div style="font-size:23px">
+
+[Empty Promises of Prosperity](prisontowns.html): Prison Towns and Quality of Life in Rural Georgia - A Spatial Analysis (November 2023)
+
+
+</div>
+
+<br><br><br>

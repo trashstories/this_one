@@ -1,0 +1,680 @@
+---
+title: "FL Prisoner Solidarity"
+subtitle: "City of Gainesville Budget Analysis"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "left"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE)
+
+library(tidyverse)
+library(lubridate)
+library(ggrepel)
+library(scales)
+library(readr)
+library(summarytools)
+library(patchwork)
+library(googlesheets4)
+library(extrafont)
+library(gt)
+library(colorspace)
+library(plotly)
+library(highcharter)
+
+colors <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#CCAC14", "#0ACCC5", "#CC1F14",
+            lighten("#7400CC", amount = .5), 
+            lighten("#CC0AA4", amount = .5), 
+            lighten("#0E0ACC", amount = .5), 
+            lighten("#3ACC14", amount = .5), 
+            lighten("#CCAC14", amount = .5), 
+            lighten("#0ACCC5", amount = .5), 
+            lighten("#CC1F14", amount = .5))
+
+colors12 <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+              "#CCAC14", "#0ACCC5", "#CC1F14",
+              lighten("#7400CC", amount = .5), 
+              lighten("#CC0AA4", amount = .5), 
+              lighten("#0E0ACC", amount = .5),
+              lighten("#3ACC14", amount = .5), 
+              lighten("#CCAC14", amount = .5))
+
+colors8 <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+             "#CCAC14", "#0ACCC5", "#CC1F14",
+             lighten("#7400CC", amount = .5))
+
+th_dream <- theme_light() + 
+  theme(panel.grid.major = element_line(color = "#FFD1F9", 
+                                        linewidth = .5, 
+                                        linetype = "longdash"),
+        panel.grid.minor = element_line(color = "#FFD1F9", 
+                                        linewidth = .5, 
+                                        linetype = "dotted"),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_text(color = "#310873", 
+                                 family = "Cambria"),
+        axis.title = element_text(color = "#310873", 
+                                  family = "Changa"),
+        plot.title = element_text(color = "#310873", 
+                                  size = 14, 
+                                  face = "bold", 
+                                  family = "Changa"),
+        plot.subtitle = element_text(color = "#310873", 
+                                     size = 12, 
+                                     family = "Changa"),
+        legend.text = element_text(color = "#310873", 
+                                   family = "Changa"),
+        plot.caption = element_text(color = "#310873", 
+                                    family = "Cambria"))
+
+my_dollar <- label_number(accuracy = 1, prefix = "$", big.mark = ",")
+
+# Define the formatter function
+tip_formatter <- function(x, points) {
+  # Initialize the tooltip string with x value in bold
+  tooltip_string <- paste0("<b>", x, "</b>")
+
+  # Iterate over the points and add series name and y value to the tooltip string
+  for (point in points) {
+    tooltip_string <- paste0(tooltip_string, "<br/>", point$series$name, ": ", point$y, "m")
+  }
+
+  # Return the formatted tooltip string
+  return(tooltip_string)
+}
+
+library(highcharter)
+
+highchart() %>%
+  hc_title(text = "Highcharts with a shared tooltip formatter") %>%
+  hc_xAxis(categories = c('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'),
+           crosshair = TRUE) %>%
+  hc_tooltip(formatter = JS("function () {
+                              return '<b>' + this.x + '</b>' + this.points.reduce(function (s, point) {
+                                  return s + '<br/>' + point.series.name + ': ' +
+                                      point.y + 'm';
+                              }, '');
+                            }"),
+             shared = TRUE) %>%
+  hc_add_series(data = c(29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1,
+                          95.6, 54.4)) %>%
+  hc_add_series(data = c(216.4, 194.1, 95.6, 54.4, 29.9, 71.5, 106.4, 129.2, 144.0, 176.0,
+                          135.6, 148.5))
+
+
+# # Example usage
+# x_value <- "example_x"
+# points <- list(
+#   list(series = list(name = "Series A"), y = 20),
+#   list(series = list(name = "Series B"), y = 15),
+#   list(series = list(name = "Series C"), y = 25)
+# )
+# formatted_tooltip <- formatter(x_value, points)
+# print(formatted_tooltip)
+
+
+```
+
+``` {r load}
+
+gs4_deauth()
+
+budget <- read_sheet("https://docs.google.com/spreadsheets/d/1oT1NV5ybg8CDS-IiOBJmy8086s2ruwwq-dHFfvZXTEo/edit#gid=724481585") %>% 
+  drop_na(use) 
+
+funds21_ <- read_sheet("https://docs.google.com/spreadsheets/d/1oT1NV5ybg8CDS-IiOBJmy8086s2ruwwq-dHFfvZXTEo/edit#gid=724481585", sheet = "Funds21") %>% 
+  drop_na(use) 
+
+f21sum <- funds21_ %>% 
+  group_by(use) %>% 
+  summarise(s19actual = sum(fy2019actual, na.rm = TRUE))
+
+funds21 <- funds21_ %>% 
+  left_join(f21sum, by = "use") %>% 
+  mutate(tip = paste0("Adopted Allocation: ", my_dollar(fy2019adopt), 
+                      "\nActual Spending: ", my_dollar(s19actual))) %>% 
+  mutate(fy2019actualK = fy2019actual / 1000) %>% 
+  mutate(color = case_when(source == "CIRB 2014 Capital Projects" ~ "#9556E9",
+                           source == "Capital Improvement Revenue Bond 2005 Capital Projects Fund" ~ "black",
+                           source == "Capital Improvement Revenue Bond 2017" ~ "black",
+                           source == "Capital Improvement Revenue Note, Series 2019" ~ "#CC0AA4",
+                           source == "Community Development Block Grant (CDBG)" ~ "#FFCAEC",
+                           source == "Contingency Reserve for Declared Emergencies Fund" ~ "#CC1F14",
+                           source == "Emergency Fund" ~ "#FF9290",
+                           source == "Equipment Replacement Fund" ~ "#0E0ACC",
+                           source == "Facilities Maintenance Recurring Fund" ~ "#8C8CFF",
+                           source == "Federal Law Enforcement Contraband Forfeiture Fund" ~ "#3ACC14",
+                           source == "FFGFC 2002 Capital Projects Fund" ~ "black",
+                           source == "General Capital Projects Fund" ~ "#7400CC",
+                           source == "Hurricane Dorian Fund" ~ "#CCAC14",
+                           source == "Miscellaneous Grants Fund" ~ "#FFE9AB",
+                           source == "Miscellaneous Special Revenue Fund" ~ "#8FFFF9",
+                           source == "Police Billable Overtime Fund" ~ "#0ACCC5",
+                           source == "State Law Enforcement Contraband Forfeiture Fund" ~ "black",
+                           TRUE ~ "white"))
+
+
+```
+
+```{r pivot}
+
+pct_budget <- budget %>% 
+  select(c(use, starts_with("pct"))) %>% 
+  pivot_longer(starts_with("pct")) %>% 
+  mutate(type = case_when(str_detect(name, "adopt") ~ "Adopted",
+                          str_detect(name, "actual") ~ "Actual",
+                          str_detect(name, "plan") ~ "Plan",
+                          str_detect(name, "propose") ~ "Proposed"))
+
+```
+
+# Introduction
+
+The visualizations and summaries provided here are derived from data extracted from the City of Gainesville budget summaries and documents provided online. The summaries are available for the previous five years. These documents were downloaded from the [City of Gainesville website](https://www.gainesvillefl.gov/Government-Pages/Government/Departments/Financial-Services/Financial-Operating-Plan#section-3).
+
+# Budget by Spending Categories
+
+According to these documents, the percent of the adopted budgets for the available years used in each category has remained largely consistent (see @fig-adoptpct). Aside from the obvious outlier of 2020 (due to the COVID-19 pandemic), the distribution of spending by category has also remained largley consistent (see @fig-actualpct).
+
+::: column-page
+```{r adopt}
+#| fig-height: 5
+#| fig-width: 10
+#| label: fig-adoptpct
+#| fig-cap:  "City of Gainsville Adopted Budget 2018 - 2022"
+
+pct_budget %>% 
+  filter(name == "pctfy2018adopt20" |
+           name == "pctfy2019adopt21" |
+           name == "pctfy2020adopt22" |
+           name == "pctfy2021adopt23" |
+           name == "pctfy2022adopt23") %>% 
+  filter(value > 0.01) %>% 
+  ggplot(aes(reorder(use, -value), value, fill = name)) +
+  geom_col(position = position_dodge()) +
+  scale_x_discrete(labels = str_wrap(c("General Government Services",
+                                       "Public Safety",
+                                       "Transportation",
+                                       "Other Financing Uses",
+                                       "Transfers to Other Funds",
+                                       "Physical Environment",
+                                       "Cultural & Recreation",
+                                       "Internal Service Expenses",
+                                       "Economic Environment",
+                                       "Other Nonoperating",
+                                       "Human Services"), 12)) +
+  scale_y_continuous(breaks = seq(0,1,.15),
+                     labels = label_percent()) +
+  scale_fill_manual(values = colors,
+                    labels = c("2018",
+                               "2019",
+                               "2020",
+                               "2021",
+                               "2022")) +
+  labs(x = NULL,
+       y = "Percent of Budget",
+       fill = NULL,
+       title = "City of Gainsville Adopted Budget 2018 - 2022",
+       caption = "Note: Budget items representing lest than 1% of the total budget are not shown.") +
+  th_dream +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = "bottom")
+
+ggsave("adoptpcts.png", width = 10, height = 5,
+       device = png, type = "cairo", dpi = 300)
+
+
+
+```
+
+```{r actual}
+#| fig-height: 5
+#| fig-width: 10
+#| label: fig-actualpct
+#| fig-cap: "City of Gainsville Actual Budget Spending 2018 - 2021"
+
+pct_budget %>% 
+  filter(type == "Actual",
+         value > 0.01,
+         use != "Internal Service Expenses") %>% 
+  ggplot(aes(reorder(use, -value), value, fill = name)) +
+  geom_col(position = position_dodge()) +
+  scale_x_discrete(labels = str_wrap(c("General Government Services",
+                                       "Public Safety",
+                                       "Transportation",
+                                       "Transfers to Other Funds",
+                                       "Cultural & Recreation",
+                                       "Physical Environment",
+                                       "Economic Environment"), 12)) +
+  scale_y_continuous(breaks = seq(0,1,.15),
+                     labels = label_percent()) +
+  scale_fill_manual(values = colors,
+                    labels = c("2018",
+                               "2019",
+                               "2020",
+                               "2021")) +
+  labs(x = NULL,
+       y = "Percent of Budget",
+       fill = NULL,
+       title = "City of Gainsville Actual Budget Spending 2018 - 2021",
+       caption = "Note: Budget items representing lest than 1% of the total budget are not shown.") +
+  th_dream +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = "bottom")
+
+ggsave("actualpcts.png", width = 5 * 1.618, height = 5,
+       device = png, type = "cairo", dpi = 300)
+
+```
+:::
+
+```{r}
+
+gf <- budget %>% 
+  filter(use == "Public Safety")
+
+```
+
+
+# Public Safety Spending by Funding Source
+
+@fig-ps shows the breakdown of public safety adopted allocations and actual spending for 2019. (The most recent year with data about actual spending is 2020, but since the spending for that year is not representative of a typical year, I chose 2019.) Each bar (or potion of a bar) is colored to correspond to its funding source in the legend. Budget items representing lest than $5,000 are not shown.
+
+To improve the readability of the graph, some funding sources have been omitted including the General fund, pension and retirement funds, and building code enforcement. @fig-ps_ shows the spending for those funds on a separate scale. Notably, the uses listed for these funds are vague and therefore, difficult to interrogate. The largest fund of `r my_dollar(gf$fy2019adopt[1])` is attributed to "Public Safety" generally. 
+
+Finally, @fig-psGPD shows the actual spending on GPD specific uses. This may not include all spending on police activities (and some may also include other aspects of public safety), but it includes all the uses for funds that mention police specifically and all uses that directly name GPD.
+
+::: column-page
+```{r funds21}
+#| fig-height: 13
+#| fig-width: 10.517
+#| label: fig-ps
+#| fig-cap: "City of Gainsville Adopted vs Actual Budget 2019"
+
+adopt <- funds21 %>% 
+  drop_na(fy2019adopt) %>% 
+  filter(source != "General Fund",
+         source != "Pension Obligation Bond - Series 2003B",
+         source != "Police Officer and Fire Fighters Consolidated Retirement Fund",
+         source != "Florida Building Code Enforcement Fund") %>%
+  mutate(source = str_wrap(source, 32),
+         color_label = ifelse(fy2019adopt >= 900000 | fy2019adopt == 44370, "light", "dark"),
+         x_label = case_when(fy2019adopt >= 900000 ~ fy2019adopt - (fy2019adopt * .075), 
+                             fy2019adopt < 900000  ~ fy2019adopt + 65000)) %>%
+  mutate(x_label = ifelse(fy2019adopt == 44370, fy2019adopt + 65000, x_label))
+
+adopt_ <- adopt %>% 
+  distinct(source, color) 
+
+adopt19 <- adopt %>% 
+  ggplot(aes(fy2019adopt, reorder(use, fy2019adopt), fill = source)) +
+  geom_col(aes()) +
+  geom_text(aes(x_label, 
+                color = color_label,
+                label = my_dollar(fy2019adopt)),
+            family = "Changa",
+            size = 3.5, 
+            show_guide = FALSE) +
+  scale_x_continuous(breaks = seq(0,1500000,200000),
+                     labels = label_dollar(),
+                     limits = c(0,1500000)) +
+  scale_fill_manual(values = adopt_$color) +
+  scale_color_manual(values = c("#310873", "white")) +
+  guides(fill = guide_legend(nrow = 3)) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "City of Gainsville Adopted Budget 2019",
+       subtitle = "Public Safety") +
+  th_dream +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "top")
+
+ggsave("PSadopt19.png", width = 5.5 * 1.618, height = 5.5,
+       device = png, type = "cairo", dpi = 300)
+
+actual <- funds21 %>% 
+  filter(fy2019actual > 5000) %>% 
+  drop_na(fy2019actual) %>% 
+  filter(source != "General Fund",
+         source != "Pension Obligation Bond - Series 2003B",
+         source != "Police Officer and Fire Fighters Consolidated Retirement Fund",
+         source != "Florida Building Code Enforcement Fund") %>%
+  mutate(source = str_wrap(source, 32)) %>%
+  mutate(x_label = case_when(fy2019actual == 14181 ~ s19actual + 180000, 
+                             fy2019actual == 140596 ~ s19actual + 65000, 
+                             fy2019actual == 7672 ~ s19actual + 165000, 
+                             fy2019actual == 19352 ~ s19actual + 65000, 
+                             fy2019actual == 7778 ~ s19actual + 165000, 
+                             fy2019actual == 18142 ~ s19actual + 65000,
+                             TRUE ~ s19actual + 65000)) 
+
+actual_ <- actual %>% 
+  distinct(source, color) 
+
+actual19 <- actual %>%
+  ggplot(aes(fy2019actual, reorder(use, s19actual), fill = source)) +
+  geom_col(aes()) +
+  geom_text(aes(x_label, 
+                label = my_dollar(fy2019actual)),
+            family = "Changa",
+            size = 3.5,
+            color = "#310873", 
+            show_guide = FALSE) +
+  scale_x_continuous(breaks = seq(0,1500000,200000),
+                     labels = label_dollar(),
+                     limits = c(0,1500000)) +
+  scale_fill_manual(values = actual_$color) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "City of Gainsville Actual Spending 2019",
+       subtitle = "Public Safety",
+       caption = "Note: Budget items representing lest than $5,000 are not shown.") +
+  th_dream +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "top")
+
+(adopt19 / actual19) +
+  plot_layout(heights = c(.45,.55))
+
+ggsave("PS19.png", width = 5.5 * 1.618, height = 11,
+       device = png, type = "cairo", dpi = 300)
+
+```
+
+```{r funds21_}
+#| fig-height: 5.5
+#| fig-width: 10.517
+#| label: fig-ps_
+#| fig-cap: "City of Gainsville Adopted vs Actual Budget 2019 - Omitted Funds"
+
+adopt19 <- funds21 %>% 
+  filter(fy2019adopt > 20000) %>% 
+  drop_na(fy2019adopt) %>% 
+  filter(source == "General Fund" |
+         source == "Pension Obligation Bond - Series 2003B" |
+         source == "Police Officer and Fire Fighters Consolidated Retirement Fund" |
+         source == "Florida Building Code Enforcement Fund") %>%
+  mutate(source = str_wrap(source, 44),
+         color_label = ifelse(fy2019adopt >= 60000000, 
+                              "light", "dark"),) %>%
+  mutate(x_label = ifelse(fy2019adopt == 60645383, 
+                          fy2019adopt - 4500000, 
+                          fy2019adopt + 4250000)) %>% 
+  ggplot(aes(fy2019adopt, reorder(use, fy2019adopt), fill = source)) +
+  geom_col(aes()) +
+  geom_text(aes(x_label, 
+                color = color_label,
+                label = my_dollar(fy2019adopt)),
+            family = "Changa",
+            size = 5, 
+            show_guide = FALSE) +
+  scale_x_continuous(breaks = seq(0,100000000,10000000),
+                     labels = label_dollar(),
+                     limits = c(0,62500000)) +
+  scale_fill_manual(values = colors) +
+  scale_color_manual(values = c("#310873", "white")) +
+  guides(fill = guide_legend(nrow = 2)) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       color = NULL,
+       title = "City of Gainsville Adopted Budget 2019",
+       subtitle = "Public Safety") +
+  th_dream +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "top")
+
+ggsave("PSadopt19.png", width = 5.5 * 1.618, height = 5.5,
+       device = png, type = "cairo", dpi = 300)
+
+actual19 <- funds21 %>% 
+  filter(fy2019actual > 20000) %>% 
+  drop_na(fy2019actual) %>% 
+  filter(source == "General Fund" |
+         source == "Pension Obligation Bond - Series 2003B" |
+         source == "Police Officer and Fire Fighters Consolidated Retirement Fund" |
+         source == "Florida Building Code Enforcement Fund") %>%
+  mutate(source = str_wrap(source, 44),
+         color_label = ifelse(fy2019actual >= 50000000, 
+                              "light", "dark"),) %>%
+  mutate(x_label = ifelse(fy2019actual == 57206362, 
+                          fy2019actual - 4500000, 
+                          fy2019actual + 4250000)) %>% 
+  ggplot(aes(fy2019actual, reorder(use, s19actual), fill = source)) +
+  geom_col(aes()) +
+  geom_text(aes(x_label, 
+                color = color_label,
+                label = my_dollar(fy2019actual)),
+            family = "Changa",
+            size = 5, 
+            show_guide = FALSE) +
+  scale_x_continuous(breaks = seq(0,100000000,10000000),
+                     labels = label_dollar(),
+                     limits = c(0,62500000)) +
+  guides(fill = guide_legend(nrow = 2)) +
+  scale_fill_manual(values = colors) +
+  scale_color_manual(values = c("#310873", "white")) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       color = NULL,
+       title = "City of Gainsville Actual Spending 2019",
+       subtitle = "Public Safety",
+       caption = "Note: Budget items representing lest than $5,000 are not shown.") +
+  th_dream +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "top")
+
+(adopt19 / actual19) +
+  plot_layout(heights = c(.45,.55),
+              guides = "collect") &
+  theme(legend.position = "top")
+
+```
+
+```{r actualGPD}
+#| fig-height: 6.5
+#| fig-width: 10.517
+#| label: fig-psGPD
+#| fig-cap: "City of Gainsville Public Safety Spending - GPD Specific"
+
+
+
+
+gpd <- funds21 %>% 
+  filter(fy2019actual > 5000,
+         police == TRUE) %>% 
+  drop_na(fy2019actual) %>% 
+  filter(source != "General Fund",
+         source != "Pension Obligation Bond - Series 2003B",
+         source != "Police Officer and Fire Fighters Consolidated Retirement Fund",
+         source != "Florida Building Code Enforcement Fund") %>%
+  mutate(source = str_wrap(source, 32),
+         color_label = ifelse(fy2019actual >= 300000 & fy2019actual < 650000, "light", "dark"),
+         x_label = ifelse(fy2019actual >= 300000, 
+                          s19actual - 40000, 
+                          s19actual + 40000)) %>%
+  mutate(x_label = ifelse(fy2019actual == 7778, 
+                          s19actual + 40000 + 60000, 
+                          x_label)) 
+
+gpd_ <- gpd %>% 
+  distinct(source, color) 
+
+gpd %>% 
+  ggplot(aes(fy2019actual, reorder(use, s19actual), fill = source)) +
+  geom_col(aes()) +
+  geom_text(aes(x_label, 
+                color = color_label,
+                label = my_dollar(fy2019actual)),
+            family = "Changa",
+            size = 4.5, 
+            show_guide = FALSE) +
+  scale_x_continuous(breaks = seq(0,1000000,100000),
+                     labels = label_dollar()) +
+  scale_fill_manual(values = gpd_$color) +
+  scale_color_manual(values = c("#310873", "white")) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "City of Gainsville Actual Spending 2019",
+       subtitle = "Public Safety - GPD Specific",
+       caption = "Note: Budget items representing lest than $5,000 are not shown.") +
+  th_dream +
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position = "top")
+
+```
+:::
+
+## Interactive Spending Graphs
+
+These graphs are interactive.
+
+- Hover over each funding source in the legend to dim all other sources and see more details.  
+- Click each funding source in the legend to toggle visibility.
+
+::: column-page
+```{r interact_all}
+#| fig-height: 8
+#| label: fig-all
+#| fig-cap: "City of Gainsville Actual Spending 2019 (Interactive)"
+
+act <- funds21 %>% 
+  filter(fy2019actualK > 5) %>% 
+  drop_na(fy2019actualK) %>% 
+  filter(source != "General Fund",
+         source != "Pension Obligation Bond - Series 2003B",
+         source != "Police Officer and Fire Fighters Consolidated Retirement Fund",
+         source != "Florida Building Code Enforcement Fund") %>%
+  mutate(source = str_wrap(source, 32)) 
+
+act_ <- act %>% 
+  distinct(source, color) 
+
+act %>% 
+  hchart("bar",
+         hcaes(use, fy2019actualK, group = source, 
+               value = fy2019adopt, value2 = fy2019actual),
+         stacking = "normal",
+         color = act_$color) %>% 
+  hc_yAxis(title = "",
+           labels = list(format = "${value:.0f}K"),
+           gridLineColor = "#FFD1F9",
+           gridLineDashStyle = "longdash") %>% 
+  hc_xAxis(title = "",
+           categories = act$use,
+           labels = list(style = list(fontFamily = "Cambria"))) %>%  
+  hc_legend(verticalAlign = "top",
+            itemStyle = list(fontFamily = "Changa", 
+                             fontWeight = "Regular")) %>% 
+  hc_title(text = "City of Gainsville Actual Spending 2019",
+           style = list(fontFamily = "Changa")) %>% 
+  hc_subtitle(text = "Public Safety",
+              style = list(fontFamily = "Changa")) %>% 
+  hc_caption(text = "Note: Budget items representing lest than $5,000 are not shown.",
+             align = "right",
+             style = list(fontFamily = "Cambria")) %>% 
+  hc_tooltip(formatter = JS("function () {
+                              var formatted1 = this.point.value.toLocaleString('en-US', { 
+                                  style: 'currency', 
+                                  currency: 'USD', 
+                                  minimumFractionDigits: 0, 
+                                  maximumFractionDigits: 0 });
+                              var formatted2 = this.point.value2.toLocaleString('en-US', { 
+                                  style: 'currency', 
+                                  currency: 'USD', 
+                                  minimumFractionDigits: 0, 
+                                  maximumFractionDigits: 0 });
+                              return '<b>' + this.x + 
+                                  '</b><br><i>Funding Source: ' + this.series.name + 
+                                  '</i><br>Adopted Allocation: <b>' + formatted1 +
+                                  '</b><br>Actual Spending: <b>' + formatted2 + '</b>';
+                            }"))
+ 
+```
+
+```{r interactGPD}
+#| fig-height: 6.5
+#| label: fig-police
+#| fig-cap: "City of Gainsville Actual Spending 2019 (Interactive) - GPD"
+
+actGPD <- funds21 %>% 
+  filter(fy2019actualK > 5,
+         police == TRUE) %>% 
+  drop_na(fy2019actualK) %>% 
+  filter(source != "General Fund",
+         source != "Pension Obligation Bond - Series 2003B",
+         source != "Police Officer and Fire Fighters Consolidated Retirement Fund",
+         source != "Florida Building Code Enforcement Fund") %>%
+  mutate(source = str_wrap(source, 32)) 
+
+actGPD_ <- actGPD %>% 
+  distinct(source, color) 
+
+actGPD %>% 
+  hchart("bar",
+         hcaes(use, fy2019actualK, group = source, 
+               value = fy2019adopt, value2 = fy2019actual),
+         stacking = "normal",
+         color = actGPD_$color) %>% 
+  hc_yAxis(title = "",
+           labels = list(format = "${value:.0f}K"),
+           gridLineColor = "#FFD1F9",
+           gridLineDashStyle = "longdash") %>% 
+  hc_xAxis(title = "",
+           categories = actGPD$use,
+           labels = list(style = list(fontFamily = "Cambria"))) %>%  
+  hc_legend(verticalAlign = "top",
+            itemStyle = list(fontFamily = "Changa", 
+                             fontWeight = "Regular")) %>% 
+  hc_title(text = "City of Gainsville Actual Spending 2019",
+           style = list(fontFamily = "Changa")) %>% 
+  hc_subtitle(text = "Public Safety - GPD Specific",
+              style = list(fontFamily = "Changa")) %>% 
+  hc_caption(text = "Note: Budget items representing lest than $5,000 are not shown.",
+             align = "right",
+             style = list(fontFamily = "Cambria")) %>% 
+  hc_tooltip(formatter = JS("function () {
+                              var formatted1 = this.point.value.toLocaleString('en-US', { 
+                                  style: 'currency', 
+                                  currency: 'USD', 
+                                  minimumFractionDigits: 0, 
+                                  maximumFractionDigits: 0 });
+                              var formatted2 = this.point.value2.toLocaleString('en-US', { 
+                                  style: 'currency', 
+                                  currency: 'USD', 
+                                  minimumFractionDigits: 0, 
+                                  maximumFractionDigits: 0 });
+                              return '<b>' + this.x + 
+                                  '</b><br><i>Funding Source: ' + this.series.name + 
+                                  '</i><br>Adopted Allocation: <b>' + formatted1 +
+                                  '</b><br>Actual Spending: <b>' + formatted2 + '</b>';
+                            }"))
+
+
+
+```
+
+:::

@@ -1,0 +1,30 @@
+---
+title: "Blog"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    fig-align: "center"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    template-partials:
+      - "_layouts/sidebar.html"
+---
+
+# Musings about Data and Social Justice
+
+<div style="font-size:20px; text-align: justify">
+
+[Inevitable Bias: Why We Need to Stop Saying Anything We Do is Has No Bias](inevitable_bias.html)
+
+</div>
+
+# Other Musings on a Much Lighter Note
+
+<div style="font-size:20px; text-align: justify">
+
+
+
+</div>

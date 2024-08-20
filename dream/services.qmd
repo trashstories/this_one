@@ -1,0 +1,66 @@
+---
+title: "Services"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+# Optimization and sustaining services
+
+<div style="font-size:20px">
+
+  - Survey design
+  - Optimize data collection
+  - Optimize case management
+  - Best practices materials
+  - Automation
+  - Template creation
+  - Data training
+  - Data diagnostics
+  - Data cleaning
+
+</div>
+
+# Products
+
+<div style="font-size:20px">
+
+  - Data visualization
+  - Data dashboards
+  - Data reports
+  - Data security
+  - Accessible products for any audience
+    - Stakeholders
+    - Team members
+    - Community members
+    - Fundraising
+    - Social media
+    - Traditional media
+    
+</div>
+
+# Methods and skills
+
+<div style="font-size:20px">
+
+  - Qualitative analysis
+  - Quantitative analysis
+  - Mixed-methods research
+  - Exploratory data analysis
+  - Descriptive data analysis
+  - Explanatory data analysis
+  - Impact/Program evaluation
+  - Causal inference
+  - Predictive analysis
+  - Machine learning
+  - Advanced statistical methods
+
+</div>

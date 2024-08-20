@@ -1,0 +1,40 @@
+---
+title: "Inevitable Bias"
+subtitle: "Why We Need to Stop Saying Anything We Do is Has No Bias"
+author: "jamie pantazi"
+date: today
+date-format: "long"
+format: 
+   html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+    tbl-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+# Inevitable Bias
+
+<div style="font-size:22px; text-align: justify; font-family: Veranda, sans-serif">
+
+Why We Need to Stop Saying Anything We Do is Has No Bias
+
+</div>
+
+<div style="font-size:18px; text-align: justify">
+
+In our current polarized society, we are all struggling to discern the “truth” of things. In some cases, bias is obvious, and we know to think carefully about any conclusions drawn; when someone is selling you something, you know not to trust all the claims they make about a product at face value, and it is important to utilize previous knowledge to avoid getting ripped off. But anything made by a human has bias embedded because all humans are biased. Everything we do, every choice we make in the process of creating something new, is informed by our own internal bias. 
+
+If I put less salt in my stew than you do, that is a choice that I make that is informed by my own knowledge and opinion about what makes a successful stew. Even something as simple as making a stew leaves so much up to interpretation—what makes a stew successful? Is it successful if it is nutritious? If it is delicious? If my family enjoys it? If I enjoy it? All of these? Something else entirely? My knowledge about stew itself and generally agreed upon parameters for successful stew also influence my choices. Maybe my family has a history of heart disease, so we avoid salt when we can, but this stew might be for a potluck where others will be eating the stew, so I might decide that I believe most people want salt, so I might add some since my audience is different than usual. Even if I try to make the most neutral stew possible, I still have to choose a recipe to follow, and I still need to determine my own definition of success. You might love my stew, but you kids hate it—is my stew successful? I think so because I think kids are picky eaters.
+
+When we talk about data, analysis, reporting, algorithms, and all the things we use math and machines to help us do things, we want everything to be unbiased—we want the truth, we want machines and automations that do things correctly and fairly. That is a fantasy. All data is created by humans. Humans perform analysis, write reports, and program computers to do things and make decisions based on a prediction based on data created by other humans. 
+
+All humans have bias; it is unavoidable. I might be biased toward a less salty stew, and I make the decision to use less salt (and I might even post my recipe online, potentially contributing to data that someone else might use to assess the most common amount of salt in stew). If you know me, and you know I try to avoid salt, then you might expect my food to be less salty, and I would not be offended if you brought salt with you when you knew I would be cooking (I have actually brought my own cheese to a few vegan potlucks!). All of this is true for data and everything that humans use data to do.
+
+
+</div>

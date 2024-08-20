@@ -1,0 +1,226 @@
+---
+title: "research and design by jamie pantazi"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    fig-align: "center"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    template-partials:
+      - "_layouts/sidebar.html"
+---
+
+# research
+
+<div style="font-size:20px; text-align: justify">
+
+Welcome to my portfolio of research and graphic design. My research goals have been focused on exposing systemic racism as feature, not a bug, in American societies from the first settler-colonialist to the present day. Patriarchal white supremacy is baked into the foundation of the systems that govern our lives; from criminal justice to social services, racist and sexist biases are inherent. In order to break down these oppressive structures, they must first be identified and understood.
+
+</div>
+
+## abolition
+
+<div style="float:left; margin-right: 10px;">
+  [![](abolition/figures/Crisis.png){width=300 fig-alt="A map of Maryland showing imprisonment rate and distance to inpatient mental health facilities with crisis intervention."}](abolition/prisoners.html)
+</div>
+
+<div style="font-size:23px">
+
+[Prisoners of a Broken System](abolition/prisoners.html): Investigating the Relationship Between High Imprisonment Rates and Access to Inpatient Mental Health Care in Maryland - A Bayesian Analysis (February 2024) 
+
+</div>
+
+<br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](abolition/figures/mapcropped.png){width=300 fig-alt=""}](Bail_Impact.html)
+</div>
+
+<div style="font-size:23px">
+
+[Pleading Change](abolition/Bail_Impact.html): Unraveling the Impact of Bail Reform on Guilty Pleas in Harris County - An Ex-Post Policy Analysis (December 2023)
+
+</div>
+
+<br><br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](abolition/figures/ImpactTheroy2.png){width=300 fig-alt="A diagram of bail reform influencing length of detention, reduced plea deas, and increased equality in the justice system."}](abolition/bail.html)
+</div>
+
+<div style="font-size:23px">
+
+[Equal Justice Under the Law](abolition/bail.html): Examining the Impacts of Bail Reform in Harris County - A Proposed Study Outlined (May 2023)
+
+</div>
+
+<br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](abolition/figures/price.png){width=300 fig-alt="ENTER ALT TEXT!"}](abolition/Bail_Reform.html)
+</div>
+
+
+<div style="font-size:23px">
+
+[The Price of Pretrial Detention](abolition/Bail_Reform.html): Avoidable Impacts of Pretrial Detention on Families and Children - A Research Proposal (May 2023)
+
+</div>
+
+<br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](abolition/figures/prisons.png){width=300 fig-alt="A map of Georgia showing the capacity and location of prisons, color coded to indicate type of facility."}](abolition/prisontowns.html)
+</div>
+
+
+<div style="font-size:23px">
+
+[Empty Promises of Prosperity](abolition/prisontowns.html): Prison Towns and Quality of Life in Rural Georgia - A Spatial Analysis (November 2023)
+
+</div>
+
+<br><br><br><br><br>
+
+## immigration
+
+<div style="float:left; margin-right: 10px;">
+  [![](immigration/figures/detention.png){width=300 fig-alt="An image of a detention facility and the text IMPACTS: Immigrant detention tears families apart, denies immigrants access to legal counsel and necessary healthcare, as well as drains the economy for a profit. Another image of protesters with signs and the text SOLUTIONS: Community based alternatives are more humane, more effective, and less costly thandetention."}](immigration/detention.html)
+</div>
+
+<div style="font-size:23px">
+
+[Ending Immigrant Detention in the United States](immigration/detention.html) - A Policy Brief (April 2022)
+
+</div>
+
+<br><br><br><br><br><br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](immigration/figures/karnes.png){width=300 fig-alt="An image of the sky with flying birds."}](https://www.raicestexas.org/2022/07/20/karnes-family-immigration-prison-as-an-adult-immigration-prison/)
+</div>
+
+<div style="font-size:23px">
+
+[Karnes Family Immigration Prison as an Adult Immigration Prison](https://www.raicestexas.org/2022/07/20/karnes-family-immigration-prison-as-an-adult-immigration-prison/): Why Expedited Removal and Immigrant Detention Must End (July 2022)
+
+</div>
+
+<br><br><br><br><br><br>
+
+## history
+
+<div style="float:left; margin-right: 10px;">
+  [![](history/figures/manifest.jpg){width=300 fig-alt="America Progress by John Gast (1872)"}](history/badmen.html)
+</div>
+
+
+<div style="font-size:23px">
+
+[Constructing Bad Men](history/badmen.html): Literary Myths and Protectionist Masculinity (December 2018)
+
+
+</div>
+
+<br><br><br><br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](history/figures/elias.png){width=300 fig-alt="Portrait of Elias Boudinot with a Cherokee Phoenix newspaper backdrop."}](history/elias.html)
+</div>
+
+
+<div style="font-size:23px">
+
+[Elias Boudinot](history/elias.html): Editor in Assimilation (May 2018)
+
+</div>
+
+<br><br><br><br><br><br><br><br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](history/figures/borgia.jpg){width=300 fig-alt="An image from the Codex Borgia showing a deity and human exchanging blood."}](history/identity.html)
+</div>
+
+<div style="font-size:23px">
+
+[Indigenous Identity Outside the National Narrative](history/identity.html): An Analysis of Indigenous Resilience in Mexico (December 2017)
+
+</div>
+
+<br><br><br><br><br>
+
+# design
+
+## maps
+
+[![Distance to Inpatient Facilities with Crisis Intervention](abolition/figures/crisis.png){fig-alt="A map of Maryland showing imprisonment rate and distance to inpatient mental health facilities with crisis intervention."}](abolition/prisoners.html)
+ 
+[![Misdemeanor Arrests in Harris County by Defendant's Zip Code](abolition/figures/mapcropped.png){fig-alt="A map of the US with each zip code colored to indicate the number of arrests in Harris County."}](Bail_Impact.html)
+
+[![Prisons in Georgia by Type and Capacity](abolition/figures/overviewmap.png){fig-alt="A map of Georgia showing the capacity and location of prisons, color coded to indicate type of facility."}](abolition/prisontowns.html)
+
+## dashboards
+
+[![Prisoners of a Broken System: Investigating the Relationship Between High Imprisonment Rates and Access to Inpatient Mental Health Care in Maryland](abolition/figures/prisoners_dash.png){fig-alt=""}](abolition/prisoners.html)
+
+[![Pleading Change: Unraveling the Impact of Bail Reform on Guilty Pleas in Harris County](abolition/figures/pleadingchange_dash.png){fig-alt=""}](abolition/Bail_Impact.html)
+
+[![Empty Promises of Prosperity: Prison Towns and Quality of Life in Rural Georgia](abolition/figures/prisontowns_w_memo.png){fig-alt=""}](abolition/prisontowns.html)
+
+# work with me!
+
+[![DREAM Analytics: Dumpster Research for Equity with an Abolitionist Mindset](figures/dumpsterdata.png){width="80%" fig-alt="D.R.E.A.M. Analytics Dumpster Research for Equity with an Abolitionist Mindset, an image of a raccoon next to a dumpster with data icons in and around it with the caption 'Turn your trash data into treasure!'"}](https://rpubs.com/trashability/dream)
+
+DREAM Analytics is a moniker that I work under in my personal time to offer my data skills to non-profit and grassroots organizations at low or no costs. 
+
+Ideally, I hope to grow this into a network of data activists to share skills and support the greater movement for abolition of the prison industrial complex and the white supremacist systems rooted in settler-colonialism that perpetuate harm and have committed genocide on the continent known as North America for centuries against anyone outside the white anglo protestant elite, most notably against Indigenous and African people. 
+
+Email me at [trashability56@gmail.com](mailto:trashability56@gmail.com) if you are interested in collaborating. I am on Instagram but not very active, but I will reply to DMs and welcome followers [@trashability56](https://www.instagram.com/trashability56) (I usually post pup photos and examples of my graphics).
+
+### Mission
+
+<div style="text-align: justify">
+
+Our mission is to provide non-profit and grassroots organizations with tailored data services that not only enhance their operational efficiency but also contribute to dismantling systemic inequalities. 
+
+</div>
+
+### Values
+
+<div style="text-align: justify">
+
+At DREAM Analytics, we believe in transforming data into a catalyst for positive change. We are dedicated to ensuring that every data-driven initiative aligns with our commitment to equity, justice, and abolition.
+
+- **Data Liberation for Equity**: We view data as a tool for liberation. Our services are designed to liberate valuable insights that empower organizations to identify and address disparities, including unknown implicit biases, and advance equity in their missions.
+- **Collaborative Empowerment**: DREAM Analytics collaborates directly with organizations, recognizing their expertise and unique insights into the communities they serve. Through collaborative empowerment, we aim to build sustainable data-driven practices that amplify the impact of social justice initiatives. 
+- **Abolitionist Mindset in Action**: We actively integrate an abolitionist mindset into every facet of our work. By challenging conventional data practices and dismantling oppressive norms, we strive to contribute to the broader movement for social and systemic change, and ultimately toward a society without police and prisons.
+- **Innovation and Adaptability**: We are committed to continuous innovation and adaptability. As the social landscape evolves, so do our methodologies. DREAM Analytics embraces emerging technologies and novel approaches to deliver cutting-edge data solutions.
+- **Ethical Data Practices**: Ethical considerations are at the core of our work. We uphold the highest standards of data privacy, security, and transparency. Our ethical data practices ensure that the insights derived from data are used responsibly and with the utmost respect for individual rights.
+
+</div>
+
+# favorite resources
+
+<div style="font-size:20px">
+
+- **Abolition**
+  - [Critical Resistance](https://criticalresistance.org/)
+  - [Prison Policy Initiative](https://www.prisonpolicy.org/)
+  - [The Marshall Project](https://www.themarshallproject.org/)
+  - [The Sentencing Project](https://www.sentencingproject.org/)
+  - [Vera Institute of Justice](https://www.vera.org/)
+- **Immigration**
+  - [Detention Watch Network](https://www.detentionwatchnetwork.org/)
+  - [Freedom for Immigrants](https://www.freedomforimmigrants.org/)
+  - [Human Rights Watch](https://www.hrw.org/)
+  - [Refugee and Immigrant Center for Education and Legal Services (RAICES)](https://www.raicestexas.org/)
+- **Mental Health**
+  - [Fireweed Collective](https://fireweedcollective.org/)
+  - [Icarus Project](https://ibpf.org/resource/the-icarus-project/) / [Icarus Project NYC](http://nycicarus.org/)
+  - [Substance Abuse and Mental Health Services Administration (SAMHSA)](https://www.samhsa.gov/data/)
+
+</div>
+

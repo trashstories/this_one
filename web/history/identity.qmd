@@ -1,0 +1,90 @@
+---
+title: "Indigenous Identity Outside the National Narrative"
+subtitle: "An Analysis of Indigenous Resilience in Mexico"
+author: "jamie pantazi"
+date: "December 5, 2017"
+date-format: "long"
+bibliography: identity.bib
+csl: "https://raw.githubusercontent.com/citation-style-language/styles/master/chicago-note-bibliography.csl"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+---
+
+```{css, echo = FALSE}
+.justify {
+  text-align: justify !important
+}
+```
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+```
+
+::: {.justify}
+
+Many films have attempted to depict events surrounding the invasion and conquest of the Americas by Europeans, typically reiterating a similar colonial victory narrative: Europeans came to civilize, save, and subdue the native populations who were seen as savage, brutal, and pagan. Salvador Carrasco’s film, La Otra Conquista tells the story differently. Destruction and massacre, at the hands of the Spanish, forces Topiltzin to fight for his survival and the survival of his people’s culture and history. He refuses to submit to the Spanish and convert to Catholicism, but is spared by Hernando Cortes when Tecuichpo, Cortes’ concubine, reveals that Topiltzin is the illegitimate son of Montezuma, former emperor of the Aztec Empire. He is tortured and then held prisoner in a monastery with Friar Diego who attempts to conquer not only his body but his soul. In his mission to challenge Topiltzin’s strength of faith, Friar Diego struggles with his own faith as Topiltzin challenges him with equal resistance. The duality of the two beliefs becomes mutually influential to the conquering of both religions in the form they had existed and ultimately gives birth to a new form of coexistence. The idea of the merging of both identities to create a new single identity makes up much of the national Mexican identity. Though it does incorporate religious aspects and cultural aesthetics of Nahuatl, Mixtec, and Maya people, the national narrative attempts to replace Indigenous identities that still exists outside the hegemonic, post-colonial Mexican identity.
+
+La Orta Conquista does a relatively good job of representing Nahuatl speaking people in Mexico in the early 16th century accurately, considering the little that is known with certainty and the scarcity of primary sources available. The appearance and the chain of events in the film are consistent with historical interpretations of codices from that time, with the exception of minor inaccuracies that have more to do with the film’s low budget.  Because so much of the documents and possessions from the Aztec Empire were destroyed by Spanish Catholics when they were first encountered, it is hard to determine from what remains which interpretations are closest to the truth. The Broken Spears (2006) is an interpretation of different codices and accounts created within one generation of the events that set up the premise of the film; the accounts in the book, though they still contain some colonial influence, support the way the events and era are portrayed in the film. 
+
+In addition to the historical accuracy of the film, the depiction of both Mexica and European characters challenge many stereotypes reinforced by many portrayals in literature and film. These stereotypes are much of the foundation of myths about the conquest; myths like Indigenous people believing Cortes was the Aztec god Quetzalcoatl returning or all the Spanish being brutal soldiers with only the desire to murder and pillage. Both of these stereotypes or myths, along with others, generally portray characters of history as two-dimensional and unchanging, which is usually damaging to the truth of the events and representation of identity.
+
+Carrasco avoids these myths and stereotypes by creating dynamic characters. Both of the main characters, Topiltzin and Friar Diego, are humanized and have agency over their decisions; even Tecuichpo, who is a captive and concubine of Hernando Cortes, makes choices which determine her fate. Her character is based on la Malinche, the concubine and translator of Cortes, who is seen as a traitor for assisting the Spanish; the mythology surrounding her legacy remains to refer to Mexicans who prefer white identity and culture.  An example is a Mexican woman who marries a white man may be labeled la Malinche as an insult implying she is a traitor to her race. However, Carrasco examines the complications of her position and her will to survive by showing her resistance within her self-preservation. After defying submission to Cortes by mistranslating his words to Topiltzin, Tecuichpo forges letters from Cortes as an act of resistance and revenge. She is cinematically shown as his equal, by speaking to him at eye level and not usually overpowered by him in spite of the fact that she is owned by him. The eyeline of characters as they interact is an important motif that appears throughout the film to represent the power dynamic between them. The simplicity of her myth is deconstructed by her agency and her sly assistance to Topiltzin. 
+
+Friar Diego’s mission to use his divine power save the souls of the Native people is expressed in the way he looks down at Topiltzin after destroying the monument of the Mother Goddess which he calls a “handful of stones.” But as the film progresses, Topiltzin is seen rising to stand at eye level with the Friar in almost every scene they share; for example, when the Friar confronts him about the forgery, Topiltzin tells Diego “our encounter is inevitable, and eternal.” Again, when he is kneeling outside the sacristy looking at the image of Mary, he stands to face Friar Diego eye to eye when Diego talks for the first time about the idea of ‘truth’ in Topiltzin’s belief and the “new world.” Although Topiltzin is never seen above the Friar, his refusal to remain submissive proves his determination to retain his culture. His resistance and his strength of will shows that he is also influencing the Friar, and the ritual and religion he represents, and in a way conquering his mindset as well.  While the film supports the national Mexican identity of these two societies influencing each other to create a new society to replace the old, the resistance of Topiltzin, though steadfast, seems to be complete by the end of the film, but is ongoing in modern Mexico.
+
+The testing of each other’s strength of faith between Friar Diego and Topiltzin begins even before they meet. At the beginning, when confronted by his brother, Topiltzin says, “I will not adapt, I know who I am.” He does not wish to submit his body, as many others have, and only “be with our gods in secret.” Friar Diego begins to question the intentions of the Spanish and their representation of his faith first when he confronts Cristóbal on what appears to be his first day in New Spain, and again when he begs them not to shoot the Mexica performing a sacrificial ceremony by saying Cristóbal and his men are “behaving just like them.” Both men stand very firmly in their faith, but as they interact throughout the film, and although Friar Diego is persistently forcing his beliefs on Topiltzin, it is clear that the influence goes both ways. 
+
+The “other conquest” the film’s title alludes to is both the spiritual conquest by the Catholic missionaries, and also to the reverse “conquest” of the way Aztec culture and ritual influenced and forever changed the way Catholicism is practiced in Mexico. The film shows that both religions were changed forever by their encounter. The imagery comparing the duality of Mary and the Mother Goddess, representing women on both sides, and the ending scene when Topiltzin performs his ritual sacrifice with the statue of Mary signifying a birth of new ritual or religion. Both religions were forced to change and adapt to something new, but this does not replace the legacy of Indigenous culture in Mesoamerica.
+
+Although the dominance of the Spanish and their Catholicism is overwhelmingly and physically taking over the land and culture, Topiltzin’s resistance does not waiver. While he is being held captive at the monastery, Friar Diego personally is relentless in forcing his Catholic doctrine onto him. When Topiltzin develops a fever and has visions or hallucinations of Mary and the Mother Goddess; he sees a pendant with the image of Mary on the nun who is caring for him he cries out, “Mother! You can have my body, but my spirit never.” He later tells the Friar that “there is a reason he stays here,” although he is a prisoner, they both know that he could have left at any time if he wanted to.  Topiltzin believes that the fate of the world relies on him. He believes that he must unite both beliefs, by destroying, or “conquering,” both so a new belief could be born. There is an image in Topiltzin’s vision of Mary being lowered down onto a platform, juxtaposed with the woman from the sacrificial ritual descending; Mary drops the baby in her arms and Topiltzin catches a real baby with white skin. This imagery shows the duality of the mother figures for both beliefs and the birth of something new. It also flips the traditional stereotype of the “white savior” protecting “uncivilized natives” by the “primitive” character embracing the white child instead.
+
+To further examine that imagery, the scene after Topiltzin’s capture, when he is being tortured, there is a Mexican woman in the crowd holding a white baby whispering, “This is my body, this is my blood, even though you are white, I will never abandon you.” Tecuichpo repeats the first half this phrase to Cortes in reference to her own pregnancy after she has been imprisoned.  This phrase serves to represent the bond between mother and child, but it is also an allusion to Jesus’ words and the Catholic ritual of taking of communion. The analogy of the Aztec ritual and beliefs being the mother of what becomes Mexican Catholicism is a powerful and unique way to approach the conquest of both body and mind, of the land and the soul.
+
+Although, in the film, Topiltzin is portrayed with autonomy over his actions and beliefs, when he sacrifices himself with the Virgin Mary and creates a new religious identity, the message is clear that the old way is gone, and the new, synthesized way is born. This plays to the national narrative of the formation of the Mexican state and discounts the descendants of Nahuatl and Mixtec people who continue to identify with their Indigenous culture and tradition. Guillermo Bonfil Batalla calls this the Mèxico Profundo, describing those living in Mexico but outside the national narrative which he calls “the imaginary Mexico.”  Although, in modern Mexico City, blending of Indigenous and Catholic culture can be seen in the art and aesthetics of the common areas, such as Our Lady of Guadalupe; the mythology of its origin delegitimizes the actual history and contemporary presence of Indigenous communities.  To say that this new cultural identity came out of the merging of two old cultures is to say that the old is gone and the new has replaced it; this is a fallacy because to say that traditional Catholicism is gone would be to discount all those who are practicing Catholics outside of Mexico, but this narrative does achieve this sentiment in discounting Nahautl, Mixtec, and Maya communities who exist in Mexico but continue practice their own culture outside that narrative.
+
+Religion in Mexico is not the only representation of the synthesis of Indigenous and colonial culture. The uniqueness of modern art in Mexico compared to European and US modern art is in part due to the influence of Indigenous classical art; Diego Rivera commented that pre-colonial Indigenous art is classical, not in the Western sense, but in the purity of its creation.  When comparing pre-colonial Nahuatl and Mixtec aesthetics and Mexican modern art works such as those of Diego Rivera and Frida Kahlo, it is easy to see the influence one has on the other. The most notable similarity in the two images below (the first is from the Codex Borgia and the second is a painting by Frida Kahlo entitled The Two Fridas) is the use of a stream of blood connecting the two figures; in the first the blood is connecting the death deity to human offering a sacrifice, and the second a stream of blood is connecting the hearts of two self-portraits of the artist. In addition to the influence on modern art, popular imagery, such as sugar skulls, are a clear “tie between popular and pre-Hispanic art” that Rivera observed the difference in the way Indigenous, historians, and upper classes of citizens and tourist each responded to their display in museums: Indigenous with reverence, historians for study, and citizens for entertainment.  The popularity and consumerism surrounding these images works to consolidate Mexican identity and discount the thriving Indigenous culture which still reveres the symbolism and identity separate from the colonial narrative. 
+
+<div style="float:left;">
+  [![](figures/borgia.jpg){height=425 fig-alt="An image from the Codex Borgia showing a deity and human exchanging blood."}](figures/borgia.jpg)
+</div>
+
+<div style="float:right;">
+  [![](figures/frida.jpg){height=425 fig-alt="ADD ALT TEXT!"}](figures/frida.jpg)
+</div>
+
+Although, colonialism and Catholicism did conquer Mesoamerica legally in the long run, because of the resistance and strength of Nahuatl and Mixtec people and their beliefs, the conquest was never complete and never could be; Indigenous resistance – culturally, aesthetically, and religiously – influenced the nation narrative while also maintaining autonomy outside of that narrative. The strength of will and faith is an almost impossible thing to conquer, even if the land and the physical materials are; this resistance has been ongoing and persists through the 21st century.
+
+Colonial resistance in Mixtec regions began with the initial contact with the Spanish and retained much of their land holdings for nearly a century through both physical resistance and within the Spanish courts.  This resistance has not ceased in the five hundred years since the massacre depicted in the opening scene of La Otra Conquista and since the early 1990s the indigenous movements have still been calling for “the redefinition of the Mexican nation as a multi-ethnic – legally, socially, and politically – and guarantees for indigenous self-determination” including autonomy, the San Andrès Peace Accords on Indigenous Rights and Culture, and “redefinition of the relationship between Indian peoples and the Mexican state.” 
+
+::: 
+
+## Bibliography
+
+Batalla, Guillermo Bonfil. México Profundo Reclaiming a Civilization. Translated by Philip A. Dennis. Austin, TX: University of Texas Press, 2009.
+
+"The Complete Works." Frida Kahlo - The Complete Works. Accessed November 30, 2017. https://www.frida-kahlo-foundation.org/the-complete-works.html?pageno=1.
+
+Conant, Jeff. A Poetics of Resistance: The Revolutionary Public Relations of the Zapatisa Insurgency. Oakland, CA: AK Press, 2010.
+
+Diaz, Gisele, and Alan Rodgers. The Codex Borgia: A Full Color Restoration of the Ancient Mexican Manuscript. New York: Dover publications, 1993.
+
+La Otra Conquista (The Other Conquest). DVD. Directed by Salvador Carrasco. Mexico City: Carrasco & Domingo Films, 1998.
+
+"La Otra Conquista (1998)." IMDb. Accessed November 18, 2017. http://www.imdb.com/title/tt0175996/.
+
+Lenchek, Shep. "La Malinche - - Harlot or Heroine?" La Malinche - Indian Women In History. December 1997. Accessed November 18, 2017. http://www.manataka.org/page1265.html.
+
+León-Portilla, Miguel, ed. The Broken Spears. Beacon Press, 2006. 
+
+Lomnitz, Claudio. Death and the Idea of Mexico. Brooklyn, NY: Zone Books, 2005.
+
+Stephen, Lynn. ¡Zapata Lives!: Histories and Cultural Politics in Southern Mexico. Berkeley, CA: University of California Press, 2002.

@@ -1,0 +1,37 @@
+---
+title: "immigration"
+subtitle: "research and data regarding immigration policy"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+---
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/karnes.png){width=300 fig-alt="An image of the sky with flying birds."}](https://www.raicestexas.org/2022/07/20/karnes-family-immigration-prison-as-an-adult-immigration-prison/)
+</div>
+
+<div style="font-size:23px">
+
+[Karnes Family Immigration Prison as an Adult Immigration Prison](https://www.raicestexas.org/2022/07/20/karnes-family-immigration-prison-as-an-adult-immigration-prison/): Why Expedited Removal and Immigrant Detention Must End (July 2022)
+
+</div>
+
+<br><br><br><br><br><br>
+
+<div style="float:left; margin-right: 10px;">
+  [![](figures/detention.png){width=300 fig-alt="An image of a detention facility and the text IMPACTS: Immigrant detention tears families apart, denies immigrants access to legal counsel and necessary healthcare, as well as drains the economy for a profit. Another image of protesters with signs and the text SOLUTIONS: Community based alternatives are more humane, more effective, and less costly thandetention."}](detention.html)
+</div>
+
+<div style="font-size:23px">
+
+[Ending Immigrant Detention in the United States](detention.html) - A Policy Brief (April 2022)
+
+</div>
+
+<br><br><br><br>

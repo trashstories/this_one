@@ -1,0 +1,30 @@
+---
+title: "Visualization Examples"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+![](figures/prisoners_dash.png){width="100%"}
+
+<br><br><br>
+
+![](figures/pleadingchange_dash.png){width="100%"}
+
+<br><br><br>
+
+![](figures/prisontowns_w_memo.png){width="100%"}
+
+<br><br><br>
+
+![](figures/ai_viz.png){width="100%"}
+
+<br><br><br>

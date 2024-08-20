@@ -1,0 +1,72 @@
+---
+title: "miscellaneous"
+subtitle: "miscellaneous projects"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+---
+# DREAM Analytics
+
+[![DREAM Analytics: Dumpster Research for Equity with an Abolitionist Mindset](dumpsterdata.png){width="80%" fig-alt="D.R.E.A.M. Analytics Dumpster Research for Equity with an Abolitionist Mindset, an image of a raccoon next to a dumpster with data icons in and around it with the caption 'Turn your trash data into treasure!'"}](https://rpubs.com/trashability/dream)
+
+DREAM Analytics is a moniker that I work under in my personal time to offer my data skills to non-profit and grassroots organizations at low or no costs. 
+
+Ideally, I hope to grow this into a network of data activists to share skills and support the greater movement for abolition of the prison industrial complex and the white supremacist systems rooted in settler-colonialism that perpetuate harm and have committed genocide on the continent known as North America for centuries against anyone outside the white anglo protestant elite, most notably against Indigenous and African people. 
+
+Email me at [trashability56@gmail.com](mailto:trashability56@gmail.com) if you are interested in collaborating. I am on Instagram but not very active, but I will reply to DMs and welcome followers [@trashability56](https://www.instagram.com/trashability56) (I usually post pup photos and examples of my graphics).
+
+### Mission
+
+<div style="text-align: justify">
+
+Our mission is to provide non-profit and grassroots organizations with tailored data services that not only enhance their operational efficiency but also contribute to dismantling systemic inequalities. 
+
+</div>
+
+### Values
+
+<div style="text-align: justify">
+
+At DREAM Analytics, we believe in transforming data into a catalyst for positive change. We are dedicated to ensuring that every data-driven initiative aligns with our commitment to equity, justice, and abolition.
+
+- **Data Liberation for Equity**: We view data as a tool for liberation. Our services are designed to liberate valuable insights that empower organizations to identify and address disparities, including unknown implicit biases, and advance equity in their missions.
+- **Collaborative Empowerment**: DREAM Analytics collaborates directly with organizations, recognizing their expertise and unique insights into the communities they serve. Through collaborative empowerment, we aim to build sustainable data-driven practices that amplify the impact of social justice initiatives. 
+- **Abolitionist Mindset in Action**: We actively integrate an abolitionist mindset into every facet of our work. By challenging conventional data practices and dismantling oppressive norms, we strive to contribute to the broader movement for social and systemic change, and ultimately toward a society without police and prisons.
+- **Innovation and Adaptability**: We are committed to continuous innovation and adaptability. As the social landscape evolves, so do our methodologies. DREAM Analytics embraces emerging technologies and novel approaches to deliver cutting-edge data solutions.
+- **Ethical Data Practices**: Ethical considerations are at the core of our work. We uphold the highest standards of data privacy, security, and transparency. Our ethical data practices ensure that the insights derived from data are used responsibly and with the utmost respect for individual rights.
+
+</div>
+
+# Mischievious Maps
+
+<div style="font-size:23px">
+
+Visit my Etsy store for personalized map art!
+
+</div>
+
+<div style="font-size:23px; text-align: center">
+
+[Berry Foray's Michievious Maps](https://mischievousmaps.etsy.com)
+
+</div>
+
+![](circles.png)
+
+![](friends6pink.jpg)
+
+![](nikkimap.png)
+
+![](friends4blue.jpg)
+
+![](maptest.png)
+
+
+
+
