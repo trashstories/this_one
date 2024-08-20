@@ -1,0 +1,182 @@
+---
+title: "rolling meadow adventures"
+author: "jamie pantazi (berry foray) and roman wander (dave)"
+format: 
+  html: 
+    toc: true
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    fig-align: "center"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+---
+
+**Follow us in our Rolling Meadow as we adventure through the forests, mountains, swamps, and maybe even a desert someday!**
+
+:::: {.columns}
+
+::: {.column width="40.5%"}
+
+![](pics\bus\bus1.png){width="100%"}
+
+:::
+
+::: {.column width="59.5%"}
+
+![](pics\bus\bus2.jpg){width="100%"}
+
+:::
+
+::::
+
+# how it started...
+
+[![](pics\wedding\journey.png){width="100%"}](prewedding.html)
+
+:::: {.columns}
+
+::: {.column width="33.33%"}
+
+<!-- ![](pics\wedding\IMG-9791.jpg){width="100%"} -->
+<!-- ![](pics\wedding\health.png){width="100%"} -->
+
+:::
+
+::: {.column width="33.33%"}
+
+<!-- ![](pics\wedding\vows.png){width="100%"} -->
+<!-- ![](pics\wedding\stuff.png){width="100%"} -->
+
+:::
+
+::: {.column width="33.33%"}
+
+<!-- ![](pics\wedding\sibs.png){width="100%"} -->
+<!-- ![](pics\wedding\action.png){width="100%"} -->
+
+:::
+
+::::
+
+
+## love & fiction
+
+[![](pics\wedding\invite.png){width="100%"}](lovefiction.html)
+
+[![](pics\wedding\action2.png){width="100%"}](lovefiction.html)
+
+*link to wedding storymap*
+
+# rolling meadow
+
+<div style="font-size:18px; text-align: justify">
+
+While we were planning our wedding (and finishing grad school), we began looking at what we might do after school finished. We knew we wanted to get out of the city, away from all the cities, and we began looking for somewhere we might be able to get a good bit of land where we could spread out, maybe bring some other folks to help build something different. We thought about starting a dog rescue on the land and maybe building some spaces to hold gatherings and events. At the top of our list of places to move was Carbondale, IL, so we decided to visit on our honeymoon. 
+
+Carbondale was everything we wanted—liberal enough of a college town, great hospital, affordable land, enough state protections of our rights to feel safe for the time being, and when we visited it did not disappoint! We looked at a few houses that we really liked, but decided to wait until school finished to make a decision (wanted to be sure we had reliable income after school). 
+
+However, shortly after we came home, my health deteriorated quickly, and I ended up in the hospital. I saw all the specialist under the sun and no one had a clue why I could no longer walk more than a few steps or use my arms or hands for anything delicate or strenuous. Since we lived in a two-story apartment at the time and I could no longer make it up the stairs, we decided that if we had to move out and we weren't buying a home yet, that we might as well buy a bus and live in that until we make more permanent plans. 
+
+As of writing this, we are a little over one year into the journey, and while we have certainly seen some trials, overall, we couldn't ask for anything more. We get to wake up next to great lakes and might rivers every day. I got my dream job and can work from anywhere. If I can't get out of bed, I can take my bed with me.
+
+</div>
+
+## bumpy start
+
+*link to bus storymap*
+
+### chasing rainbow
+
+## flatlands full of sand
+
+*link to bus storymap*
+
+### camping with the niblings
+
+We saw some deer, swam in the lake, and watched *Inside Out* on the side of the bus!
+
+:::: {.columns}
+
+::: {.column width="33.33%"}
+
+![](pics\niblings\20231021_084302.jpg){width="100%"}
+![](pics\niblings\20231021_085641.jpg){width="100%"}
+
+:::
+
+::: {.column width="33.33%"}
+
+![](pics\niblings\20231021_090531.jpg){width="100%"}
+![](pics\niblings\20231021_113633.jpg){width="100%"}
+![](pics\niblings\20231021_123900.jpg){width="100%"}
+![](pics\bus\drawers.jpg){width="100%"}
+
+:::
+
+::: {.column width="33.33%"}
+
+![](pics\niblings\20231021_123205.jpg){width="100%"}
+![](pics\niblings\20231020_203051.jpg){width="100%"}
+![](pics\niblings\20231021_083036.png){width="100%"}
+
+:::
+
+::::
+
+### surviving that long in Florida was made possible by these amazing kids (and dogs)
+
+:::: {.columns}
+
+::: {.column width="33.33%"}
+
+![](pics\bus\20230902_200151.jpg){width="100%"}
+![](pics\bus\20230902_185400.jpg){width="100%"}
+![](pics\bus\20230907_215048.jpg){width="100%"}
+
+:::
+
+::: {.column width="33.33%"}
+
+![](pics\bus\20230830_135110.jpg){width="100%"}
+![](pics\bus\PXL_20230903_001022458.jpg){width="100%"}
+![](pics\bus\PXL_20230909_224241946.jpg){width="100%"}
+
+:::
+
+::: {.column width="33.33%"}
+
+![](pics\bus\bday.jpg){width="100%"}
+![](pics\bus\ari1.jpg){width="100%"}
+![](pics\bus\dogs1.jpg){width="100%"}
+
+:::
+
+::::
+
+## hot & spikey
+
+*link to bus storymap*
+
+### Garner State Park
+
+## great lakes & mighty rivers
+
+*link to bus storymap*
+
+### crystal clear
+
+### the most superior of lakes
+
+### Mississippi south
+
+## rainbows
+
+### Carson (nationals 2021)
+
+### Blue Ridge (summer 2023)
+
+### Ocala (winter 2024)
+
+### Apalachacola (winter 2024)
+
+### Great Lakes (summer 2024)

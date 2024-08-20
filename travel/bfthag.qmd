@@ -1,0 +1,270 @@
+---
+title: "black feminist transformational healing and growth"
+author: "jamie pantazi (berry foray) and roman wander"
+format: 
+  html: 
+    toc: false
+editor_options: 
+  chunk_output_type: console
+---
+ <!-- style="border-radius:50%; padding:0px" -->
+
+![](bfth\pics\amb.jpg){width="12%" style="border-radius: 8px"}
+![](bfth\pics\hooks.jpeg){width="12%" style="border-radius: 8px"}
+![](bfth\pics\patrisse.jpg){width="12%" style="border-radius: 8px"}
+![](bfth\pics\srt.jpg){width="12%" style="border-radius: 8px"}
+![](bfth\pics\prentis.jpg){width="12%" style="border-radius: 8px"}
+![](bfth\pics\birdsong.jpg){width="12%" style="border-radius: 8px"}
+![](bfth\pics\haga.jpg){width="12%" style="border-radius: 8px"}
+![](bfth\pics\ruha.png){width="12%" style="border-radius: 8px"}
+
+<div style="font-size:18px; text-align: justify">
+
+**a repeatable 12 month black feminist transformational healing reading and activity resource for personal, interpersonal, and community growth**
+
+For the last few months, my partner and I have been engaging in a practice of reading together everyday (or at least *almost* every day). We have been choosing books from Black Feminist authors like bell hooks and Sonya Renee Taylor, and together we read approximately one chapter (or about 15-20 minutes) and then discuss how the ideas in the reading relate to our relationship and any recent or current conflicts, as well as how they relate to our larger community and the movement towards liberation more broadly.
+
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(scales)
+library(readr)
+library(extrafont)
+library(googlesheets4)
+library(gt)
+library(colorspace)
+
+```
+
+```{r load}
+
+gs4_deauth()
+
+grow <- read_sheet("https://docs.google.com/spreadsheets/d/1moyOGAkx7BfEeaZPbrDrXKWK2oYudeBaA4T9IwTHAn0/edit#gid=0", sheet = "grow") %>% 
+  drop_na(title)
+
+
+
+```
+
+``` {r books}
+
+grow %>% 
+  arrange(o) %>%
+  mutate(link = paste0("[", title, "](", link, ")"), 
+         link = map(link, gt::md)) %>%
+  select(link, author, year) %>% 
+  gt() %>% 
+  tab_header(md("**Reading List**")) %>% 
+  cols_label(link = md("**Title**"),
+             author = md("**Author**"),
+             year = md("**Year**")) %>% 
+  cols_align(align = "left")
+
+```
+
+The idea behind creating this page is to capture and share insights, reflections, and transformations from our individual lives and relationship (both with each other and others in our lives). We hesitate to call this a guide or a curriculum because it is born out of genuine longing for better relationships and community. We didn't plan out what to read; we simply started with [*The Will to Change: Men, Masculinity, and Love*](https://bellhooksbooks.com/product/the-will-to-change/) by bell hooks, and I was reading [*An Abolitionist's Handbook: 12 Steps to Changing Yourself and the World*](https://www.akpress.org/an-abolitionist-s-handbook.html) on my own. As soon as I finished it, I told my partner that we are reading it together next. From there, we followed some of the suggestions in the "What to Read/Watch/See/Hear" sections of each chapter in that book. Eventually, we began listening to Prentis Hemphill's podcast [*Finding Our Way*](https://www.findingourwaypodcast.com/) in between books to discover new authors and titles. This resource is ever expanding and designed for different sections to be revisited, either on a 12 month rolling basis, or whenever there is a particular need to dive into one of these concepts and continue the never-ending journey of change.
+
+One central tenet to this work toward healing, growth, and eventually liberation is that all of the growth and strategies must scale; they must scale up from our most intimate relationships all the way to the global community of humans, and back. adrienne maree brown defines a fractal as "a never-ending pattern. Fractals are infinitely complex patterns that are self-similar across different scales. They are created by repeating a simple process over and over in an ongoing feedback loop" ([*Emergent Strategy: Shaping Change, Changing Worlds*](https://www.akpress.org/emergentstrategy.html), 2017). This idea has informed how we look at each chapter we read and discuss. While it is important to imagine, strategize, and work toward a world where all humans have agency, dignity, and safety (on top of meeting their fundamental human needs), the tactics that will get us there are tactics that must also be practiced in the most minute of relationships. If we cannot treat the ones we choose to love in a way that helps us both heal and grow safely, how can we build that for humans we do not even know, and very well may not even like.
+
+We have formatted this resource as a 12-month plan adopted from the 12 steps and concepts in Patrisse Cullors book [*An Abolitionist's Handbook: 12 Steps to Changing Yourself and the World*](https://www.akpress.org/an-abolitionist-s-handbook.html). She provides 12 distinct concepts that build on each other to create a framework for how this type of healing and growth can be made more sustainable. Each month will focus on one step in her book. While there is no right or wrong way to use this resource, the intention is that the corresponding chapter of *An Abolitionist's Handbook* provides a succinct explanation of the concept, along with examples of success and failure, and could be read alone; the other works in that section come from other sources, but tackle a similar or related concept to dive further into the practice. Our suggestion is to read the *Handbook* chapter and then pick 1-3 other chapters or articles listed in that section to read following the chapter (depending on your capacity and the capacity of the other humans you might be using this with). 
+
+Though my partner and I did this together inside a long-term committed relationship, and our reflections may lean more towards applications in that arena, we hope that this resource can be helpful for larger groups or even individual journeys.
+
+</div>
+
+::: column-margin
+
+<div style="font-size:13px; text-align: justify">
+
+"It was and is devastatingly clear to me that until we have some sense of how to live our solutions locally, we won’t be successful at implementing a just governance system regionally, nationally, or globally...Grace articulated it in what might be the most-used quote of my life: 'Transform yourself to transform the world.'"
+
+—adrienne maree brown. [*Emergent Strategy: Shaping Change, Changing Worlds*](https://www.akpress.org/emergentstrategy.html) (p. 55-56). 2017. AK Press.
+
+</div>
+
+![](bfth\pics\amb.jpg){width="100%" style="border-radius: 8px"}
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<div style="font-size:13px; text-align: justify">
+
+"Over time, I have come to understand that social transformation (the push for more just systems and policies) and personal transformation (healing our own trauma and reshaping our relationships) have to happen together. Not one or the other, but both. We neglect ourselves or our growth in our rush to change what is external. When we do, we fracture, and succumb to what we are unwilling to face."
+
+—Prentis Hemphill. [*What It Takes to Heal: How Transforming Ourselves Can Change the World*](https://www.penguinrandomhouse.com/books/726173/what-it-takes-to-heal-by-prentis-hemphill/) (p. xxii). 2024. Random House Publishing Group. 
+
+</div>
+
+![](bfth\pics\prentis.jpg){width="100%" style="border-radius: 8px"}
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<div style="font-size:14px; text-align: justify">
+
+**Note**: This has resource has been gathered together and presented by me and my partner with all work cited to the original authors. The (mostly) women and non-cismen who wrote these invaluable books and articles deserve all the credit for bringing these insights and lessons to us in the written word. While we hope that our curation and reflections on their work help more folks discover these healing words and experience healing in their relationships and community and more, we want to be explicit about honoring the work and experience of the individuals who did the labor of organizing, fighting, surviving, writing, editing, and publishing their words for the world to learn from. Please seek out and support their work if you can.
+
+</div>
+
+<div style="font-size:16px; text-align: center">
+
+[adrienne maree brown](https://adriennemareebrown.net/)  
+[bell hooks](https://bellhooksbooks.com/)  
+[Patrisse Cullors](https://www.patrissecullors.com/)  
+[Sonya Renee Taylor](https://www.sonyareneetaylor.com/)  
+[Prentis Hemphill](https://prentishemphill.com/)  
+[Mia Birdsong](https://www.miabirdsong.com/about-1)  
+[Kazu Haga](https://www.sfzc.org/teachers/kazu-haga)  
+[Ruha Benjamin](https://www.ruhabenjamin.com/)  
+
+</div>
+
+::: 
+
+# 12 Months ~~Steps~~ to Changing Yourself and the World
+
+<div style="font-size:17px; text-align: justify">
+
+Each chapter from [*An Abolitionist's Handbook: 12 Steps to Changing Yourself and the World*](https://www.akpress.org/an-abolitionist-s-handbook.html) by Patrisse Cullors is presented here with an exerpt or two defining that month's concept. We have also included some of our own reflections on the concept about how it has shown up in our relationship or movement work. 
+
+Each month has a link to a dedicated page with more articles, chapters, podcast episodes, and more to dive deeper into the topic. We are always open to recommendations for other works around these topics, and if you would like to share any other work or any feedback on thise resource or its content, [feel free to drop us a line!](mailto:lookcloser.beauty@gmail.com) (We are also not opposed to virtul book clubs or reading groups!)
+
+*-add reflections-*
+
+</div>
+
+### month 1: Courageous Conversations 
+
+<div style="font-size:17px; text-align: justify">
+
+“We have courageous conversations because our goal is to live inside of a healthy community that values the dignity of every single human being. We are able to value our lives more if we make the time to engage ourselves and each other with honesty, directness and the courage it takes to speak our truths.”
+
+[read more](bfthg/m01.html)
+
+</div>
+
+### month 2: Respond vs. React 
+
+<div style="font-size:17px; text-align: justify">
+
+“Conflict should actually strengthen relationships and community dynamics. We don’t have to approach conflict as automatically volatile. We can see conflict the way we understand friction. If you are rubbing two twigs together, eventually the friction can create heat and that heat can turn into fire. If you are not careful with the fire, you can burn yourself, but if you are careful with the fire, the heat can nourish you.”
+
+[read more](bfthg/m02.html)
+
+</div>
+
+### month 3: Nothing Is Fixed 
+
+<div style="font-size:17px; text-align: justify">
+
+“When I say “fixed,” I mean it in every sense of the word: nothing is permanent or absolute, and nothing within this current system has been repaired.”
+
+“When we choose experimentation as abolitionists, we get to see what’s possible on the other side of the rules that have been written for us. Abolitionists who have experimented throughout the development of this nation have changed the course of history. If we didn’t experiment, the project of chattel slavery would still exist. Jim Crow and Black codes would still exist. It is because of our experimentation that the abolitionist movement in its current form continues to disrupt the police and prison state.”
+
+[read more](bfthg/m03.html)
+
+</div>
+
+### month 4: Say Yes to Imagination 
+
+<div style="font-size:17px; text-align: justify">
+
+“Abolitionist praxis offers us an opportunity to dream of a world where our families and communities are provided with the utmost care. Abolitionist praxis exists in a world where our governments are no longer reliant on police, jails, prisons, courts and military. Abolitionist praxis is rooted in our collective healing. It is rooted in a deep and profound trust for all beings and our ability to love each other. While we sit in this moment during this global pandemic, we get to reimagine an abolitionist world. We owe it to each other and ourselves. We owe it to our descendants and it all starts with our imagination.”
+
+[read more](bfthg/m04.html)
+
+</div>
+
+### month 5: Forgive Actively, Not Passively 
+
+<div style="font-size:17px; text-align: justify">
+
+“Forgiving passively means you accept and forget. Forgiving actively means you become part of the process, even if it’s uncomfortable...The best apology comes with action. Forgiving someone actively comes with action steps. If you truly want to forgive someone, you want them to be better.”
+
+“Forgiving actively gives the forgiver an agency that is often unmet when we hold on to what or who has harmed us. When we are unable to forgive or when we are hell-bent on holding on to a lack of forgiveness, we create a cycle of apathy at best, revenge at worst.”
+
+[read more](bfthg/m05.html)
+
+</div>
+
+### month 6: Allow Yourself to Feel 
+
+<div style="font-size:17px; text-align: justify">
+
+“Feelings are important because they help us identify our hurts and joys. They help us understand our emotional makeup, thus giving us more possibility and range in naming our needs...Stuffing our feelings or not acknowledging them creates a cycle of self-blame and self-harm that in fact impacts every part of our lives.”
+
+[read more](bfthg/m06.html)
+
+</div>
+
+### month 7: Commit to Not Harming or Abusing Others 
+
+<div style="font-size:17px; text-align: justify">
+
+“Violence doesn’t happen in a vacuum. It is connected to the conditions that we live in, and we all participate in creating those conditions, and we all have a collective responsibility for ending violence, harm and abuse.”
+
+“We all have the capacity to be harmed and also have the capacity to cause harm. The sooner we are able to understand that the dichotomy of abuser and victim is inherently false, the closer we are to understanding how abolition can, will and does support moving all of us toward a healing path...Sometimes abuse and harm are done unintentionally, but whether we cause harm intentionally or unintentionally, it is our work to interrupt that pattern for the sake of healing and liberation.”
+
+[read more](bfthg/m07.html)
+
+</div>
+
+### month 8: Practice Accountability 
+
+<div style="font-size:17px; text-align: justify">
+
+“For some, seeing someone getting emotional is hard to take in. So we rush to apologize in the hopes that they will stop crying and return to “normal.” We’re taught to push back discomfort as quickly as possible. We try to apologize and hug to make it go away quickly. But as abolitionists, sitting with discomfort is critical for taking accountability. Imagine that you have harmed someone. They confront you and tell you their thoughts. The most important thing you can do if you want to take accountability is just listen. So much discomfort and discord comes when people feel like they are not being heard. Often because someone wants to rush through the discomfort and skip to the apology.”
+
+[read more](bfthg/m08.html)
+
+</div>
+
+### month 9: Embrace Non-Reformist Reform 
+
+<div style="font-size:17px; text-align: justify">
+
+“To make it simple, non-reformist reform is the idea that we’re not fighting to improve an existing, failed system. We are fighting for what we actually need within a brand-new system.”
+
+“Reforms ultimately keep the greater society the same, with some minor approaches to change. They actually maintain, support and increase the status quo and don’t approach the root causes.”
+
+[read more](bfthg/m09.html)
+
+</div>
+
+### month 10: Build Community 
+
+<div style="font-size:17px; text-align: justify">
+
+“You need every principle we’ve discussed thus far in order to make this one work. This work can’t be done alone. Can you start alone? Yes. Can you read alone and think alone and marinate on teachings alone? Absolutely. No matter what level your work will take you to, it will likely require you to join or build a community—whether it’s a weekly meeting at your kitchen table or a Zoom lecture with hundreds.”
+
+“Plain and simple: without community, we don’t get free. Even though many communities, like the Black Panthers and the Nation of Islam, were flawed, both in their beginnings and at their heights, we can learn from them and avoid the bumps we know will be in the road waiting for us.”
+
+[read more](bfthg/m10.html)
+
+</div>
+
+### month 11: Value Interpersonal Relationships 
+
+<div style="font-size:17px; text-align: justify">
+
+“Interpersonal relationships are important because they are how we build our communities, and healthy connections to other human beings help build strong societies. The role of an abolitionist is to recognize the inherent value of human life and human connection. It is why we believe everyone has the capacity to transform, heal and be accountable for harm caused.”
+
+[read more](bfthg/m11.html)
+
+</div>
+
+### month 12: Fight the U.S. State Rather Than Make It Stronger
+
+<div style="font-size:17px; text-align: justify">
+
+“Part of the work we must do as abolitionists to get free is to create new avenues to undermine the current United States and the ability of its harmful, broken systems to further oppress, suppress and attack communities who are poor.”
+
+“It reminded me how important it is to push back against the state and how we approach things from a state and governmental point of view. Conflict does not have to be drawn-out legal battles with lawyers reaping more money than any of the parties involved. Can I just ask an elder to interfere? Maybe not. But shouldn’t the goal be to dismantle the agencies that keep us in their courtrooms, deciding our tensions? What can we do to make sure our battles are waged with courageous conversations, directly across from each other, with all the tears and emotion that come with that?”
+
+[read more](bfthg/m12.html)
+
+</div>
+
+
+

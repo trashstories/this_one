@@ -1,0 +1,66 @@
+---
+title: "pre-bus travels"
+author: "jamie pantazi (berry foray) and roman wander (david bower)"
+format: 
+  html: 
+    toc: true
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    fig-align: "center"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+---
+
+# how it started...
+
+## really ties the room together
+
+After graduating undergrad in December 2018, I decided to move to Texas to get a job helping with family separation and the crisis at the border. I decided to stop in New Orleans for a night or two on my way from Atlanta to San Antonio. The friend I was staying with also had someone else sleeping on the couch temporarily. As we all sat around the living room, smoking, joking, and watching something on the TV, the other couch guy made a joke about the rug tying the room together. I laughed since I understood the reference and also a Coen brothers fan. Since I thought he was kind of cute, I decided to switch to the couch he was sitting on the next time I stood up. As night turned into early morning, we had been scooching closer and closer to each other on the couch. Eventually, our hands finally touched, and it escalated quickly from there. I extended my stay in New Orleans for a few extra days, and we spent it together exploring the city, smoking cigarettes, and going out on a real live date.
+
+## origins of gouda cheese dog
+
+On a very hot day in the summer of 2019, in San Antonio, my boss sent out an email to the team explaining that she had found an adorable little street dog scrounging for food and shade around her house. I sent the picture of the dog to Dave to ask what he thought about him. He said that is a very cute little dog, so they planned to meet the dog that evening. As soon as he came out of the crate to greet us, the little guy ran up to me and proceeded to poop diarrhea all over my leg. After it was all cleaned up they snapped this picture. The dog was so happy and relieved to have a family, he just could not hold it in! As we contemplated a name for our new family member, our love of cheese and pets named after food overwhelmed us as we chose a name for our new Gouda-colored puppy.
+
+![](pics\wedding\hi_gouda.png){width="60%" style="display: block; margin-left: auto; margin-right: auto"}
+
+## 11,000 feet up
+
+We had gathered the gear and gone on many practice camping trips to prepare for this rugged and lengthy excursion into the Carson National Forest in July of 2021. The occasion was the national Rainbow Gathering. Carson National Forest is located near Taos, NM, and contains gorgeous mountains that stretch as high as 12,113 feet up. The trek up to the camping area was over 2.5 miles from where we parked, and the trail up was mostly inclined, with only a few flat areas to rest. After a hard road up, we set up camp with thousands of others spread throughout the forest. We stayed four nights in this beautiful treasure of a National Forest, mingling with new friends, participating in hippie roadblocks, and enjoying peace and harmony in nature.
+
+![](pics\wedding\20210703_091543.jpg){width="60%" style="display: block; margin-left: auto; margin-right: auto"}
+
+# pre-wedding travels
+
+![](pics\wedding\journey.png){width="100%"}
+
+
+# Just Married!
+
+:::: {.columns}
+
+::: {.column width="33.33%"}
+
+![](pics\wedding\IMG-9791.jpg){width="100%"}
+![](pics\wedding\health.png){width="100%"}
+![](pics\wedding\us3.png){width="100%"}
+
+:::
+
+::: {.column width="33.33%"}
+
+![](pics\wedding\vows.png){width="100%"}
+![](pics\wedding\stuff.png){width="100%"}
+![](pics\wedding\us.png){width="100%"}
+
+:::
+
+::: {.column width="33.33%"}
+
+![](pics\wedding\sibs.png){width="100%"}
+![](pics\wedding\action.png){width="100%"}
+![](pics\wedding\kiss.png){width="100%"}
+
+:::
+
+::::
+# Honeymoon Adventures
