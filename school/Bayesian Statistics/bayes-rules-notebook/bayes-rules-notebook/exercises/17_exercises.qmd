@@ -1,0 +1,233 @@
+---
+title: "17: (Normal) Hierarchical Models with Predictors"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(rstanarm)
+library(bayesplot)
+library(tidybayes)
+library(broom.mixed)
+library(lme4)
+
+```
+
+# 17.9.1 Conceptual exercises
+
+## Exercise 17.1 (Translating assumptions into model notation) 
+
+To test the relationship between reaction times and sleep deprivation, researchers enlisted 3 people in a 10-day study. Let $Y_{ij}$ denote the reaction time (in ms) to a given stimulus and $X_{ij}$ the number of days of sleep deprivation for the $i$th observation on subject $j$. For each set of assumptions below, use mathematical notation to represent an appropriate Bayesian hierarchical model of $Y_{ij}$ vs $X_{ij}$.
+
+a. Not only do some people tend to react more quickly than others, sleep deprivation might impact some people’s reaction times more than others.
+
+\begin{aligned}
+Y_{ij} | \beta_{0j}, \beta_1, \sigma_y & \sim N(\mu_{ij}, \sigma_y^2) \;\; \text{ with } \;\;  \mu_{ij} = \beta_{0j} + \beta_1 X_{ij} \text{(regression model} \\
+& \text{ WITHIN subject $j$)} \\
+\beta_{0j} | \beta_0, \sigma_0 \stackrel{ind}{\sim} N(\beta_0, \sigma_0^2) & \text{(variability in baseline speeds} \\
+& \text{ BETWEEN subjects)}\\
+\beta_{0c}  & \sim N(m_0, s_0^2) \text{(priors on global parameters)} \\
+\beta_1  & \sim N(m_1, s_1^2) \\
+\sigma_y & \sim \text{Exp}(l_y) \\
+\sigma_0 & \sim \text{Exp}(l_0) \\
+\end{aligned}
+
+b. Though some people tend to react more quickly than others, the impact of sleep deprivation on reaction time is the same for all.
+c. Nobody has inherently faster reaction times, though sleep deprivation might impact some people’s reaction times more than others.
+
+## Exercise 17.2 (Sketch the assumption: Part 1) 
+
+Continuing with the sleep study, suppose we model the relationship between reaction time $Y_{ij}$ and days of sleep deprivation $X_{ij}$ using the random intercepts model (17.5).
+
+a. Sketch a plot of data that we might see if $\sigma_y > \sigma_0$.
+b. Explain what $\sigma_y > \sigma_0$ would mean in the context of the sleep study.
+c. Repeat part a assuming $\sigma_y < \sigma_0$.
+d. Repeat part b assuming $\sigma_y < \sigma_0$.
+
+## Exercise 17.3 (Sketch the assumption: Part 2) 
+
+Suppose instead that we model the relationship between reaction time $Y_{ij}$ and days of sleep deprivation $X_{ij}$ using the random intercepts and slopes model (17.12) (with different priors).
+
+a. Sketch a plot of subject-specific trends that we might see if the correlation parameter were positive $\rho > 0$.
+b. Explain what $\rho > 0$ would mean in the context of the sleep study.
+c. Repeat part a for $\rho < 0$.
+d. Repeat part b for $\rho < 0$.
+
+## Exercise 17.4 (Making meaning of models) 
+
+To study the relationship between weight and height among pug puppies, you collect data on 10 different litters, each containing 4 to 6 puppies born to the same mother. Let $Y_{ij}$ and $X_{ij}$ denote the weight and height, respectively, for puppy $i$ in litter $j$.
+
+a. Write out formal model notation for model 1, a random intercepts model of $Y_{ij}$ vs $X_{ij}$.
+b. Write out formal model notation for model 2, a random intercepts and slopes model of $Y_{ij}$ vs $X_{ij}$.
+c. Summarize the key differences in the assumptions behind models 1 and 2. Root this discussion in the puppy context.
+
+## Exercise 17.5 (Translating models to code) 
+
+Suppose we had `weight` and `height` data for the puppy study. Write out appropriate `stan_glmer()` model code for models 1 and 2 from Exercise 17.4.
+
+# 17.9.2 Applied exercises
+
+## Exercise 17.6 (Sleep: setting up the model) 
+
+In the above conceptual exercises, you considered a sleep study of the relationship between reaction time and the number of days of sleep deprivation. You will explore this relationship in more depth here. To this end, suppose researchers tell us that on a typical day, the average person should have a reaction time of roughly 250ms to the stimulus used in the sleep study. Beyond this baseline, we’ll balance weakly informative priors with the `sleepstudy` data from the **lme4** package to better understand reaction times. Specifically, consider two possible models as expressed by `stan_glmer()` syntax:
+
+| model |  formula                             |
+| ----- | ------------------------------------ |
+|  1    | `Reaction ~ Days + (1 | Subject)`    |
+|  2    | `Reaction ~ Days + (Days | Subject)` |
+
+```{r}
+
+sleep <- sleepstudy
+
+sleep %>% 
+  ggplot(aes(x = Days, y = Reaction, color = Subject)) +
+  geom_smooth(se = FALSE)
+
+```
+
+a. What’s the grouping variable in the `sleepstudy` data and why is it important to incorporate this grouping structure into our analysis? **Because each person will have a certain variability among their response times and from the other participants.**
+b. Use formal notation to define the hierarchical regression structure of models 1 and 2. (You will tune the priors in the next exercise.)
+
+\begin{aligned}
+\text{Layer 1:} Y_{ij} | \mu_j, \sigma_y \sim &\text{model of how Reaction varies WITHIN Subject} j \\
+\text{Layer 2:} \mu_j | \mu, \sigma_\mu \sim &\text{model of how the typical Reaction $\mu_j$ varies BETWEEN Subjects}\\
+\text{Layer 3:} \mu, \sigma_y, \sigma_\mu \sim &\text{prior models for shared global parameters} \\
+\end{aligned}
+
+c. Summarize the key differences between models 1 and 2. Root this discussion in the sleep study.
+d. Using the `sleepstudy` data, construct and discuss a plot that helps you explore which model is more appropriate: 1 or 2.
+
+## Exercise 17.7 (Sleep: simulating the model) 
+
+Continuing with the sleep analysis, let’s simulate and dig into the hierarchical posteriors.
+
+a. Simulate the posteriors of models 1 and 2. Remember to use a baseline reaction time of 250ms, and weakly informative priors otherwise.
+
+```{r}
+
+sleep_model_1_prior <- stan_glmer(
+  Reaction ~ Days + (1 | Subject), 
+  data = sleep, family = gaussian,
+  prior_intercept = normal(250, 50),
+  prior = normal(2.5, 1), 
+  prior_aux = exponential(1, autoscale = TRUE),
+  prior_covariance = decov(reg = 1, conc = 1, shape = 1, scale = 1),
+  chains = 4, iter = 5000*2, seed = 84735, 
+  prior_PD = TRUE)
+
+set.seed(84735)
+sleep %>% 
+  add_fitted_draws(sleep_model_1_prior, n = 4) %>%
+  ggplot(aes(x = Days, y = Reaction)) +
+    geom_line(aes(y = .value, group = paste(Subject, .draw))) + 
+    facet_wrap(~ .draw)
+
+sleep %>%
+  add_predicted_draws(sleep_model_1_prior, n = 100) %>%
+  ggplot(aes(x = Reaction)) +
+    geom_density(aes(x = .prediction, group = .draw))
+
+ggplot(sleep, aes(x = Days, y = Reaction)) + 
+  geom_point() + 
+  facet_wrap(~ Subject)
+
+# Simulate the posterior
+sleep_model_1 <- update(sleep_model_1_prior, prior_PD = FALSE)
+
+# Check the prior specifications
+prior_summary(sleep_model_1)
+
+# Markov chain diagnostics
+mcmc_trace(sleep_model_1)
+mcmc_dens_overlay(sleep_model_1)
+mcmc_acf(sleep_model_1)
+neff_ratio(sleep_model_1)
+rhat(sleep_model_1)
+
+tidy_summary_1 <- tidy(sleep_model_1, effects = "fixed",
+                       conf.int = TRUE, conf.level = 0.80)
+tidy_summary_1
+
+B0 <- tidy_summary_1$estimate[1]
+B1 <- tidy_summary_1$estimate[2]
+sleep %>%
+  add_fitted_draws(sleep_model_1, n = 200, re_formula = NA) %>%
+  ggplot(aes(x = Days, y = Reaction)) +
+    geom_line(aes(y = .value, group = .draw), alpha = 0.1) +
+    geom_abline(intercept = B0, slope = B1, color = "blue")
+
+```
+
+```{r, cache=TRUE, eval=FALSE}
+
+sleep_model_2 <- stan_glmer(
+  Reaction ~ Days + (Days | Subject), 
+  data = sleep, family = gaussian,
+  prior_intercept = normal(250, 50),
+  prior = normal(2.5, 1),
+  prior_aux = exponential(1, autoscale = TRUE),
+  prior_covariance = decov(reg = 1, conc = 1, shape = 1, scale = 1),
+  chains = 4, iter = 5000*2, seed = 84735, adapt_delta = 0.99999
+)
+
+saveRDS(sleep_model_2, "sleep_model_2.rds")
+
+```
+
+b. For model 2, report the global posterior median regression model of `Reaction` time.
+c. For model 2, construct and interpret 80% credible intervals for the `Days` regression coefficient.
+d. For model 2, calculate and interpret the posterior medians of $\sigma_y$, $\sigma_0$, $\sigma_1$, and $\rho$.
+
+## Exercise 17.8 (Sleep: group-specific inference) 
+
+Next, let’s dig into what Model 2 indicates about the individuals that participated in the sleep study.
+
+a. Use your posterior simulation to identify the person for whom reaction time changes the least with sleep deprivation. Write out their posterior median regression model.
+b. Repeat part a, this time for the person for whom reaction time changes the most with sleep deprivation.
+c. Use your posterior simulation to identify the person that has the slowest baseline reaction time. Write out their posterior median regression model.
+d. Repeat part c, this time for the person that has the fastest baseline reaction time.
+e. Simulate, plot, and discuss the posterior predictive model of reaction time after 5 days of sleep deprivation for two subjects: you and Subject 308. You’re encouraged to try this from scratch before relying on the `posterior_predict()` shortcut.
+
+## Exercise 17.9 (Sleep: Which model?)
+
+a. Evaluate the two models of reaction time: Are they wrong? Are they fair? How accurate are their posterior predictions?
+b. Which of the two models do you prefer and what does this indicate about the relationship between reaction time and sleep deprivation? Justify your answer with posterior evidence.
+
+## Exercise 17.10 (Voices: setting up the model) 
+
+Does one’s voice pitch change depending on attitude? To address this question, Winter and Grawunder (2012) conducted a study in which each subject participated in various role-playing dialogs. These dialogs spanned different contexts (e.g., asking for a favor) and were approached with different attitudes (polite vs informal). In the next exercises you’ll explore a hierarchical regression analysis of $Y_{ij}$, the average voice pitch in subject $j$’s $i$th dialog session (measured in Hz), by $X_{ij}$, whether or not the dialog was polite (vs informal). Beyond a baseline understanding that the typical voice pitch is around 200 Hz, you should utilize weakly informative priors.
+
+a. Using formal notation, define the hierarchical regression model of $Y_{ij}$ vs $X_{ij1}$. In doing so, assume that baseline voice pitch differs from subject to subject, but that the impact of attitude on voice pitch is similar among all subjects.
+b. Compare and contrast the meanings of model parameters $\beta_{0j}$ and $\beta_0$ in the context of this voice pitch study. NOTE: Remember that $X_{ij1}$ is a categorical indicator variable.
+c. Compare and contrast the meanings of model parameters $\sigma_y$ and $\sigma_0$ in the context of this voice pitch study.
+
+## Exercise 17.11 (Voices: check out some data) 
+
+To balance our weakly informative priors for the model of pitch by attitude, check out some data.
+
+a. Load the voices data from the bayesrules package. How many study subjects are included in this sample? In how many dialogs did each subject participate?
+b. Construct and discuss a plot which illustrates the relationship between voice pitch and attitude both within and between subjects.
+
+## Exercise 17.12 (Voices: simulating the model) 
+
+Continuing with the voice pitch analysis, in this exercise you will simulate and dig into the hierarchical posterior of your model parameters.
+
+a. Simulate the hierarchical posterior model of voice pitch by attitude. Construct and discuss trace plots, density plots, autocorrelation plots, and a pp_check() of the chain output.
+b. Construct and interpret a 95% credible interval for $\beta_0$.
+c. Construct and interpret a 95% credible interval for $\beta_1$.
+d. Is there ample evidence that, for the average subject, voice pitch differs depending on attitude (polite vs informal)? Explain.
+
+## Exercise 17.13 (Voices: focusing on the individual) 
+
+Continuing with the voice pitch analysis, in this exercise you will focus on specific subjects.
+
+a. Report the global posterior median model of the relationship between voice pitch and attitude.
+b. Report and contrast the posterior median models for two subjects in our data: A and F.
+c. Using `posterior_predict()`, simulate posterior predictive models of voice pitch in a new polite dialog for three different subjects: A, F, and you. Illustrate your simulation results using `mcmc_areas()` and discuss your findings.
+
+

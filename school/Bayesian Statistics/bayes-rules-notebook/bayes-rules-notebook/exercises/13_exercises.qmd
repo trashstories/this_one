@@ -1,0 +1,137 @@
+---
+title: "13: Logistic Regression"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(rstanarm)
+library(bayesplot)
+library(tidyverse)
+library(tidybayes)
+library(broom.mixed)
+library(janitor)
+
+```
+
+# 13.8.1 Conceptual exercises
+
+## Exercise 13.1 (Normal vs logistic) 
+
+For each scenario, identify whether Normal or logistic regression is the appropriate tool for modeling $Y$ by $X$.
+
+a. $Y =$ whether or not a person bikes to work, $X =$ the distance from the person’s home to work 
+   -  **logistic**
+b. $Y =$ the number of minutes it takes a person to commute to work, $X =$ the distance from the person’s home to work  
+   - **normal**
+c. $Y =$ the number of minutes it takes a person to commute to work, $X =$ whether or not the person takes public transit to work  
+   - **normal**
+
+## Exercise 13.2 (What are the odds?) 
+
+Calculate and interpret the odds for each event of interest below.
+
+a. The probability of rain tomorrow is 0.8. 
+   - $\text{odds of rain } = \frac{4/5}{1-4/5} = 4$ 
+   - **It is 4 times more likely to rain than not rain tomorrow.**
+b. The probability of flipping 2 Heads in a row is 0.25.
+   - $\text{2 heads in a row } = \frac{1/4}{1-1/4} = \frac{1}{3} $ 
+   - **It is one third as likely to flip 2 heads in a row than not.**
+c. The log(odds) that your bus will be on time are 0.
+   - $\text{on-time bus } = e^0 = 1 $ 
+   - **The odds that your bus will be on time are 1, which means it's equally likely to be on time as it is to be late or early**
+d. The log(odds) that a person is left-handed are -1.386.
+   - $\text{left-handed } = e^{-1.386} = 0.25 $ 
+   - **The odds that a person is left-handed are approximately 0.25, which means that for every 1 left-handed person, there are 3 right-handed people.**
+   
+   e = 2.71828182845904523536028747135266249775724709369995....
+
+## Exercise 13.3 (What’s the probability?) 
+
+Calculate and interpret the probability for each event of interest below.
+
+a. The odds that your team will win the basketball game are 20 to 1.
+   - $\text{win game } = \pi = \frac{20}{1 + 20} = 0.952381$
+   - **95.24% chance of winning**
+b. The odds of rain tomorrow are 0.5.
+   - $\text{probability of rain } = \pi = \frac{{\frac{1}{2}}}{1 + \frac{1}{2}} = 0.3333333$
+   - **33.33% chance of rain tomorrow**
+c. The log(odds) of a certain candidate winning the election are 1.
+   - $\text{win election } = \frac{e^{1}}{1 + e^{1}} = 0.7311$
+   - **73.11% chance of winning**
+d. The log(odds) that a person likes pineapple pizza are -2.
+   - $\text{likes pineapple } = \frac{e^{-2}}{1 + e^{-2}} = 0.1192$
+   - **11.92% chance of liking pineapple on pizza**
+   
+*Not 100% sure how this are calculated...*
+
+## Exercise 13.4 (Logistic models) 
+
+Let $Y$ indicate whether or not somebody believes that climate change is real and caused by people (TRUE or FALSE), and $X$ be their age. The simplified posterior median logistic regression model of $Y$ by $X$ provides insight into the relationship between the two. NOTE: This formula is loosely based on the `pulse_of_the_nation` survey results in the **bayesrules** package.
+
+\begin{align}
+\text{log(odds of belief in climate change)} = 1.43 - 0.02 \text{age}
+\end{align}
+
+a. Express the posterior median model on the odds and probability scales.
+b. Interpret the age coefficient on the odds scale.
+c. Calculate the posterior median probability that a 60-year-old believes in climate change.
+d. Repeat part c for a 20-year-old.
+
+## Exercise 13.5 (Sensitivity vs specificity) 
+
+Continuing our climate change belief analysis, the confusion matrix below summarizes the performance of our logistic model in classifying the beliefs of 1000 survey respondents, using a probability cut-off of 0.5.
+
+|     y      |   0   |   1   |
+| ---------- | ----- | ----- |
+| FALSE (0)  |	50   |  300  |
+| TRUE (1)	 |  30	 |  620  |
+
+a. Calculate and interpret the model’s overall accuracy.
+b. Calculate and interpret the model’s sensitivity.
+c. Calculate and interpret the model’s specificity.
+d. Suppose that researchers want to improve their ability to identify people that do not believe in climate change. How might they adjust their probability cut-off: Increase it or decrease it? Why?
+
+# 13.8.2 Applied exercises
+
+## Exercise 13.6 (Hotel bookings: getting started) 
+
+Plans change. Hotel room bookings get canceled. In the next exercises, you’ll explore whether hotel cancellations might be predicted based upon the circumstances of a reservation. Throughout, utilize weakly informative priors and the `hotel_bookings` data in the **bayesrules** package. Your analysis will incorporate the following variables on hotel bookings:
+
+|  variable                |  notation  |	 meaning                                 |
+| ------------------------ | ---------- | ---------------------------------------- |
+| `is_canceled`	           |    $Y$     | whether or not the booking was canceled  |
+| `lead_time`              |   $X_1$	  | number of days between the booking       |
+|                          |            | and scheduled arrival                    |
+| `previous_cancellations` |   $X_2$    | number of previous times the guest has   |
+|                          |            | canceled a booking                       |
+| `is_repeated_guest`      |   $X_3$    | whether or not the booking guest is a    |
+|                          |            | repeat customer at the hotel             |
+| `average_daily_rate`     |   $X_4$    | the average per day cost of the hotel    |
+
+a. What proportion of the sample bookings were canceled?
+b. Construct and discuss plots of `is_canceled` vs each of the four potential predictors above.
+c. Using formal mathematical notation, specify an appropriate Bayesian regression model of $Y$ by predictors $(X_1,X_2,X_3,X_4)$.
+d. Explain your choice for the structure of the data model.
+
+## Exercise 13.7 (Hotel bookings: simulation)
+
+a. Simulate the posterior model of your regression parameters $(\beta_0,\beta_1,\ldots,\beta_4)$. Construct trace plots, density plots, and a `pp_check()` of the chain output.
+b. Report the posterior median model of hotel cancellations on each of the log(odds), odds, and probability scales.
+c. Construct 80% posterior credible intervals for your model coefficients. Interpret those for $\beta_2$ and  $\beta_3$ on the odds scale.
+d. Among the four predictors, which are significantly associated with hotel cancellations, both statistically and meaningfully? Explain.
+
+## Exercise 13.8 (Hotel bookings: classification rules)
+
+a. How good is your model at anticipating whether a hotel booking will be canceled? Evaluate the classification accuracy using both the in-sample and cross-validation approaches, along with a 0.5 probability cut-off.
+b. Are the cross-validated and in-sample assessments of classification accuracy similar? Explain why this makes sense in the context of this analysis.
+c. Interpret the cross-validated overall accuracy, sensitivity, and specificity measures in the context of this analysis.
+d. Thinking like a hotel booking agent, you’d like to increase the sensitivity of your classifications to 0.75. Identify a probability cut-off that you could use to achieve this level while maintaining the highest possible specificity.
+
+## Exercise 13.9 (Hotel bookings: will they cancel?!)
+
+A guest that is new to a hotel and has only canceled a booking 1 time before, has booked a \$100 per day hotel room 30 days in advance. Simulate, plot, and discuss the posterior predictive model of $Y$, whether or not the guest will cancel this booking.
+Come up with the features of another fictitious booking that’s more likely to be canceled than the booking in part a. Support your claim by simulating, plotting, and comparing this booking’s posterior predictive model of $Y$ to that in part a.

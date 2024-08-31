@@ -1,0 +1,141 @@
+---
+title: "Exercise 11"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+It is **never** okay to truncate the y-axis on a bar chart, however, it may be acceptable for other types of charts. When visualizing data where zero is either impossible or out of the range of analysis, there is no reason to bring the y-axis down to zero. An example of this might be the age of voters; a person must be 18 to vote, so if the chart is showing the age of voters on the y-axis, it makes a lot of sense to start the y-axis at 18.
+
+\newpage
+
+# Task 2: Visualizing time
+
+Do the following:
+
+## 1. Load some time-related data
+
+```{r load-libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(haven)
+library(ggridges)
+library(gganimate)
+
+gss <- read_dta("data/GSS-1972-2018.dta") %>% 
+  drop_na(grass) %>% 
+  mutate(partyid = as_factor(partyid)) 
+
+```
+
+## 2. Make a plot to show how that data changes over time.
+
+```{r, warning=FALSE, message=FALSE}
+#| fig-height: 10.5
+#| fig-width: 8
+#| fig-cap: "'Grass'roots Support over Time"
+
+g <- gss %>% 
+  select(year, grass, partyid) %>% 
+  filter(partyid != "DK", partyid != "NA", partyid != "other party")
+
+g %>%   
+  ggplot(aes(grass, partyid)) +
+  geom_density_ridges(alpha = .5, fill = "#17E665") +
+  facet_wrap(~ as_factor(year), ncol = 5) +
+  scale_x_continuous(breaks = c(1,2), 
+                     labels = c(str_wrap("Joints For Everyone!", 8), 
+                                str_wrap("Lock Up the Dope Smokers!", 8)),
+                     position = "top") + 
+  scale_y_discrete(labels = c(str_wrap("Most Democrat", 8), 
+                              "", "", 
+                              "Independent", 
+                              "", "", 
+                              str_wrap("Most Republican", 8))) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "'Grass'roots Support over Time") +
+  theme_light() +
+  theme(legend.position = "bottom",
+        title = element_text(face = "bold", size = 14, 
+                             color = "#244500", family = "serif"),
+        plot.subtitle = element_text(color = "#249900"),
+        axis.text = element_text(color = "#2B004D", size = 8, face = "bold"),
+        axis.ticks = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(linetype = "longdash", 
+                                          color = "#E600C1"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(color = "#2B004D", face = "bold")) 
+
+```
+
+## 3. Explain why you chose to visualize the data the way you did.
+
+I chose to visualize support for the legalization of marijuana by party identity over time. To view the trends and format the plot, I used different facets for each year, but with so many years, that is a lot of little plots to read. I wanted to experiment with animations, so I animated the plot by year, so the shift in support can be seen throughout the years. The short animation shows how support for legalization increased overtime, especially for democrats.
+
+Animated .gif is attached separately.
+
+```{r, eval=FALSE, warning=FALSE, message=FALSE}
+
+grass <- g %>% 
+  ggplot(aes(grass, partyid)) +
+  geom_density_ridges(alpha = .5, fill = "#17E665") +
+  scale_x_continuous(breaks = c(1,2), 
+                     labels = c(str_wrap("Joints For Everyone!", 10), 
+                                str_wrap("Lock Up the Dope Smokers!", 15)),
+                     position = "top") + 
+  scale_y_discrete(labels = c(str_wrap("Most Democrat", 8), 
+                              "", "", 
+                              "Independent", 
+                              "", "", 
+                              str_wrap("Most Republican", 8))) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "'Grass'roots Support over Time",
+       subtitle = 'Year: {frame_time}') +
+  theme_light() +
+  theme(legend.position = "bottom",
+        title = element_text(face = "bold", size = 26, 
+                             color = "#244500", family = "serif"),
+        plot.subtitle = element_text(color = "#249900"),
+        axis.text = element_text(color = "#2B004D", size = 14, face = "bold"),
+        axis.ticks = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(linetype = "longdash", 
+                                          color = "#E600C1"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank()) +
+  transition_time(as.integer(year)) +
+  ease_aes('cubic-in-out')
+
+grass
+
+anim_save("grass.gif", grass, height = 800, width = 800)
+
+```

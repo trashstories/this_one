@@ -1,0 +1,14 @@
+{
+  "hash": "727106807999f28b48572f7af40af3fe",
+  "result": {
+    "markdown": "---\ntitle: \"8: Posterior Inference & Prediction\"\neditor_options: \n  chunk_output_type: console\n---\n\n::: {.cell}\n\n```{.r .cell-code}\n# Load packages\nlibrary(bayesrules)\nlibrary(tidyverse)\n```\n\n::: {.cell-output .cell-output-stderr}\n```\n── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n✔ dplyr     1.1.2     ✔ readr     2.1.4\n✔ forcats   1.0.0     ✔ stringr   1.5.0\n✔ ggplot2   3.4.2     ✔ tibble    3.2.1\n✔ lubridate 1.9.2     ✔ tidyr     1.3.0\n✔ purrr     1.0.1     \n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\nℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors\n```\n:::\n\n```{.r .cell-code}\nlibrary(rstan)\n```\n\n::: {.cell-output .cell-output-stderr}\n```\nLoading required package: StanHeaders\nrstan (Version 2.21.8, GitRev: 2e1f913d3ca3)\nFor execution on a local, multicore CPU with excess RAM we recommend calling\noptions(mc.cores = parallel::detectCores()).\nTo avoid recompilation of unchanged Stan programs, we recommend calling\nrstan_options(auto_write = TRUE)\nDo not specify '-march=native' in 'LOCAL_CPPFLAGS' or a Makevars file\n\nAttaching package: 'rstan'\n\nThe following object is masked from 'package:tidyr':\n\n    extract\n```\n:::\n\n```{.r .cell-code}\nlibrary(bayesplot)\n```\n\n::: {.cell-output .cell-output-stderr}\n```\nThis is bayesplot version 1.10.0\n- Online documentation and vignettes at mc-stan.org/bayesplot\n- bayesplot theme set to bayesplot::theme_default()\n   * Does _not_ affect other ggplot2 plots\n   * See ?bayesplot_theme_set for details on theme setting\n```\n:::\n\n```{.r .cell-code}\nlibrary(broom.mixed)\nlibrary(janitor)\n```\n\n::: {.cell-output .cell-output-stderr}\n```\n\nAttaching package: 'janitor'\n\nThe following objects are masked from 'package:stats':\n\n    chisq.test, fisher.test\n```\n:::\n\n```{.r .cell-code}\n# Load data\ndata(\"moma_sample\")\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

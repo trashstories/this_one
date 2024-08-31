@@ -1,0 +1,186 @@
+---
+title: "10: Evaluating Regression Models"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(bayesplot)
+library(rstanarm)
+library(rstan)
+library(tidybayes)
+library(janitor)
+library(broom.mixed)
+
+```
+
+
+# 10.6.1 Conceptual exercises
+
+## Exercise 10.1 (The Big Three) 
+
+When evaluating a model, what are the big three questions to ask yourself? 
+
+1. **How fair is the model?**
+2. **How wrong is the model?**
+3. **How accurate are the posterior predictive models?**
+
+## Exercise 10.2 (Model fairness) 
+
+Give an example of a model that will not be fair for each of the reasons below. Your examples don’t have to be from real life, but try to keep them in the realm of plausibility.
+
+a. How the data was collected. **Collecting data to track foot traffic that also counts bicycles or other objects as people walking**
+b. The purpose of the data collection. **Collecting data through mobile apps to sell to other entities**
+c. Impact of analysis on society. **P-hacking to support a desirable conclusion**
+d. Bias baked into the analysis. **Using data influenced by human bias to make subjective predictions that appear fair mathematically**
+
+## Exercise 10.3 (Your perspective) 
+
+Everyone has a standpoint or perspective that influences how they perceive the world. Rather than pretend that our standpoint is neutral, it is important to recognize it and how it might limit our ability to perceive the potential harms or benefits of our analyses.
+
+a. Identify two aspects of your life experience that inform your standpoint or perspective. 
+   i. **I have spent a significant portion of my adult life without a house or below the poverty line.**
+   ii. **I am a fat disabled woman in a world built on capitalist and patriarchal ideals that prioritize productivity, unattainable beauty standards, and masculine characteristics.**
+b. Identify how those two aspects of your life experience might limit your evaluation of future analyses.
+   i. **I will often assume the capitalists and those in power are the root cause of injustice.**
+   ii. **I may take on more than I can handle to stay ahead of those with more opportunity or privilege.**
+c. Identify how those two aspects of your life experience might benefit your evaluation of future analyses.
+   i. **I have a more nuanced understanding of the less obvious impacts of poverty.**
+   ii. **My perspective has less representation in previous researching offering a fresh approach.**
+
+## Exercise 10.4 (Neutrality?) 
+
+There are several instances in which data scientists might falsely consider themselves neutral. In this exercise, you will practice how to challenge the false idea of neutrality, an underappreciated skill for data scientists.
+
+a. How would you respond if your colleague were to tell you “I’m just a neutral observer, so there’s no bias in my data analysis?”
+b. Your colleague now admits that they are not personally neutral, but they say “my model is neutral.” How do you respond to your colleague now?
+c. Give an example of when your personal experience or perspective has informed a data analysis.
+
+## Exercise 10.5 (That famous quote) 
+
+George Box famously said: “All models are wrong, but some are useful.” Write an explanation of what this quote means so that one of your non-statistical friends can understand.
+
+## Exercise 10.6 (Assumptions) 
+
+Provide 3 assumptions of the Normal Bayesian linear regression model with $Y_i | \beta_0, \beta_1, \sigma \stackrel{ind}{\sim} N(\mu_i, \sigma^2)$ where $\mu_i = \beta_0 + \beta_1 X_i$.
+
+1. **Conditioned on $X$, the observed data $Y_i$ on case $i$ is independent of the observed data on any other case $j$.**
+2. **The typical $Y$ outcome can be written as a linear function of $X$0, $\mu = \beta_0 + \beta_1 X$.**
+3. **At any $X$ value, $Y$ varies normally around $\mu$ with consistent variability $\sigma$.**
+
+## Exercise 10.7 (Mini posterior predictive check) 
+
+Suppose we have a small dataset where predictor $X$ has values $\vec{x} = (12, 10, 4, 8, 6)$, and response variable $Y$ has values $\vec{y} = (20, 17, 4, 11, 9)$. Based on this data, we built a Bayesian linear regression model of $Y$ vs $X$.
+
+a. In our first simulated parameter set, $\left(\beta_0^{(1)}, \beta_1^{(1)}, \sigma^{(1)} \right) = (-1.8, 2.1, 0.8)$. Explain how you would use these values, combined with the data, to generate a prediction for $Y_1$.
+b. Using the first parameter set, generate predictions for $(Y_1, Y_2, \ldots, Y_5)$. Comment on the difference between the predictions and the observed values $\vec{y}$.
+   i. 
+   
+```{r}
+
+x <- c(12,10,4,8,6)
+y <- c(20,17,4,11,9)
+sig <- .8
+
+df <- data.frame(x = x, y = y, sig = sig)
+
+```
+
+``` {r, warning=FALSE, message=FALSE, results=FALSE, cache=TRUE}
+
+df_model <- stan_glm(y ~ x, data = df,
+                     family = gaussian,
+                     prior_intercept = normal(5000, 1000),
+                     prior = normal(10, 5), 
+                     prior_aux = exponential(0.8),
+                     chains = 4, iter = 5000*2, seed = 84735)
+
+# STEP 1: DEFINE the model
+stan_sample_model <- "
+  data {
+    int<lower = 0> n;
+    vector[n] Y;
+    vector[n] X;
+  }
+  parameters {
+    real beta0;
+    real beta1;
+    real<lower = 0> sigma;
+  }
+  model {
+    Y ~ normal(beta0 + beta1 * X, sigma);
+    beta0 ~ normal(-2000, 1000);
+    beta1 ~ normal(100, 40);
+    sigma ~ exponential(0.0008);
+  }
+"
+
+# STEP 2: SIMULATE the posterior
+stan_sample_sim <- 
+  stan(model_code = stan_sample_model, 
+       data = list(n = nrow(df), Y = df$y, X = df$x), 
+       chains = 4, iter = 5000*2, seed = 84735)
+
+```
+
+``` {r}
+
+df_model_df <- as.data.frame(df_model)
+
+first <- head(df_model_df, 1)
+first
+
+b0 <- first$`(Intercept)`
+b1 <- first$x
+sig  <- first$sigma
+
+set.seed(80085)
+one_sim <- df %>%
+  mutate(mu = b0 + b1 * sig,
+         sim = rnorm(5, mean = mu, sd = sig)) %>%
+  select(x, y, sim)
+
+pp_check(df_model, nreps = 50) + 
+  xlab("x")
+
+```
+
+## Exercise 10.8 (Explain to a friend: posterior predictive check) 
+
+Congratulations! You have just completed a posterior predictive check for your regression model. Your friend Shefali has a lot of questions about this. Explain the following to Shefali in plain language:
+
+a. The goal of a posterior predictive check.
+b. How to interpret the posterior predictive check results.
+
+## Exercise 10.9 (Explain to a friend: posterior predictive summary) 
+
+Shefali really appreciated your explanations from the previous exercise. She now wants you to explain posterior predictive summaries. Explain the following in plain language:
+
+a. What the median absolute error tells us about your model.
+b. What the scaled median absolute error is, and why it might be an improvement over median absolute error.
+c. What the within-50 statistic tells us about your model.
+
+## Exercise 10.10 (Posterior predictive checks)
+
+a. In `pp_check()` plots, what does the darker density represent? What does a single lighter-colored density represent?
+b. If our model fits well, describe how its `pp_check()` will appear. Explain why a good fitting model will produce a plot like this.
+c. If our model fits poorly, describe how its `pp_check()` might appear.
+
+## Exercise 10.11 (Cross-validation and tacos) 
+
+Recall this example from the chapter: *Suppose you want to open a new taco stand. You build all of your recipes around Reem, your friend who prefers that anchovies be a part of every meal. You test your latest “anchov-ladas” dish on her and it’s a hit.*
+
+a. What is the “data” in this analogy?
+b. What is the “model” in this analogy?
+c. How could you use cross-validation to evaluate a new taco recipe?
+d. Why would cross-validation help you develop a successful recipe?
+
+## Exercise 10.12 (Cross-validation)
+
+a. What are the four steps for the k-fold cross-validation algorithm?
+b. What problems can occur when you use the same exact data to train and test a model?
+c. What questions do you have about k-fold cross-validation?

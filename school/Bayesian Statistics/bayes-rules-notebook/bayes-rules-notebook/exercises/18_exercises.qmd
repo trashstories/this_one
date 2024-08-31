@@ -1,0 +1,44 @@
+---
+title: "18: Non-Normal Hierarchical Regression & Classification"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(bayesplot)
+library(rstanarm)
+library(tidybayes)
+library(broom.mixed)
+library(janitor)
+
+```
+
+## Exercise 18.1 (We know how to do a lot of stuff) 
+
+For each model scenario, specify an appropriate structure for the data model, note whether the model is hierarchical, and if so, identify the grouping variable. Though you do not need to simulate the models, be sure to justify your selections using the data provided. To learn more about these datasets, type `?name_of_dataset` into the console.
+
+a. Using the `coffee_ratings` data in R, researchers wish to model whether a batch of coffee beans is of the Robusta `species` based on its `flavor.`
+   - 
+b. Using the `trees` data in R, researchers wish to model a tree’s `Height` by its `Girth.`
+   -
+c. Using the `radon` data in the `rstanarm` package, researchers wish to model a home’s log_radon levels by its `log_uranium` levels.
+   -
+d. Using the `roaches` data in the `rstanarm` package, researchers wish to model the number of roaches in an urban apartment by whether or not the apartment has received a pest control `treatment`.
+   -
+   
+```{r}
+
+coffee <- coffee_ratings
+
+trees <- trees
+
+radon <- radon
+
+roaches <- roaches
+
+```
+

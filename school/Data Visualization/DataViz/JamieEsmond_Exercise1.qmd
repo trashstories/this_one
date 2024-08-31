@@ -1,0 +1,77 @@
+---
+title: "Exercise 1"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+# Reflection
+
+What is truth? Also coming from a humanities background, the questioning *truth* is an eternal quest. As a historian, the goal is to find the truth of history, but the first thing you learn in the study of history is that there is no single version of the truth of about what happened. Data is the same way. Data may represent some account of what took place, just as a European settler's diary may represent an account of early colonial life (for someone who knew how to write, owned a diary, and had the time and interest in writing anything down). Historians (and other experts of the humanities) must learn how to interpret various accounts; the interpretation of data is similar---data is the account and can be interpreted considering the context, the source, and the scope. Like a good historian tells a good story about what happen, while striving to present the truth as they understand it, data visualization tells a story about the data in the hopes of communicating truth.
+
+\newpage
+
+# My first plot
+
+```{r load-libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+
+cars <- read_csv("data/cars.csv")
+colors <- c("#CC0AA4", "#CCAC14", "#7400CC", "#3ACC14", "#0E0ACC")
+
+```
+
+**Here is a plot, it is not a great plot, but it is plotted.**
+
+```{r bad}
+
+cars %>% 
+  ggplot(aes(manufacturer, hwy, color = drv)) +
+  geom_point(size = 4) +
+  theme_light()
+
+```
+
+**Here is a better plot, could still be better, but it is at least prettier and legible.**
+
+```{r good}
+
+cars %>% 
+  mutate(drive = factor(case_when(drv == "4" ~ "4wd",
+                                  drv == "f" ~ "Fwd",
+                                  drv == "r" ~ "Rwd"))) %>% 
+  mutate(man = str_to_title(manufacturer)) %>% 
+  ggplot(aes(man, hwy, fill = drive)) +
+  geom_point(size = 4, shape = 21, alpha = .5) +
+  scale_fill_manual(values = colors) +
+  labs(x = NULL,
+       y = "Highway MPG",
+       fill = NULL,
+       title = "Highway MPG by Manufacturer and Drive") +
+  theme_light() +
+  theme(text = element_text(family = "serif"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom",
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#FFD1F9"),
+        panel.grid.minor.y = element_line(color = "#FFD1F9", linetype = "dashed"))
+
+```

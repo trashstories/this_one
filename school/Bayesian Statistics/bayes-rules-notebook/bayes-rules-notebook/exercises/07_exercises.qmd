@@ -1,0 +1,5 @@
+---
+title: "7: MCMC under the Hood"
+editor_options: 
+  chunk_output_type: console
+---

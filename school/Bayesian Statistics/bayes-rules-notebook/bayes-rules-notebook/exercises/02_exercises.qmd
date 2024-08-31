@@ -1,0 +1,132 @@
+---
+title: "2: Bayes' Rule"
+---
+
+## 2.5.1: Building up to Bayes' Rule
+
+### Exercise 2.1 (Comparing the prior and posterior)
+
+For each scenario below, you're given a pair of events, $A$ and $B$. Explain what you believe to be the relationship between the posterior and prior probabilities of $B$: $P(B \mid A) > P(B)$ or $P(B \mid A) < P(B)$.
+
+a. $A$ = you just finished reading Lambda Literary Award-winning author Nicole Dennis-Benn's first novel, and you enjoyed it!  
+   $B$ = you will also enjoy Benn's newest novel.  
+   **Answer:** $P(B \mid A) > P(B)$
+   
+b. $A$ = it’s 0 degrees Fahrenheit in Minnesota on a January day.  
+   $B$ = it will be 60 degrees tomorrow.  
+   **Answer:** $P(B \mid A) < P(B)$
+   
+c. $A$ = the authors only got 3 hours of sleep last night.  
+   $B$ = the authors make several typos in their writing today.  
+   **Answer:** $P(B \mid A) > P(B)$
+
+d. $A$ = your friend includes three hashtags in their tweet.  
+   $B$ = the tweet gets retweeted.  
+   **Answer:** $P(B \mid A) > P(B)$
+   
+   
+### Exercise 2.2 (Marginal, conditional, or joint?) 
+
+Define the following events for a resident of a fictional town: 
+
+$A$ = drives 10 miles per hour above the speed limit,  
+$B$ = gets a speeding ticket,  
+$C$ = took statistics at the local college,  
+$D$ = has used R,  
+$E$ = likes the music of Prince, and  
+$F$ = is a Minnesotan. 
+
+Several facts about these events are listed below. Specify each of these facts using probability notation, paying special attention to whether it’s a marginal, conditional, or joint probability.
+
+a. 73% of people that drive 10 miles per hour above the speed limit get a speeding ticket.  
+   **Answer:** $P(B \mid A)$ = 0.73 **conditional**
+
+b. 20% of residents drive 10 miles per hour above the speed limit.  
+   **Answer:** $A$ = 0.2 **marginal**
+   
+c. 15% of residents have used R.  
+   **Answer:** $A$ = 0.15 **marginal**
+   
+d. 91% of statistics students at the local college have used R.  
+   **Answer:** $P(D \mid C)$ = 0.91 **conditional**
+
+e. 38% of residents are Minnesotans that like the music of Prince.  
+   **Answer:** $P(E \mid F)P(F)$ = $E \cap F$ **joint**
+   
+f. 95% of the Minnesotan residents like the music of Prince.  
+   **Answer:** $P(E \mid F)$ = 0.95 **conditional**
+
+## 2.5.2 Practice Bayes’ Rule for events
+
+### Exercise 2.4 (Vampires?)
+
+Edward is trying to prove to Bella that vampires exist. Bella thinks there is a 0.05 probability that vampires exist. She also believes that the probability that someone can sparkle like a diamond if vampires exist is 0.7, and the probability that someone can sparkle like a diamond if vampires don’t exist is 0.03. Edward then goes into a meadow and shows Bella that he can sparkle like a diamond. Given that Edward sparkled like a diamond, what is the probability that vampires exist?
+
+$A$ = vampires exist    
+$B$ = sparkle ability  
+$C$ = Edward sparkles  
+
+**Answer:**  
+$P(A)$ = 0.05  
+$P(B \mid A)$ = 0.7  
+$P(B \mid A^{c})$ = 0.03  
+$P(A \mid B)$ > $P(A)$  
+$P(A \mid C)$  *little lost on this last part, it is very mathy*
+
+
+
+### Exercise 2.7 (Dating app) 
+
+Matt is on a dating app looking for love. Matt swipes right on 8% of the profiles he views. Of the people that Matt swipes right on, 40% are men, 30% are women, 20% are non-binary, and 10% identify in another way. Of the people that Matt does not swipe right on, 45% are men, 40% are women, 10% are non-binary, and 5% identify in some other way.
+
+$A$ = swipes right    
+$B$ = men  
+$C$ = women  
+$D$ = non-binary
+$E$ = other
+
+|             |  right  |  left  |
+|-------------|---------|--------|
+|  men        |   .4    |   .45  |
+|  women      |   .3    |   .4   |
+|  non-binary |   .2    |   .1   |
+|  other      |   .1    |   .05  |
+
+
+a. What’s the probability that a randomly chosen person on this dating app is non-binary?  
+   $P(D \mid A)$ + $P(D \mid C^{c})$ / 2 = .2 + .1 / 2 = .15
+
+b. Given that Matt is looking at the profile of someone who is non-binary, what’s the posterior probability that he swipes right?  
+   $P(A \mid D)$ > $P(A)$ 
+
+## 2.5.3 Practice Bayes’ Rule for random variables
+
+### Exercise 2.14 (Late bus)
+
+Li Qiang takes the 8:30am bus to work every morning. If the bus is late, Li Qiang will be late to work. To learn about the probability that her bus will be late ($\pi$), Li Qiang first surveys 20 other commuters:  
+3 think $\pi$ is 0.15,  
+3 think $\pi$ is 0.25,  
+8 think $\pi$ is 0.5,  
+3 think $\pi$ is 0.75, and  
+3 think $\pi$ is 0.85.
+
+a. Convert the information from the 20 surveyed commuters into a prior model for $\pi$.
+
+    $P(\pi) = ((.15 * 3) + (.25 * 3) + (.5 * 8) + (.75 * 3) + (.85 * 3)) / 20 = .5$
+
+b. Li Qiang wants to update that prior model with the data she collected: in 13 days, the 8:30am bus was late 3 times. Find the posterior model for $\pi$.
+
+    $P(\pi^{p}) = 3 / 13 = .23$
+
+c. Compare and comment on the prior and posterior models. What did Li Qiang learn about the bus?
+
+    **The bus is not late as often as commuters think it will be.**  
+    
+    $P(\pi) * P(\pi^{p}) = .5 * .23 = .115$
+    
+## 2.5.4 Simulation exercises
+
+### Exercise 2.20 (Cat image recognition) 
+
+Whether you like it or not, cats have taken over the internet.23 Joining the craze, Zainab has written an algorithm to detect cat images. It correctly identifies 80% of cat images as cats, but falsely identifies 50% of non-cat images as cats. Zainab tests her algorithm with a new set of images, 8% of which are cats. What’s the probability that an image is actually a cat if the algorithm identifies it as a cat? Answer this question by simulating data for 10,000 images.
+

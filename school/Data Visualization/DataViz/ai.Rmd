@@ -1,0 +1,174 @@
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(flexdashboard)
+library(tidyverse)
+library(scales)
+library(modelsummary)
+library(kableExtra)
+library(ggrepel)
+library(googlesheets4)
+
+colors <- c("#7400CC", "#CC0AA4", "#3ACC14", "#CCAC14", "#0E0ACC", "#3ACC14")
+
+gs4_deauth()
+
+ai <- read_sheet("https://docs.google.com/spreadsheets/d/1USWtSVkrXOklfCcts7sH50JemB3Y4OwEmbYuT-Z-z0c/edit#gid=235841052")
+
+# ai <- read_csv("data/ai.csv") 
+
+ai <- ai %>% 
+  mutate(name = `Name of AI`,
+         med = factor(Medium),
+         creatorMan = ifelse(`Author's gender` == "Male", 1, 0),
+         author = factor(ifelse(`Author's gender` == "Male", 
+                                "Creator was a Man", 
+                                "Creator was NOT a Man")),
+         aiGender = factor(`AI's perceived gender`),
+         body = ifelse(`Corporal body` == "Yes", 1, 0),
+         intent = factor(`Intentions toward humans`),
+         cat = ifelse(med == "book" | 
+                        med == "short story" | 
+                          med == "novel series", "Written Media", "Visual Media"),
+         adapt = ifelse(Adapted == "No", 0, 1)) %>% 
+  mutate(char = -nchar(Source), 
+         char = rescale(char, to = c(2,5))) 
+
+ai$intent <- factor(ai$intent, levels=c('Bad', 
+                                        'Good', 
+                                        'Subjective', 
+                                        'Desire to be human', 
+                                        'Believes they are human'))
+
+
+```
+
+## Row 
+
+### Chart A
+
+```{r plot, fig.width = 6, fig.height = 6 / 1.618}
+
+a1 <- ai %>% 
+  filter(Year > 1950,
+         intent != "Desire to be human", 
+         intent != "Believes they are human") %>% 
+  select(Year, intent, aiGender, med, body, creatorMan, author, `Corporal body`) %>% 
+  drop_na() %>% 
+  ggplot(aes(Year, aiGender, 
+             color = intent, fill = intent, 
+             shape = factor(`Corporal body`))) +
+  geom_point(size = 3.5,
+             position = position_jitter(width = 0, height = .2, seed = 80085)) +
+  facet_wrap(~ author, ncol = 2) +
+  scale_fill_manual(values = colors, guide = "none") +
+  scale_color_manual(values = colors) +
+  scale_shape_manual(values = c(1,21), guide = "none") +
+  scale_x_reverse(breaks = seq(1950,2020,10)) +
+  scale_y_discrete() +
+  coord_flip() +
+  labs(x = "Year of Publication",
+       y = "Perceived Gender of AI",
+       color = "Intentions Toward Humans",
+       shape = "Corporal Body",
+       title = "AI and Gender",
+       caption = "Empty points represent AI characters without a corporal body.") +
+  theme_light() +
+  theme(text = element_text(family = "serif", 
+                             color = "#310873"),
+        title = element_text(size = 14, 
+                             family = "sans", 
+                             face = "bold", 
+                             color = "#310873"),
+        plot.title = element_text(),
+        axis.title.x = element_text(size = 8, 
+                                    color = "#310873",
+                                    family = "sans"),
+        axis.title.y = element_text(size = 10, 
+                                    color = "#310873",
+                                    family = "sans"),
+        axis.text.x = element_text(size = 6, 
+                                   color = "#310873"),
+        axis.text.y = element_text(size = 6, 
+                                   color = "#310873"),
+        panel.grid.major.x = element_line(color = "#E9E4FC", linetype = "longdash"),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#E9E4FC", linetype = "longdash"),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        legend.title = element_text(size = 6, 
+                                    family = "sans"),
+        legend.text = element_text(size = 6),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        legend.spacing.y = unit(0, "lines"),
+        legend.box.margin = margin(t = 0, b = 0),
+        legend.margin = margin(t = 0, b = 0),
+        strip.text = element_text(color = "#310873", 
+                                  face = "bold", 
+                                  family = "sans",
+                                  size = 9),
+        strip.background = element_blank(),
+        plot.caption	= element_text(size = 6, 
+                                    family = "serif",
+                                    face = NULL))
+a2 <- a1 +
+  geom_label_repel(data = ai %>% filter(lab == "Yes"), 
+                   aes(label = Source), 
+                   seed = 50724,
+                   size = 2.5,
+                   fill = NA,
+                   alpha = .75,
+                   force = 2,
+                   force_pull = -.1,
+                   arrow = arrow(length = unit(0.05, "inches"), 
+                                 type = "closed"), 
+                   box.padding = 0.15, 
+                   label.padding = 0.15,
+                   show.legend	= FALSE)
+
+
+a2
+
+```
+
+## Row 
+
+### Chart B
+
+```{r hist, fig.width = 10.5, fig.height = 1.35}
+
+a3 <- ai %>% 
+  ggplot(aes(Year, fill = intent)) + 
+  geom_histogram(binwidth = 1, boundary = 0, color = "white") +
+  geom_hline(yintercept = seq(0,4,1), color = "white", linewidth = 1.75) +
+  scale_x_continuous(breaks = seq(1920,2030,10)) +
+  scale_color_manual(values = colors, labels = label_wrap(14)) +
+  scale_y_discrete(guide = "none") +
+  scale_fill_manual(values = colors, labels = label_wrap(14)) +
+  labs(x = NULL,
+       y = NULL,
+       fill = str_wrap("Intentions Toward Humans", 14)) +
+  theme_light() +
+  theme(panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = "right",
+        legend.direction = "vertical",
+        panel.border = element_blank())
+
+a3
+
+
+```
+

@@ -1,0 +1,140 @@
+---
+title: "Exercise 12"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+I see that you have copied my road trip map idea for yourself (and did so much more, of course!); now I am going to be up until 4 in the morning, trying to improve mine by following your blog posts. I just need to get caught up, so just is obviously not finished work, but it is a finished assignment. The subject is simply far to interesting to me; I must stop myself before I go too far!
+
+\newpage
+
+# Task 2: World map
+
+```{r load-libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(sf)
+library(scales)
+library(tigris)        # Access geographic data from the US Census
+library(tidygeocoder)  # Automated geocoding
+library(osrm)          # Access OSRM through R
+library(ggrepel)       # Nicer non-overlapping labels
+library(glue)          # Easier string interpolation
+library(patchwork)     # Combine plots nicely
+library(ggspatial)     # Nicer map features like scale bars
+library(jsonlite)      # Read JSON files
+library(patchwork)     # Combine plots nicely
+library(leaflet)       # Make interactive maps
+library(lutz)          # Look up time zones for lat/lon coordinates
+library(gt)            # Make fancy tables
+library(rcartocolor)   # Use CARTO colors (https://carto.com/carto-colors/)
+library(ggnewscale)    # Use multiple scales for the same aesthetic in ggplot
+
+# Load and clean internet user data
+internet_users <- read_csv("data/share-of-individuals-using-the-internet-1990-2015.csv") %>%
+  # Rename country code column to ISO_A3 so it matches what's in the Natural Earth shapefile
+  rename(users = `Individuals using the Internet (% of population) (% of population)`,
+         ISO_A3 = Code)
+
+# Load world shapefile from Natural Earth
+# https://www.naturalearthdata.com/downloads/110m-cultural-vectors/
+world_shapes <- read_sf("data/ne_110m_admin_0_countries/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp")
+```
+
+```{r combine-shapefile-internet-users}
+# Only look at 2015
+users_2015 <- internet_users %>%
+  filter(Year == 2015)
+
+users_map <- world_shapes %>%
+  left_join(users_2015, by = "ISO_A3") %>%
+  filter(ISO_A3 != "ATA")  # No internet in Antarctica. Sorry penguins.
+```
+
+Make a map showing the proportion of individuals in each country that had access to the internet in 2015.
+
+```{r plot-2015-internet-uses}
+#| fig.cap: "Internet Users Around the World"
+# TODO: Make a map of internet users with ggplot() + geom_sf()
+# Important: Remember to consider the map projection
+
+users_map %>% 
+  ggplot() +
+  geom_sf(aes(fill = users)) +
+  # annotation_scale(location = "bl", bar_cols = c("grey20", "white"),
+  #                  unit_category = "imperial") +
+  coord_sf(crs = st_crs("ESRI:54030")) +  # Robinson
+  scale_fill_steps(low = "#E9E4FC", high = "#6610F2", na.value = "white", 
+                   breaks = c(0,25,50,75,100), label = label_percent(scale = 1)) +
+  labs(fill = "% Internet Users",
+       title = "Internet Users Around the World") +
+  theme_void() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(family = "serif", face = "bold", hjust = .5))
+
+```
+
+\newpage
+
+# Task 3: Personal map
+
+```{r personal-map, warning=FALSE, message=FALSE}
+#| fig-cap: "Not A Finished Map..."
+# TODO: Make a map
+
+colors <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#CCAC14", "#0ACCC5", "#CC5514")
+
+together <- read_rds("data/together.rds") %>% 
+  st_as_sf(coords = c("lon", "lat"), crs = st_crs("EPSG:4326"))
+
+us_states <- states(resolution = "20m", year = 2022, cb = TRUE)
+
+my_states <- us_states %>% 
+  filter((NAME %in% c("Texas", 
+                      "Louisiana", 
+                      "Mississippi",
+                      "Alabama",
+                      "Georgia",
+                      "Florida",
+                      "Maryland",
+                      "New Mexico")))
+
+ggplot() + 
+  geom_sf(data = my_states, fill = "#CCc1DA") +
+  geom_sf(data = together, aes(color = year)) +
+  coord_sf(crs = st_crs("ESRI:102003")) +  # Albers
+  scale_color_manual(values = colors) +
+  labs(color = NULL,
+       title = "Pre-Wedding Travels",
+       subtitle = "I am going to update this, but tonight, I must sleep",
+       caption = str_wrap("*There is a lot of points and elements to add to this, but if I even try to start right now, nothing else in my life will ever get done, but it is a goal of mine to finish updating our map with R before we are done working together.", 125)) +
+  theme_void() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(family = "serif", face = "bold"),
+        plot.subtitle = element_text(family = "serif"),
+        plot.caption =  element_text(family = "serif"))
+
+```

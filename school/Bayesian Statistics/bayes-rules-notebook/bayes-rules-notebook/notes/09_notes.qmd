@@ -1,0 +1,256 @@
+---
+title: "9: Simple Normal Regression"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(rstan)
+library(rstanarm)
+library(bayesplot)
+library(tidybayes)
+library(janitor)
+library(broom.mixed)
+
+```
+
+# 9.2 Tuning prior models for regression parameters
+
+```{r}
+
+plot_normal(mean = 5000, sd = 1000) + 
+  labs(x = "beta_0c", y = "pdf")
+plot_normal(mean = 100, sd = 40) + 
+  labs(x = "beta_1", y = "pdf")
+plot_gamma(shape = 1, rate = 0.0008) + 
+  labs(x = "sigma", y = "pdf")
+
+```
+
+# 9.3 Posterior simulation
+
+```{r, warning=FALSE, message=FALSE}
+
+# Load and plot data
+data(bikes)
+
+ggplot(bikes, aes(x = temp_feel, y = rides)) + 
+  geom_point(size = 1.5) + 
+  geom_smooth(method = "lm", se = FALSE, linewidth = 2)
+
+```
+
+# 9.3.1 Simulation via rstanarm
+
+```{r}
+
+bike_model <- stan_glm(rides ~ temp_feel, data = bikes,
+                       family = gaussian,
+                       prior_intercept = normal(5000, 1000),
+                       prior = normal(100, 40), 
+                       prior_aux = exponential(0.0008),
+                       chains = 4, iter = 5000*2, seed = 84735)
+
+# Effective sample size ratio and Rhat
+neff_ratio(bike_model)
+
+rhat(bike_model)
+
+# Trace plots of parallel chains
+mcmc_trace(bike_model, size = 0.1)
+
+# Density plots of parallel chains
+mcmc_dens_overlay(bike_model)
+
+
+saveRDS(bike_model, "bike_model.RDS")
+
+```
+
+# 9.3.2 Optional: Simulation via rstan
+
+```{r}
+
+# STEP 1: DEFINE the model
+stan_bike_model <- "
+  data {
+    int<lower = 0> n;
+    vector[n] Y;
+    vector[n] X;
+  }
+  parameters {
+    real beta0;
+    real beta1;
+    real<lower = 0> sigma;
+  }
+  model {
+    Y ~ normal(beta0 + beta1 * X, sigma);
+    beta0 ~ normal(-2000, 1000);
+    beta1 ~ normal(100, 40);
+    sigma ~ exponential(0.0008);
+  }
+"
+# STEP 2: SIMULATE the posterior
+stan_bike_sim <- 
+  stan(model_code = stan_bike_model, 
+       data = list(n = nrow(bikes), Y = bikes$rides, X = bikes$temp_feel), 
+       chains = 4, iter = 5000*2, seed = 84735)
+```
+
+# 9.4 Interpreting the posterior
+
+```{r}
+
+# Posterior summary statistics
+tidy(bike_model, effects = c("fixed", "aux"),
+     conf.int = TRUE, conf.level = 0.80)
+
+# Store the 4 chains for each parameter in 1 data frame
+bike_model_df <- as.data.frame(bike_model)
+
+# Check it out
+nrow(bike_model_df)
+
+head(bike_model_df, 3)
+
+# 50 simulated model lines
+bikes %>%
+  add_fitted_draws(bike_model, n = 50) %>%
+  ggplot(aes(x = temp_feel, y = rides)) +
+    geom_line(aes(y = .value, group = .draw), alpha = 0.15) + 
+    geom_point(data = bikes, size = 0.05)
+
+# Tabulate the beta_1 values that exceed 0
+bike_model_df %>% 
+  mutate(exceeds_0 = temp_feel > 0) %>% 
+  tabyl(exceeds_0)
+
+# Simulate four sets of data
+bikes %>%
+  add_predicted_draws(bike_model, n = 4) %>%
+  ggplot(aes(x = temp_feel, y = rides)) +
+    geom_point(aes(y = .prediction, group = .draw), size = 0.2) + 
+    facet_wrap(~ .draw)
+
+saveRDS(bike_model_df, "bike_model_df.RDS")
+
+```
+
+# 9.5.1 Building a posterior predictive model
+
+```{r}
+  
+first_set <- head(bike_model_df, 1)
+first_set
+
+mu <- first_set$`(Intercept)` + first_set$temp_feel * 75
+mu
+
+set.seed(84735)
+y_new <- rnorm(1, mean = mu, sd = first_set$sigma)
+y_new
+
+# Predict rides for each parameter set in the chain
+set.seed(84735)
+predict_75 <- bike_model_df %>% 
+  mutate(mu = `(Intercept)` + temp_feel*75,
+         y_new = rnorm(20000, mean = mu, sd = sigma))
+
+head(predict_75, 3)
+
+```
+
+```{r}
+
+# Construct 80% posterior credible intervals
+predict_75 %>% 
+  summarize(lower_mu = quantile(mu, 0.025),
+            upper_mu = quantile(mu, 0.975),
+            lower_new = quantile(y_new, 0.025),
+            upper_new = quantile(y_new, 0.975))
+
+# Plot the posterior model of the typical ridership on 75 degree days
+ggplot(predict_75, aes(x = mu)) + 
+  geom_density()
+
+# Plot the posterior predictive model of tomorrow's ridership
+ggplot(predict_75, aes(x = y_new)) + 
+  geom_density()
+
+```
+
+# 9.5.2 Posterior prediction with rstanarm
+
+```{r}
+
+# Simulate a set of predictions
+set.seed(84735)
+shortcut_prediction <- 
+  posterior_predict(bike_model, newdata = data.frame(temp_feel = 75))
+
+# Construct a 95% posterior credible interval
+posterior_interval(shortcut_prediction, prob = 0.95)
+
+# Plot the approximate predictive model
+mcmc_dens(shortcut_prediction) + 
+  xlab("predicted ridership on a 75 degree day")
+
+```
+
+# 9.6 Sequential regression modeling
+
+```{r}
+
+bikes %>% 
+  select(date, temp_feel, rides) %>% 
+  head(3)
+
+phase_1 <- bikes[1:30, ]
+phase_2 <- bikes[1:60, ]
+phase_3 <- bikes
+
+my_model <- stan_glm(rides ~ temp_feel, data = phase_1, family = gaussian, 
+                     prior_intercept = normal(5000, 1000),
+                     prior = normal(100, 40), 
+                     prior_aux = exponential(0.0008),
+                     chains = 4, iter = 5000*2, seed = 84735)
+
+```
+
+# 9.7 Using default rstanarm priors
+
+```{r}
+
+bike_model_default <- stan_glm(
+  rides ~ temp_feel, data = bikes, 
+  family = gaussian,
+  prior_intercept = normal(5000, 2.5, autoscale = TRUE),
+  prior = normal(0, 2.5, autoscale = TRUE), 
+  prior_aux = exponential(1, autoscale = TRUE),
+  chains = 4, iter = 5000*2, seed = 84735)
+
+prior_summary(bike_model_default)
+
+# Perform a prior simulation 
+bike_default_priors <- update(bike_model_default, prior_PD = TRUE)
+
+# 200 prior model lines
+bikes %>%
+  add_fitted_draws(bike_default_priors, n = 200) %>%
+  ggplot(aes(x = temp_feel, y = rides)) +
+    geom_line(aes(y = .value, group = .draw), alpha = 0.15)
+
+# 4 prior simulated datasets
+set.seed(3)
+bikes %>%
+  add_predicted_draws(bike_default_priors, n = 4) %>%
+  ggplot(aes(x = temp_feel, y = rides)) +
+    geom_point(aes(y = .prediction, group = .draw)) + 
+    facet_wrap(~ .draw)
+
+```
+

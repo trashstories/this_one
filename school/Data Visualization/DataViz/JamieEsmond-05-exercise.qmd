@@ -1,0 +1,162 @@
+---
+title: "Exercise 5"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+How do the principles of CRAP apply to graph design and other theme elements?
+
+\newpage
+
+# Task 2: Ugly plot
+
+Duncan Greere has collected a database of 48 Soviet dogs who flew as test subjects in USSR's space program in the 1950s and 60s. [The original data can be found here](https://airtable.com/universe/expG3z2CFykG1dZsp/sovet-space-dogs).
+
+## Load and clean data
+
+First we load and clean the data.
+
+```{r load-clean-data, warning=FALSE, message=FALSE}
+# You'll only need the tidyverse library for this exercise
+library(tidyverse)
+
+space_dogs_raw <- read_csv("data/Dogs-Database.csv")
+
+space_dogs <- space_dogs_raw %>% 
+  # The Fate column seems to either say "Survived" or "Died <DATE>", so we make
+  # a new binary version of the Fate column that is "Survived" if the dog
+  # survived and "Died" otherwise
+  mutate(Fate_binary = ifelse(Fate == "Survived", "Survived", "Died")) %>% 
+  # The data lists the dates of each flight, separated by a comma. To convert
+  # that to a number, we do a little trick: count the number of commas in the
+  # cell and add 1 (if there were 2 flights, there would be 1 comma, etc.)
+  mutate(Flights_num = str_count(Flights, ",") + 1)
+```
+
+There are actually some interesting trends here! Female dogs were far less likely to die and went on way more flights than their male counterparts, but that's in part because the USSR used almost only male dogs from 1951-1954, so those dogs faced the early prototypes of rockets and capsules.
+
+```{r summarize-data}
+# Summarize the data by fate and gender
+space_dogs_summarized <- space_dogs %>% 
+  group_by(Fate_binary, Gender) %>% 
+  summarize(total_dogs = n(),
+            total_flights = sum(Flights_num))
+
+space_dogs_summarized
+```
+
+## Ugly plot
+
+But the trends don't matter here. What matters is hideous plots. Change the colors, modify the theme, add labels, etc. and make this ugly. You can leave the `geom_pointrange()` as is, or you can mess with it too (or even change it to a bar chart or pie chart or heatmap or something if you feel up to it).
+
+```{r ugly-plot}
+
+# ugly_plot <- ggplot(data = space_dogs_summarized, 
+#                     mapping = aes(x = Fate_binary, y = total_flights, color = Gender)) +
+#   geom_pointrange(aes(ymin = 0, ymax = total_flights), size = 2, 
+#                   position = position_dodge(width = 0.5))
+# 
+# ugly_plot
+
+space_dogs_summarized %>% 
+  ggplot(aes(Fate_binary, total_flights, 
+             fill = Gender, shape = Gender, size = total_dogs)) +
+  geom_pointrange(aes(ymin = 0, ymax = total_flights),
+                  position = position_dodge(width = 1), 
+                  color = "#99CCCB", linewidth = 2) +
+  geom_label(aes(label = total_flights, 
+                 family = "mono",
+                 size = total_dogs),
+             label.size = 1.5,
+             label.r = unit(0.75, "lines"),
+             label.padding = unit(0.5, "lines")) +
+  scale_fill_manual(values = c("#FF19D0", "#FFD719")) +
+  scale_shape_manual(values = c(24,22)) +
+  labs(x = "Fate",
+       y = "Flights",
+       fill = "Gender",
+       shape = "Gender",
+       size = "Number of Dogs",
+       title = "DOGS IN SPACE",
+       subtitle = "Female dogs survive longer in space!!!",
+       caption = "This cacophony of colors, sizes, shapes, and fonts does not do a good job of conveying truth.") +
+  theme_dark() +
+    theme(text = element_text(family = "serif"),
+          title = element_text(size = 20, 
+                               family = "sans", 
+                               face = "bold", 
+                               color = "#B35D2D"),
+          axis.title.x = element_text(size = 16, 
+                                      family = "sans", 
+                                      color = "#36B368"),
+          axis.title.y = element_text(size = 12, 
+                                      family = "serif", 
+                                      color = "#B33697"),
+          axis.text.x = element_text(size = 20,
+                                     family = "serif",
+                                     face = "bold",
+                                     color = "#3EB3AF"),
+          axis.text.y = element_text(size = 20,
+                                     family = "mono",
+                                     face = "bold",
+                                     color = "#B3251B",
+                                     angle = 30),
+          panel.grid.major.x = element_line(color = "#662959", 
+                                            linetype = "dotted", 
+                                            linewidth = 2),
+          panel.grid.major.y = element_line(color = "#662959", 
+                                            linewidth = 2.5),
+          panel.grid.minor.y = element_line(color = "#99352E", 
+                                            linetype = "dashed", 
+                                            linewidth = 1),
+          legend.position = "left",
+          legend.title = element_text(size = 10,
+                                      family = "mono",
+                                      face = "bold",
+                                      color = "#61734B"), 
+          legend.text = element_text(size = 16,
+                                     family = "sans",
+                                     face = "bold",
+                                     color = "#61734B"),
+          legend.background = element_rect(fill = "#50B379"),
+          legend.margin = margin(t = 30, b = 30),
+          aspect.ratio = 1,
+          plot.title = element_text(hjust = 1.5),
+          plot.subtitle	= element_text(hjust = .75,
+                                       color = "#3EB3AF",
+                                       size = 12),
+          plot.caption	= element_text(hjust = 1,
+                                       color = "#99267E",
+                                       size = 7,
+                                       face = "italic"))
+  
+```
+
+```{r save-plot}
+# Save the plot as a PNG with ggsave()
+
+ggsave("ugly.png", last_plot())
+
+```

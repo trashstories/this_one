@@ -1,0 +1,114 @@
+---
+title: "9: Simple Normal Regression"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(rstan)
+library(rstanarm)
+library(bayesplot)
+library(tidybayes)
+library(janitor)
+library(broom.mixed)
+
+```
+
+# 9.10.1 Conceptual exercises
+
+## Exercise 9.1 (Normal regression priors) 
+
+For the Normal regression model (9.6) with $Y_i|\beta_0, \beta_1, \sigma \sim N(\mu_i, \sigma)$ where $\mu_i = \beta_0 + \beta_1X_i$, we utilized Normal priors for $\beta_0, \beta_1$ and an Exponential prior on $\sigma$.
+
+a. Why is a Normal prior a reasonable choice for $\beta_0$ and $\beta_1$? **Because they are independent**
+b. Why isn’t a Normal prior a reasonable choice for $\sigma$? **Because it is exponential**
+c. What’s the difference between weakly informative and vague priors? **Weakly informative priors are more focused and reasonable than vague priors, which can sometimes weight non-sensible parameter values.**
+
+## Exercise 9.2 (Identify the variable) 
+
+Identify the response variable ($Y$) and predictor variable ($X$) in each given relationship of interest.
+
+a. We want to use a person’s arm length to understand their height. **$Y$ = height, $X$ = arm length**
+b. We want to predict a person’s carbon footprint (in annual CO$_2$ emissions) with the distance between their home and work. **$Y$ = carbon footprint, $X$ = distance from home to work**
+c. We want to understand how a child’s vocabulary level might increase with age. **$Y$ = vocabulary, $X$ = age**
+d. We want to use information about a person’s sleep habits to predict their reaction time. **$Y$ = reaction time, $X$ = sleep habits**
+
+## Exercise 9.3 (Interpreting coefficients) 
+
+In each situation below, suppose that the typical relationship between the given response variable $Y$ and predictor $X$ can be described by $\beta_0 + \beta_1 X$. Interpret the meaning of $\beta_0$ and $\beta_1$ and indicate whether your prior understanding suggests that $\beta_1$ is negative or positive.
+
+a. $Y$ = height in cm of a baby kangaroo, $X$ = its age in months **$\beta_0$ is the expected height of a kangaroo at 0 months, $\beta_1$ is the amount of expected growth for each month increase, and prior understanding suggests that it is positive**
+b. $Y$ = a data scientist’s number of GitHub followers, $X$ = their number of GitHub commits in the past week **$\beta_0$ is the expected number of a followers if they had 0 commits in the past week, $\beta_1$ is the amount of expected followers for each additional commit, and prior understanding suggests that it is positive**
+c. $Y$ = number of visitors to a local park on a given day, $X$ = rainfall in inches on that day **$\beta_0$ is the expected number of visitors if there is 0 inches of rainfall, $\beta_1$ is the amount of expected change in visitors with each inch increase of rainfall, and prior understanding suggests that it is negative**
+d. $Y$ = the daily hours of Netflix that a person watches, $X$ = the typical number of hours that they sleep **$\beta_0$ is the expected daily hours of Netflix watched, $\beta_1$ is the amount of expected change in the number of hours they sleep, and prior understanding is uncertain about whether $beta_1$ is positive or negative**
+
+## Exercise 9.4 (Deviation from the average) 
+
+Consider the Normal regression model (9.6). Explain in one or two sentences, in a way that one of your non-stats friends could understand, how $\sigma$ is related to the strength of the relationship between a response variable $Y$ and predictor $X$. 
+
+**$\sigma$ is related to the strength of the relationship between $Y$ and $X$ because it represents the exceptional value of the variability in the distribution, or standard deviation from the mean.**
+
+## Exercise 9.5 (Bayesian model building: Part I) 
+
+A researcher wants to use a person’s age (in years) to predict their annual orange juice consumption (in gallons). Here you’ll build up a relevant Bayesian regression model, step by step.
+
+a. Identify the $Y$ and $X$ variables in this study. **$Y$ = orange juice consumption, $X$ = age**
+b. Use mathematical notation to specify an appropriate structure for the model of data $Y$ (ignoring $X$ for now). **UNSURE ABOUT THIS ONE**
+c. Rewrite the structure of the data model to incorporate information about predictor $X$. In doing so, assume there’s a linear relationship between $Y$ and $X$. **$\mu_i = \beta_0 + \beta_1 X_i$**
+d. Identify all unknown parameters in your model. For each, indicate the values the parameter can take. **$\mu_i$ = expected orange juice consumption, $\beta_0$ = expected orange juice consumption if age is 0, $\beta_1$ = expected change in orange juice consumption with each increase in age by one year - UNSURE ABOUT VALUES**
+e. Identify and tune suitable prior models for your parameters. Explain your rationale. ****
+
+## Exercise 9.6 (Bayesian model building: Part II) 
+
+Repeat the above exercise for the following scenario. A researcher wishes to predict tomorrow’s high temperature by today’s high temperature.
+
+## Exercise 9.7 (Posterior simulation T/F) 
+
+Mark each statement about posterior regression simulation as True or False.
+
+a. MCMC provides the exact posterior model of our regression parameters ($\beta_0$, $\beta_1 X$, $\sigma$). **FALSE: MCMC provides an approximate posterior model**
+b. MCMC allows us to avoid complicated mathematical derivations. **What exactly is mathematical derivations?**
+
+## Exercise 9.8 (Posterior simulation) 
+
+For each situation, specify the appropriate `stan_glm()` syntax for simulating the Normal regression model using 4 chains, each of length 10000. (You won’t actually run any code.)
+
+a. $X$ = `age`; $Y$ = `height`; dataset name: `bunnies`
+
+```
+stan_glm(
+  height ~ age, data = bunnies, 
+  family = gaussian,
+  prior_intercept = normal(10, 2.5, autoscale = TRUE),
+  prior = normal(1, .5, autoscale = TRUE), 
+  prior_aux = exponential(1, autoscale = TRUE),
+  chains = 4, iter = 5000*2, seed = 80085)
+```
+
+b. $\text{Clicks}_i | \beta_0, \beta_1, \sigma \sim N\left(\mu_i, \sigma^2\right) \;\; \text{ with } \;\; \mu_i = \beta_0 + \beta_1\text{Snaps}_i$; dataset name: `songs`.
+
+```
+stan_glm(
+  Clicks ~ Snaps, data = songs, 
+  family = gaussian,
+  prior_intercept = normal(1000, 2.5, autoscale = TRUE),
+  prior = normal(100, 2.5, autoscale = TRUE), 
+  prior_aux = exponential(1, autoscale = TRUE),
+  chains = 4, iter = 5000*2, seed = 80085)
+```
+
+c. $\text{Happiness}_i | \beta_0, \beta_1, \sigma \sim N\left(\mu_i, \sigma^2\right) \;\; \text{ with } \;\; \mu_i = \beta_0 + \beta_1\text{Age}_i$; dataset name: `dogs`.
+
+```
+stan_glm(
+  Happiness ~ Age, data = dogs, 
+  family = gaussian,
+  prior_intercept = normal(5, 2.5, autoscale = TRUE),
+  prior = normal(1, .5, autoscale = TRUE), 
+  prior_aux = exponential(1, autoscale = TRUE),
+  chains = 4, iter = 5000*2, seed = 80085)
+```

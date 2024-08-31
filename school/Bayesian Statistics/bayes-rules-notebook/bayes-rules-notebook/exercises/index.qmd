@@ -1,0 +1,5 @@
+---
+title: "*Bayes Rules!* Exercises"
+---
+
+Home page for the exercises section

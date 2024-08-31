@@ -1,0 +1,14 @@
+{
+  "hash": "90a0df03ab291b1ef6f5d01f94ad189d",
+  "result": {
+    "markdown": "---\ntitle: \"18: Non-Normal Hierarchical Regression & Classification\"\neditor_options: \n  chunk_output_type: console\n---\n\n::: {.cell}\n\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

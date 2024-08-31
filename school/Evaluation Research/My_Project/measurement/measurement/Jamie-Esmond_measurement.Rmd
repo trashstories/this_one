@@ -1,0 +1,201 @@
+---
+title: "Measurement"
+author: "Jamie Esmond"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+    toc: yes
+  html_document: 
+    toc: yes
+    theme: journal
+  word_document: 
+    toc: yes
+---
+\newpage
+
+```{css, echo=FALSE}
+
+.caption {
+  text-align: center;
+  font-weight: bold;
+  font-size: 100%;
+  color: #000;
+  margin-top: 10px;
+}
+
+```
+
+# 1: Measurement and Abstraction for Full-day Kindergarten
+
+## Possible outcomes
+- Outcome 1: 1st grade readiness
+- Outcome 2: Equality for disadvantaged students
+
+## Outcome 1: 1st grade readiness
+
+#### Attributes:
+
+- Socialization skills
+- Reading and writing skills
+- Comprehension and retention skills
+- Follows rules 
+- Takes turns when playing games with other children
+- Sings, dances, or acts 
+- Tells a story she heard or made up
+- Answers simple questions about story
+- Keeps a conversation going with more than three back-and-forth exchanges
+- Counts to 10
+- Pays attention for 5 to 10 minutes during activities
+- Writes some letters in their name
+
+While socialization and comprehension skills may be too broad of attributes to accurately measure, certain more specific markers of development may be more observable. The ability to count to 10, answer simple questions about a story, and write some letters in their name are more concrete skills that can be assessed to indicate 1st grade readiness for young children. Each of these activities represents a child’s development level and benchmarks they are expected to reach before 1st grade, and if full-day kindergarten increases the success rate among children entering 1st grade, the program is likely contributing to greater socialization and comprehension skills more broadly.
+
+### Attribute 1: Counts to 10
+
+- Measurable definition: Change in the percent of children with the ability to count to 10 from before and after program implementation.
+- Ideal measurement: Ask every student at the beginning of 1st grade to count to 10.
+- Feasible measurement: Survey 1st grade teachers to get an estimate of how many children can count to 10 at the beginning of the school year.
+- Measurement of program effect: Of the students of teachers surveyed, determine the percentage of them who were in full-day kindergarten. 
+
+### Attribute 2: Answer simple questions about story
+
+- Measurable definition: Change in the percent of children with the ability to answer simple questions about a story from before and after program implementation.
+- Ideal measurement: Ask every student at the beginning of 1st grade to answer simple questions about a story.
+- Feasible measurement: Survey 1st grade teachers to get an estimate of how many children can answer simple questions about a story at the beginning of the school year.
+- Measurement of program effect: Of the students of teachers surveyed, determine the percentage of them who were in full-day kindergarten. 
+
+### Attribute 3: Writes some letters in their name
+
+- Measurable definition: Change in the percent of children with the ability to write some letters in their name from before and after program implementation.
+- Ideal measurement: Ask every student at the beginning of 1st grade to write some letters in their name.
+- Feasible measurement: Survey 1st grade teachers to get an estimate of how many children can write some letters in their name at the beginning of the school year.
+- Measurement of program effect: Of the students of teachers surveyed, determine the percentage of them who were in full-day kindergarten. 
+
+## Outcome 2: Equality for disadvantaged students
+
+#### Attributes:
+
+- Achievement disparity between students with different racial and economic backgrounds
+  - Test scores
+  - School engagement
+  - Reading level
+- Achievement disparity between students with single parents 
+  - Test scores
+  - School engagement
+  - Reading level
+- Rate of grade repeating for students with different racial and economic backgrounds
+- Rate of grade repeating for students with single parents 
+
+While equality and disadvantage may be difficult concepts to measure, a range of attributes like formal test scores, reading level, and rate of grade repetition measured at different times throughout a child’s early education may illuminate racial and economic disparities and whether full-day kindergarten reduces those disparities. Testing can be difficult at a young age, but if the children who are tested later can be identified by whether they attended half-day or full-day kindergarten, there can be an assessment of the longer-term impacts of the program. Similarly, the child’s reading level can be assessed to see if longer kindergarten days lead to an earlier or higher reading level. Additionally, grade repetition before middle school can be an indicator that the child was not prepared for school after kindergarten and failed to keep up with their classmates. All these things can vary greatly depending on the racial and economic backgrounds and parental status of children, and more attention in kindergarten may help level that playing field and give disadvantaged students a healthy start to their education, in turn increasing their chance of success in the long run.
+
+### Attribute 1: Achievement disparity between students with different racial and economic backgrounds - Test scores
+
+
+- Measurable definition: Change in the average difference of students achieving adequate test scores by racial and economic background.
+- Ideal measurement: Test every student at the same time, sometime after 1st grade, and determine if the student was enrolled in all-day kindergarten or half-day.
+- Feasible measurement: Analyze standardized test scores from different schools to find the average of that test in order to compare with the averages of different tests from different schools.
+- Measurement of program effect: Predict the percentage of students that may have had full-day kindergarten in an area, and measure the change from before program implementation.
+
+### Attribute 2: Achievement disparity between students with single parents - Reading level
+
+- Measurable definition: Change in the average difference of students achieving adequate reading level for their age by single or two-parent household.
+- Ideal measurement: Test every student at the same time, sometime after 1st grade, and determine if the student was enrolled in all-day kindergarten or half-day.
+- Feasible measurement: Survey 3rd grade teachers to get an estimate of how many children can read at least a 3rd grade level.
+- Measurement of program effect: Predict the percentage of students that may have had full-day kindergarten in an area and measure the change from and after before program implementation.
+
+### Attribute 3: Rate of grade repeating for students with different racial and economic backgrounds
+
+- Measurable definition: Change in the rate of students repeating a grade before 6th grade by racial and economic backgrounds.
+- Ideal measurement: Count every student who repeats a grade before 6th grade and their demographic information.
+- Feasible measurement: Acquire school enrollment records to determine the number of students who enrolled in the same grade more than once.
+- Measurement of program effect: Predict the percentage of students that may have had full-day kindergarten in an area and measure the change from before and after program implementation.
+
+\newpage
+
+# 2: Measurement and Abstraction for Bail Reform in Harris County, TX
+
+## Possible outcomes
+
+- Equality in the justice system
+- Reduced crime
+- Reduced harm
+- Reduced negative social and economic impact
+- Court compliance
+- Remove factors that contribute to poverty
+
+## Outcome 1: Equality in the justice system
+
+#### Attributes:
+
+- Economic and racial disparities in arrests, convictions, and sentencing
+- Impact of detention on economic prospects
+- Conviction rates of detained and released defendants
+- Conviction rates for defendants with a private attorney versus a public defender
+- Rate of defendants accepting plea deals
+  - Consider the length of detention and release status at the time of the deal
+  - Economic and racial disparities by type of crime
+- Length of detention pretrial
+  - Economic and racial disparities in detention length by type of crime
+
+To measure equality in the justice system, economic and racial disparities must be considered. The most obvious place to start is with the rate of arrests, convictions, and sentencing across individuals with different economic and racial backgrounds because this could illuminate clear patterns of discrimination inherent in the system, and whether bail reform has a positive impact on the numbers. The conviction rates for detained and released defendants are also measurable, and it is a good indicator of the degree of the advantage of not being detained while appearing in court. Individuals are to be presumed innocent until proven guilty but appearing in court in a jumpsuit and shackles can give the impression of guilt even for innocent defendants. Many individuals have stated that they chose to agree to a plea deal because they could not afford bail and the alternative was to wait in jail for a court appearance. If bail was not an obstacle, the rate of individuals accepting plea deals should decrease because innocent people would not normally agree to a guilty plea without the coercion of detention.
+
+### Attribute 1: - Economic and racial disparities in arrests, convictions, and sentencing
+
+- Measurable definition: The rate of arrests, convictions, and sentences compared across different individuals with different economic and racial backgrounds.
+- Ideal measurement: Collect information about the age, employment status, income, housing situation, and race of all individuals charged with a crime to compare associations with higher rates of conviction or higher sentencing.
+- Feasible measurement: Information about the racial identity and age of an individual is usually collected with the arrest record. The economic identifiers are more difficult to gather, but they could be collected as part of a voluntary survey upon release or at the courthouse. The length of time spent in detention should be public record as well.
+- Measurement of program effect: The program effect could be measured by linking fewer days in detention to lower conviction rates. Additionally, if the disparity of economic and racial backgrounds is less severe after cash bail is ended, that could indicate that the bail program was targeting low-income people of color.
+
+### Attribute 2: Conviction rates of detained and released defendants
+
+- Measurable definition: Appearing before the court as a non-detained defendant impacts the rate of conviction.
+- Ideal measurement: Collect information regarding the detention status of defendants in court and how it correlates with conviction rates.
+- Feasible measurement: In this case, the ideal measurement is available from the court records.
+- Measurement of program effect: Bail reform allows most people arrested for a misdemeanor to be released from detention and return to the court for their next court date. If the rate of conviction is lower for non-detained defendants, this provides evidence that individuals are given more equitable proceedings when they are not brought to court directly from the jail.
+
+### Attribute 3: Rate of defendants accepting plea deals
+
+- Measurable definition: Rate of individuals agreeing to plea deals after arrest.
+- Ideal measurement: Collecting information from every arrestee about their reason for accepting or rejecting a plea deal.
+- Feasible measurement: By comparing the type of crime the individual is charged with, their criminal history, and the amount of time they were detained pretrial, there may be an indication that pretrial detention increases the likelihood of accepting a plea deal, especially when the pretrial time period longer.
+- Measurement of program effect: If individuals are less likely to accept a plea deal after release from detention, it may conclude that release from detention was a primary reason for considering a plea deal.
+
+
+## Outcome 2: Remove factors that contribute to poverty
+
+#### Attributes:
+
+- Social and economic impact of detention
+  - Job loss
+  - Loss of housing
+  - Childcare implications
+  - Financial and emotional stress on non-detained family members
+- Unemployment rate
+- Family separation
+- Job readiness
+- Education outcomes for the children of detained adults
+- Permanent criminal record (in the case of individuals taking plea deals to be released more quickly)
+
+While there are many factors that contribute to poverty, the financial and emotional stress on non-detained family members, family separation, and job loss are measurable attributes to assess the impact of pretrial detention. Financial and emotional stress on non-detained family members is a key contributor to poverty; many children rely on one parent working multiple jobs to make ends meet, and emotional support is often lacking in low-income families. Removing the only source of income and support from children can have lasting traumatic impacts, both financially and emotionally. Family separation has a similar impact, but here the focus is on the outcomes of children in the care of detained adults. Detention can lead to worse educational outcomes, risk-taking behavior, and mental health issues for children when they are separated from their parents. Employment has a direct link to income; for most people, without employment, there is no income, and lack income is a direct contribution to poverty. If individuals have jobs when they are arrested, but lose them due to extended detention, they are in a worse position when they are released.
+
+### Attribute 1: Financial and emotional stress on non-detained family members
+
+- Measurable definition: The rate of individuals detained with family members who rely on them for financial support.
+- Ideal measurement: Collect information about every individual arrested about their family situation and who is responsible for what percentage of their financial responsibilities. 
+- Feasible measurement: Survey detained individuals to ask them about their employment, savings, or other income sources for their families while they are detained. Determine the rate of household providers who are detained and the average number of people who depend on them for financial support.
+- Measurement of program effect: Assess whether spending less time detained has fewer impacts on employment and income for households.
+
+### Attribute 2: Family separation
+
+- Measurable definition: Rate of individuals detained with minor children in their custody.
+- Ideal measurement: Collect information from every individual detained about the number of minor children in their custody. Collect information from the families of detained individuals about the economic and emotional strain of detention. Assess indicators in youth outcomes of the children of detained adults, such as grades, risk-taking behavior, and mental health.
+- Feasible measurement: Survey detained individuals about the number of minor children in their custody. Measuring the youth outcomes in areas where a high rate of adults have been arrested.
+- Measurement of program effect: If the detention of an adult caretaker has negative impacts on the children in their custody, then shorter detention should reduce these impacts.
+
+### Attribute 3: Job loss
+
+- Measurable definition: The rate of individuals who were employed at the time of arrest but lost employment due to being detained. Consider the length of detention and the type of crime.
+- Ideal measurement: Collect employment information from every individual arrested and follow up after release to determine if they are still employed.
+- Feasible measurement: Survey detained individuals about their employment status at the time of arrest and ask them to predict the risk of losing employment before release.
+- Measurement of program effect: If the length of detention is linked to a higher chance of losing employment, then shorter detention should reduce job loss.

@@ -1,0 +1,302 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r gender}
+
+gender %>% 
+  ggplot(aes(Gender, allwords, fill = Gender)) +
+  geom_col() +
+  geom_text(aes(Gender,
+                allwords - 250,
+                label = my_pct(pctwords),
+                family = "serif"),
+            color = "#FAA6F5",
+            size = 4) +
+  facet_wrap(~ Film) +
+  scale_y_continuous(labels = label_comma(), 
+                     expand = expansion(mult = 0.01, add = 0.1)) +
+  scale_fill_manual(values = colors, guide = "none") +
+  labs(x = NULL,
+       y = "Total Words",
+       title = "Total Words by Gender and Film 1") +
+  theme_light() +
+  theme(text = element_text(family = "serif"),
+        title = element_text(size = 18, 
+                             family = "sans", 
+                             face = "bold"),
+        axis.title.y = element_text(size = 14, 
+                                    family = "sans", 
+                                    color = "#310873"),
+        axis.text.x = element_text(size = 10,
+                                   family = "sans",
+                                   face = "bold",
+                                   color = "#310873"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#FAA6F5", linetype = "dashed"),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        strip.text = element_text(color = "#310873", 
+                                  face = "bold", 
+                                  family = "serif",
+                                  size = 12),
+        strip.background = element_blank(),
+        strip.placement = "outside")
+
+```
+
+```{r start}
+
+rats %>% 
+  group_by(Borough, `Location Type`) %>% 
+	summarise(count = n()) %>% 
+  drop_na() %>% 
+  filter(count > 500) %>% 
+	ggplot(aes(reorder(`Location Type`, (count)), count, fill = Borough)) + 
+	geom_bar(stat = 'identity') + 
+  facet_wrap(~ Borough, ncol = 2) +
+  scale_fill_manual(values = colors, guide = "none") +
+  scale_x_discrete() +
+  scale_y_continuous(labels = label_number(big.mark = ",", scale_cut = cut_short_scale())) +
+  labs(x = "Location Type",
+       y = "Number of Rat Sightings",
+       title = ) +
+  coord_flip() +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "black", face = "bold", vjust = -1.5),
+        axis.text = element_text(family = "serif"),
+        panel.grid.major.x = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank())
+  
+
+```
+
+```{r rats}
+
+rats %>% 
+  filter(Borough != "Staten Island") %>% 
+  drop_na(`Location Type`) %>% 
+  group_by(Borough, type, year) %>% 
+  summarise(count = n()) %>% 
+  ggplot(aes(reorder(year, (-count)), count, fill = type)) +
+  geom_col() +
+  facet_wrap(~ Borough, ncol = 2) +
+  scale_fill_manual(values = colors) +
+  scale_x_discrete(limits = rev) +
+  scale_y_continuous(labels = label_number(big.mark = ",", 
+                                           scale_cut = cut_short_scale())) +
+  labs(x = NULL,
+       y = "Number of Rat Sightings",
+       fill = NULL,
+       title = ) +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "black", face = "bold", vjust = -1.5),
+        # axis.text.x = element_blank(),
+        axis.text = element_text(family = "serif"),
+        panel.grid = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom")
+
+```
+
+```{r titles}
+
+ai %>% 
+  filter(Year >= 2010) %>% 
+  select(Year, intent, aiGender, med, body, creatorMan, author, `Corporal body`, cat) %>% 
+  drop_na() %>% 
+  ggplot(aes(intent, Year, color = aiGender, fill = aiGender, 
+             shape = factor(`Corporal body`))) +
+  geom_point(size = 2.5,
+             position = position_jitter(width = .25, height = 0, seed = 80085)) +
+  geom_text(data = ai %>% filter(Year >= 2010), 
+            aes(intent, Year, color = aiGender, label = Source, size = char), 
+            family = "serif", nudge_y = .25) +
+  scale_fill_manual(values = colors, guide = "none") +
+  scale_size(guide = "none") +
+  scale_color_manual(values = colors) +
+  scale_shape_manual(values = c(1,21), guide = "none") +
+  scale_y_reverse(breaks = seq(1950,2020,2)) +
+  scale_x_discrete(expansion(mult = 0.5, add = 0.5), expand = c(.25,.25)) +
+  labs(y = "Year of Publication",
+       x = "Perceived Gender of AI",
+       color = "Intentions Toward Humans",
+       shape = "Corporal Body",
+       title = "AI and Gender",
+       subtitle = "select examples from science fiction",
+       caption = "Empty points represent AI characters without a corporal body.") +
+  theme_light() +
+  theme(text = element_text(family = "serif", 
+                             color = "#310873"),
+        title = element_text(size = 14, 
+                             family = "sans", 
+                             face = "bold", 
+                             color = "#310873"),
+        plot.title = element_text(hjust = -.2),
+        plot.subtitle = element_text(hjust = -.35,
+                                     size = 10),
+        axis.title.x = element_text(size = 8, 
+                                    color = "#310873",
+                                    family = "sans"),
+        axis.title.y = element_text(size = 10, 
+                                    color = "#310873",
+                                    family = "sans"),
+        axis.text.x = element_text(size = 6, 
+                                   color = "#310873"),
+        axis.text.y = element_text(size = 5, 
+                                   color = "#310873"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        legend.title = element_text(size = 6, 
+                                    family = "sans"),
+        legend.text = element_text(size = 8),
+        legend.position = "right",
+        legend.box = "vertical",
+        legend.spacing.y = unit(0, "lines"),
+        legend.box.margin = margin(t = 0, b = 0),
+        legend.margin = margin(t = 0, b = 0),
+        strip.text = element_text(color = "#310873", 
+                                  face = "bold", 
+                                  family = "sans",
+                                  size = 9),
+        strip.background = element_blank(),
+        plot.caption	= element_text(size = 6, 
+                                    family = "serif",
+                                    face = NULL))
+
+ggsave("aititles.png", last_plot())
+
+```
+
+```{r}
+
+yrmod <- lm(intentNUM ~ Year + med, data = ai1)
+
+modelsummary(yrmod,
+             output = "kableExtra",
+             estimate = "{estimate}{stars}",
+             statistic = "statistic",
+             fmt =  2,
+             gof_map = my_gof)
+
+my_gof <- tribble(
+  ~raw, ~clean, ~fmt,
+  "nobs", "N", 0)
+
+aig <- lm(intentNUM ~ aiGender + body, 
+            data = ai1)
+
+aig2 <- lm(intentNUM ~ aiGender * body, 
+            data = ai1)
+
+creator <- lm(intentNUM ~ author + body, 
+            data = ai1)
+
+creator2 <- lm(intentNUM ~ author * body, 
+            data = ai1)
+
+modelsummary(list("AI Gender OLS" = aig, 
+                  "AI Gender Interaction" = aig2,
+                  "Creator's Gender OLS" = creator, 
+                  "Creator's Gender Interaction" = creator2),
+             coef_rename = c(aiGenderMasculine = "Masculine AI",
+                             aiGenderNonbinary = "Nonbinary AI",
+                             aiGenderUndetermined = "Undetermined",
+                             body = "Corporal Status",
+                             `authorCreator was NOT a Man` = "Not Created by a Man"),
+             output = "kableExtra",
+             estimate = "{estimate}{stars}",
+             statistic = "statistic",
+             fmt =  2,
+             gof_map = my_gof) %>% 
+  row_spec(c(1,3,5,7,9,11,13), background = "#BB98F5")
+
+
+```
+
+
+
+```{r plot2, fig.width=7, fig.height=(7 / 1.618)}
+
+ai %>% 
+  filter(Year > 1950) %>% 
+  select(Year, intent, aiGender, med, body, creatorMan, author, `Corporal body`, cat) %>% 
+  drop_na() %>% 
+  ggplot(aes(Year, aiGender, color = intent, fill = intent, 
+             shape = factor(`Corporal body`))) +
+  geom_point(size = 2.5,
+             position = position_jitter(width = 0, height = .2, seed = 80085)) +
+  facet_wrap(~ cat, ncol = 1) +
+  scale_fill_manual(values = colors, guide = "none") +
+  scale_color_manual(values = colors) +
+  scale_shape_manual(values = c(1,21), guide = "none") +
+  scale_x_continuous(breaks = seq(1950,2020,10)) +
+  scale_y_discrete(limits = rev) +
+  labs(x = "Year of Publication",
+       y = "Perceived Gender of AI",
+       color = "Intentions Toward Humans",
+       shape = "Corporal Body",
+       title = "AI and Gender",
+       subtitle = "select examples from science fiction",
+       caption = "Empty points represent AI characters without a corporal body.") +
+  theme_light() +
+  theme(text = element_text(family = "serif", 
+                             color = "#310873"),
+        title = element_text(size = 14, 
+                             family = "sans", 
+                             face = "bold", 
+                             color = "#310873"),
+        plot.title = element_text(hjust = -.2),
+        plot.subtitle = element_text(hjust = -.35,
+                                     size = 10),
+        axis.title.x = element_text(size = 8, 
+                                    color = "#310873",
+                                    family = "sans"),
+        axis.title.y = element_text(size = 10, 
+                                    color = "#310873",
+                                    family = "sans"),
+        axis.text.x = element_text(size = 6, 
+                                   color = "#310873"),
+        axis.text.y = element_text(size = 5, 
+                                   color = "#310873"),
+        panel.grid.major.x = element_line(color = "#E9E4FC", linetype = "longdash"),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#E9E4FC", linetype = "longdash"),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        legend.title = element_text(size = 6, 
+                                    family = "sans"),
+        legend.text = element_text(size = 6),
+        legend.position = "bottom",
+        legend.box = "vertical",
+        legend.spacing.y = unit(0, "lines"),
+        legend.box.margin = margin(t = 0, b = 0),
+        legend.margin = margin(t = 0, b = 0),
+        strip.text = element_text(color = "#310873", 
+                                  face = "bold", 
+                                  family = "sans",
+                                  size = 9),
+        strip.background = element_blank(),
+        plot.caption	= element_text(size = 6, 
+                                    family = "serif",
+                                    face = NULL))
+
+ggsave("aimed.png", last_plot())
+
+```

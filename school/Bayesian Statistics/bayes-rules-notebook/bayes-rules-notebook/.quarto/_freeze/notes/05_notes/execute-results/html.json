@@ -1,0 +1,16 @@
+{
+  "hash": "128c93c9cc88967245c62d04416618eb",
+  "result": {
+    "markdown": "---\ntitle: \"5: Conjugate Families\"\neditor_options: \n  chunk_output_type: console\n---\n\n::: {.cell}\n\n```{.r .cell-code}\n# Load packages that will be used in this chapter\nlibrary(bayesrules)\nlibrary(tidyverse)\nlibrary(janitor)\n```\n:::\n\n\n# 5.2 Gamma-Poisson conjugate family\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Plot the Gamma(10, 2) prior\nplot_gamma(shape = 10, rate = 2)\n```\n\n::: {.cell-output-display}\n![](05_notes_files/figure-html/unnamed-chunk-1-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nplot_poisson_likelihood(y = c(6, 2, 2, 1), lambda_upper_bound = 10)\n```\n\n::: {.cell-output-display}\n![](05_notes_files/figure-html/unnamed-chunk-2-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nplot_gamma_poisson(shape = 10, rate = 2, sum_y = 11, n = 4)\n```\n\n::: {.cell-output-display}\n![](05_notes_files/figure-html/unnamed-chunk-3-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nsummarize_gamma_poisson(shape = 10, rate = 2, sum_y = 11, n = 4)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n      model shape rate mean     mode       var        sd\n1     prior    10    2  5.0 4.500000 2.5000000 1.5811388\n2 posterior    21    6  3.5 3.333333 0.5833333 0.7637626\n```\n:::\n:::\n\n\n# 5.3 Normal-Normal conjugate family\n\n\n::: {.cell}\n\n```{.r .cell-code}\nplot_normal(mean = 6.5, sd = 0.4)\n```\n\n::: {.cell-output-display}\n![](05_notes_files/figure-html/unnamed-chunk-5-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\n# Load the data\ndata(football)\nconcussion_subjects <- football %>%\n  filter(group == \"fb_concuss\")\n\nconcussion_subjects %>%\n  summarize(mean(volume))\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n  mean(volume)\n1       5.7346\n```\n:::\n\n```{.r .cell-code}\nggplot(concussion_subjects, aes(x = volume)) + \n  geom_density()\n```\n\n::: {.cell-output-display}\n![](05_notes_files/figure-html/unnamed-chunk-6-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nplot_normal_likelihood(y = concussion_subjects$volume, sigma = 0.5)\n```\n\n::: {.cell-output-display}\n![](05_notes_files/figure-html/unnamed-chunk-7-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nplot_normal_normal(mean = 6.5, sd = 0.4, sigma = 0.5,\n                   y_bar = 5.735, n = 25)\n```\n\n::: {.cell-output-display}\n![](05_notes_files/figure-html/unnamed-chunk-8-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nsummarize_normal_normal(mean = 6.5, sd = 0.4, sigma = 0.5,\n                        y_bar = 5.735, n = 25)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n      model mean mode         var         sd\n1     prior 6.50 6.50 0.160000000 0.40000000\n2 posterior 5.78 5.78 0.009411765 0.09701425\n```\n:::\n:::\n",
+    "supporting": [
+      "05_notes_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

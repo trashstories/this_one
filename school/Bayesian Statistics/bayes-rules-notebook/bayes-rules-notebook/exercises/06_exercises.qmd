@@ -1,0 +1,50 @@
+---
+title: "6: Approximating the Posterior"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r load-packages, warning=FALSE, message=FALSE}
+
+# Load packages
+library(tidyverse)
+library(janitor)
+library(rstan)
+library(bayesplot)
+library(bayesrules)
+
+```
+
+# 6.5.1 Conceptual exercises
+
+## Exercise 6.1 (Steps for grid approximation)
+
+a. Identify the steps for the grid approximation of a posterior model.
+b. Which step(s) would you change to make the approximation more accurate? How would you change them?
+
+#  Exercise 6.2 (Trace plot diagnostics) 
+
+For each MCMC simulation scenario described below, sketch by hand what a single chain trace plot might look like for each simulation.
+
+a. The chain is mixing too slowly.
+b. The chain has high correlation.
+c. The chain has a tendency to get “stuck.”
+d. The chain has no problems!
+
+## Exercise 6.3 (MCMC woes) 
+
+For each MCMC simulation scenario described below, describe how the scenario could impact the posterior approximation.
+
+a. The chain is mixing too slowly.
+b. The chain has high correlation.
+c. The chain has a tendency to get “stuck.”
+
+## Exercise 6.4 (MCMC simulation: thank you for being a friend) 
+
+Your friend missed class this week and they are allergic to reading textbooks (a common affliction). Since you are a true friend, you decide to help them out and answer their following questions:
+
+a. Why is it important to look at MCMC diagnostics?
+b. Why are MCMC simulations helpful?
+c. What are the benefits of using RStan?
+d. What don’t you understand about the chapter?
+

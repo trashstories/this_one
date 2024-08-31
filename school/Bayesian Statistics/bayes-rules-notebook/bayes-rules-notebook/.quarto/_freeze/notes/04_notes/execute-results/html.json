@@ -1,0 +1,16 @@
+{
+  "hash": "dbeac8ebaf86e19748dafc90037b0d4c",
+  "result": {
+    "markdown": "---\ntitle: \"4: Balance and Sequentiality in Bayesian Analyses\"\neditor_options: \n  chunk_output_type: console\n---\n\n::: {.cell}\n\n```{.r .cell-code}\n# Load packages that will be used in this chapter\nlibrary(bayesrules)\nlibrary(tidyverse)\nlibrary(janitor)\n```\n:::\n\n\n# 4.1 Different priors, different posteriors\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Import data\ndata(bechdel, package = \"bayesrules\")\n\n# Take a sample of 20 movies\nset.seed(84735)\nbechdel_20 <- bechdel %>% \n  sample_n(20)\n\nbechdel_20 %>% \n  head(3)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n# A tibble: 3 × 3\n   year title      binary\n  <dbl> <chr>      <chr> \n1  2005 King Kong  FAIL  \n2  1983 Flashdance PASS  \n3  2013 The Purge  FAIL  \n```\n:::\n\n```{.r .cell-code}\nbechdel_20 %>% \n  tabyl(binary) %>% \n  adorn_totals(\"row\")\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n binary  n percent\n   FAIL 11    0.55\n   PASS  9    0.45\n  Total 20    1.00\n```\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nbechdel %>% \n  filter(year == 1991) %>% \n  tabyl(binary) %>% \n  adorn_totals(\"row\")\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n binary  n   percent\n   FAIL  7 0.5384615\n   PASS  6 0.4615385\n  Total 13 1.0000000\n```\n:::\n\n```{.r .cell-code}\nbechdel %>% \n  filter(year == 2000) %>% \n  tabyl(binary) %>% \n  adorn_totals(\"row\")\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n binary  n   percent\n   FAIL 34 0.5396825\n   PASS 29 0.4603175\n  Total 63 1.0000000\n```\n:::\n\n```{.r .cell-code}\nbechdel %>% \n  filter(year == 2013) %>% \n  tabyl(binary) %>% \n  adorn_totals(\"row\")\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n binary  n   percent\n   FAIL 53 0.5353535\n   PASS 46 0.4646465\n  Total 99 1.0000000\n```\n:::\n:::\n\n\n\n\n# 4.2 Different data, different posteriors\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nplot_beta(alpha = 10, beta = 10)\n```\n\n::: {.cell-output-display}\n![](04_notes_files/figure-html/unnamed-chunk-3-1.png){width=672}\n:::\n\n```{.r .cell-code}\n# Plot the Beta-Binomial model\nplot_beta_binomial(alpha = 10, beta = 10, y = 15, n = 47)\n```\n\n::: {.cell-output-display}\n![](04_notes_files/figure-html/unnamed-chunk-3-2.png){width=672}\n:::\n\n```{.r .cell-code}\n# Obtain numerical summaries of the Beta-Binomial model\nsummarize_beta_binomial(alpha = 10, beta = 10, y = 15, n = 47)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n      model alpha beta      mean      mode         var         sd\n1     prior    10   10 0.5000000 0.5000000 0.011904762 0.10910895\n2 posterior    25   42 0.3731343 0.3692308 0.003439781 0.05864965\n```\n:::\n:::\n",
+    "supporting": [
+      "04_notes_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

@@ -1,0 +1,188 @@
+---
+title: "Exercise 5"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+How do these types of visualizations help or hinder our search for truth in data?
+
+What do you think of the Financial Times explanations of their use of absolute numbers (not per capita numbers) and log scales (not regular scales)? How have these decisions affected your perception of the pandemic? How have they affected others' perceptions?
+
+\newpage
+
+# Task 2: Essential pandemic construction
+
+The New York City Department of Buildings (DOB) maintains [a list of construction sites](https://www1.nyc.gov/assets/buildings/html/essential-active-construction.html) that have been categorized as "essential" during the city's shelter-in-place pandemic order.
+
+## Load and clean data
+
+First we load and clean the data (downloaded in May 2020):
+
+```{r load-clean-data, warning=FALSE, message=FALSE}
+# You'll only need the tidyverse library for this exercise
+library(tidyverse)
+library(scales)
+
+colors <- c("#7400CC", "#0E0ACC", "#CC0AA4", "#CCAC14", "#3ACC14")
+my_pct <- label_number(accuracy = 2, scale = 100, suffix = "%")
+
+# Load original data
+essential_raw <- read_csv("data/EssentialConstruction.csv")
+
+# Clean the data a little
+# Some of the borough names are in ALL CAPS, so we use str_to_title() to convert
+# everything in the column to title case.
+# We also make BOROUGH and CATEGORY factors (or categorical variables)
+essential <- essential_raw %>% 
+  mutate(BOROUGH = str_to_title(BOROUGH),
+         BOROUGH = factor(BOROUGH),
+         CATEGORY = factor(CATEGORY))
+```
+
+## Approved projects by borough
+
+Right now there's a row for each approved construction site. We need to condense that down to get counts of construction sites by different variables. We can do this by using `group_by()` and `summarize()`
+
+```{r summarize-data-borough}
+
+essential_by_borough <- essential %>% 
+  group_by(BOROUGH) %>% 
+  summarize(total = n()) %>% 
+  mutate(proportion = total / sum(total))
+
+```
+
+```{r plot-borough-summary}
+
+essential_by_borough %>% 
+  ggplot(aes(BOROUGH, proportion)) +
+  geom_col(fill = "#0E0ACC") +
+  theme_light() +  
+  theme(text = element_text(family = "serif"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank())
+
+```
+
+## Approved projects by category
+
+```{r summarize-data-category}
+
+essential_by_category <- essential %>% 
+  group_by(CATEGORY) %>% 
+  summarize(total = n()) %>% 
+  mutate(proportion = total / sum(total))
+
+```
+
+```{r plot-category-summary}
+# Add a lollipop chart here
+
+essential_by_category %>% 
+  ggplot(aes(CATEGORY, proportion)) +
+  geom_pointrange(aes(ymin = 0, ymax = proportion),
+                  fatten = 5, size = 1.5, color = "#0E0ACC") +
+  scale_x_discrete(labels = str_wrap(essential_by_category$CATEGORY, 
+                                     width = 11)) +
+  labs(x = "Category",
+       y = "Proportion") +
+  theme_light() +  
+  theme(text = element_text(family = "serif"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank())
+
+```
+
+## Approved projects across borough and category
+
+```{r summarize-data-heatmap}
+# Create a summarized dataset of projects by both borough and category
+#
+# I also won't give you the code to make the summary for the heatmap. You'll
+# need to group by two variables to make the summary. IMPORTANTLY you'll also
+# need to add another group_by() in between summarize() and mutate(), otherwise,
+# R will calculate percentages in unexpected groups. 
+#
+# If you want the percentages of categories to add up to 100% in each borough,
+# you'll want to group by borough before calculating the proportion; if you want
+# the percentages of boroughs to add up to 100% in each category, you'll want to
+# group by category
+
+heat <- essential %>% 
+  group_by(BOROUGH, CATEGORY) %>% 
+  summarize(total = n()) %>% 
+  group_by(BOROUGH) %>% 
+  mutate(proportion = total / sum(total))
+
+```
+
+```{r plot-heatmap, fig.width=8, fig.height=(8 / 1.618)}
+
+heat %>% 
+  ggplot(aes(CATEGORY, BOROUGH, fill = proportion)) +
+  geom_tile() +
+  geom_label(aes(label = my_pct(heat$proportion), 
+                 color = proportion, 
+                 family = "serif"),
+             label.size = 0,
+             size = 5) +
+  scale_fill_gradient(low = "#E9E4FC", 
+                      high = "#570099", 
+                      limits = c(0,1), 
+                      guide = "none") +
+  scale_color_gradient(low = "#570099", 
+                       high = "black", 
+                       guide = "none") +
+  scale_x_discrete(labels = str_wrap(heat$CATEGORY, width = 11)) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "Essential Projects",
+       subtitle = "by borough and category") +
+  coord_equal() +
+  theme_light() +  
+  theme(text = element_text(family = "serif"),
+        title = element_text(size = 16, 
+                             family = "sans", 
+                             face = "bold"),
+        legend.title = element_text(size = 10, 
+                                    family = "sans"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        legend.position = "bottom")
+
+```

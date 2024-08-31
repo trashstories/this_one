@@ -1,0 +1,176 @@
+---
+title: "Exercise 10"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+I have some feelings about dashboards and interactive graphics. While they are fun and nice to play with and they are useful to convey a lot of information to different people who need different parts of that information, I find that they can obscure the data underneath or give the appearance of sharing data when you can't actually access the data the graph is based on. I find this a lot when looking for trends of different attributes overtime, I might find a cool looking dashboard that I can adjust a bunch of different parameters, but I can't actually get access to the data to manipulate it myself. So if all you're looking for is an overview of the data to get to know it, dashboards and interactivity can be very helpful. I just know too much at this point about how to look at the raw data that it feels like a distraction technique when organizations put out dashboards in lieu of raw data.
+
+\newpage
+
+# Task 2: Interactive plots
+
+```{r load-libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(plotly)
+library(ggrepel) 
+library(scales)
+
+# Load data here
+set.seed(80085)
+colors <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#CCAC14", "#0ACCC5", "#CC5514")
+
+colors_rev <- c("#CC5514", "#0ACCC5", "#CCAC14", 
+                "#3ACC14", "#0E0ACC", "#CC0AA4", "#7400CC")
+
+sym <- read_csv("data/symptoms.csv") %>% 
+  rename(overall = `overall pain`,
+         forearm = `forearm pain`,
+         back = `back pain`) %>% 
+  mutate(date = mdy(date)) %>%
+  mutate(swim = ifelse(Swimming == "Yes", 1, 0)) %>% 
+  mutate(si = ifelse(`suicidal ideation` == "yes", 1, 0),
+         night = ifelse(nightmares == "yes", 1, 0))
+
+```
+
+Do the following:
+
+1.  Make a plot. Any kind of plot will do (though it might be easiest to work with `geom_point()`).
+
+2.  Make the plot interactive with `ggplotly()`.
+
+3.  Make sure the hovering tooltip is more informative than the default.
+
+Good luck and have fun!
+
+```{r pain-mood}
+#| label: fig-pain
+#| fig-cap: "Daily Physical Pain"
+#| fig-width: 8
+#| fig-height: 6
+
+pain <- sym %>% 
+  pivot_longer(c(overall, forearm, back, fatigue, mood, anxiety, focus)) %>% 
+  pivot_longer(c(si, night, swim), 
+               names_to = "points", 
+               values_to = "point_value") %>% 
+  mutate(sym_label = case_when(name == "overall" ~ "Overall pain",
+                               name == "forearm" ~ "Forearm pain",
+                               name == "back" ~ "Back pain",
+                               name == "fatigue" ~ "Fatigue",
+                               name == "mood" ~ "Depression",
+                               name == "anxiety" ~ "Anxiety",
+                               name == "focus" ~ "Focus Issues"),
+         dummies = case_when(points == "si" ~ "S.I.",
+                             points == "night" ~ "Nightmares",
+                             points == "swim" ~ "Swimming")) %>% 
+  mutate(tip_line = paste0(format(date, "%b %e"), 
+                           "<br>", sym_label, 
+                           " - ", value),
+         tip_point = paste0(dummies, 
+                            "<br>", format(date, "%b %e"), 
+                            " (Overall pain - ", value, ")"))
+
+symplot <- pain %>% 
+  ggplot() +
+  geom_line(aes(date, value, 
+                color = sym_label,
+                linetype = sym_label), 
+            linewidth = 1) +
+  geom_point(aes(date, value, 
+                 color = sym_label,
+                 text = tip_line), 
+             size = .1) +
+  geom_point(data = pain %>% filter(point_value == 1, name == "overall"), 
+             aes(date, case_when(dummies == "Nightmares" ~ 1.85,
+                                 dummies == "S.I." ~ 1.4,
+                                 dummies == "Swimming" ~ .95),
+                 fill = dummies,
+                 text = tip_point),
+             size = 3, alpha = .75) +
+  scale_x_date(breaks = date_breaks(width = "1 week"),
+               labels = date_format("%b %e"),
+               expand = c(.01,.01)) +
+  scale_y_continuous(breaks = seq(0,10,2)) +
+  scale_color_manual(values = colors,
+                     limits = c("Overall pain", "Forearm pain", 
+                                "Back pain", "Fatigue",
+                                "Depression", "Anxiety", "Focus Issues")) +
+  scale_linetype_manual(values = c("solid", "twodash", 
+                                   "twodash", "twodash", 
+                                   "twodash", "twodash", "twodash"), 
+                        limits = c("Overall pain", "Forearm pain", 
+                                   "Back pain", "Fatigue",
+                                   "Depression", "Anxiety", "Focus Issues")) +
+  scale_fill_manual(values = c("#456699", "#CC341F", "#0CEBFF")) +
+  scale_shape_manual(values = c(21,22,23)) +
+  labs(x = NULL,
+       y = "Severity Level",
+       color = NULL,
+       fill = NULL,
+       linetype = NULL,
+       title = "Daily Symptoms") +
+  theme_light() +
+  theme(panel.border = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#9DDD99"),
+        axis.text = element_text(color = "#310873",
+                                 family = "serif"),
+        axis.title = element_text(color = "#310873"),
+        axis.ticks = element_blank(),
+        plot.title = element_text(color = "#310873",
+                                  size = 14,
+                                  face = "bold"))
+
+p <- ggplotly(symplot, tooltip = "text") 
+
+p$x$data[[1]]$legendgroup <- p$x$data[[1]]$name
+p$x$data[[1]]$name <- "Anxiety"
+p$x$data[[2]]$legendgroup <- p$x$data[[2]]$name
+p$x$data[[2]]$name <- "Back Pain"
+p$x$data[[3]]$legendgroup <- p$x$data[[3]]$name
+p$x$data[[3]]$name <- "Depression"
+p$x$data[[4]]$legendgroup <- p$x$data[[4]]$name
+p$x$data[[4]]$name <- "Fatigue"
+p$x$data[[5]]$legendgroup <- p$x$data[[5]]$name
+p$x$data[[5]]$name <- "Focus Issues"
+p$x$data[[6]]$legendgroup <- p$x$data[[6]]$name
+p$x$data[[6]]$name <- "Forearm pain"
+p$x$data[[7]]$legendgroup <- p$x$data[[7]]$name
+p$x$data[[7]]$name <- "Overall Pain"
+
+p$x$data[[15]]$legendgroup <- p$x$data[[15]]$name
+p$x$data[[15]]$name <- "Nightmares"
+p$x$data[[16]]$legendgroup <- p$x$data[[16]]$name
+p$x$data[[16]]$name <- "S.I."
+p$x$data[[17]]$legendgroup <- p$x$data[[17]]$name
+p$x$data[[17]]$name <- "Swimming"
+
+p
+
+```

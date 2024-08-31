@@ -1,0 +1,87 @@
+---
+title: "iFPL Research Team"
+---
+
+### Dr. Can Chen
+
+<!-- Insert photo, aligned left, fixed width -->
+::: {style="float:left; margin-right: 10px;"}
+![](Chen.jpg){width="150"}
+:::
+
+*Associate Professor*
+
+**Georgia State University**
+
+[cchan64\@gsu.edu](mailto:cchan64@gsu.edu)
+
+[GSU Profile](https://aysps.gsu.edu/profile/can-chen/)
+
+<br><br><br><br>
+
+### Meera Omar
+
+<!-- Insert photo, aligned left, fixed width -->
+::: {style="float:left; margin-right: 10px;"}
+![](omar.jpg){width="150"}
+:::
+
+*Doctoral Student*
+
+**Georgia State University**
+
+<br><br><br><br>
+
+### Seun Odibo
+
+<!-- Insert photo, aligned left, fixed width -->
+::: {style="float:left; margin-right: 10px;"}
+![](obido.jpeg){width="150"}
+:::
+
+*Doctoral Student*
+
+**Georgia State University**
+
+<br><br><br><br>
+
+### Meghna Paul
+
+<!-- Insert photo, aligned left, fixed width -->
+::: {style="float:left; margin-right: 10px;"}
+![](Meghna.jpg){width="150"}
+:::
+
+*Doctoral Student*
+
+**Georgia State University**
+
+<br><br><br><br>
+
+### Chaowang Ren
+
+<!-- Insert photo, aligned left, fixed width -->
+
+::: {style="float:left; margin-right: 10px;"}
+![](Chaowang.jpg){width="150"}
+:::
+
+*Doctoral Student*
+
+**Georgia State University**
+
+<br><br><br><br>
+
+### Boyuan Zhao
+
+<!-- Insert photo, aligned left, fixed width -->
+
+::: {style="float:left; margin-right: 10px;"}
+![](zhao.jpg){width="150"}
+:::
+
+*Doctoral Candidate*
+
+**Florida International University**
+
+<br><br><br><br>

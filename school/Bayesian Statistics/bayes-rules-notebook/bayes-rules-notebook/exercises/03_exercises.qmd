@@ -1,0 +1,188 @@
+---
+title: "3: Beta-Binomial Bayesian Model"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r load-packages, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+
+```
+
+## 3.8.1 Practice: Beta prior models
+
+### Exercise 3.1 (Tune your Beta prior: Take I)
+
+In each situation below, tune a Beta( $\alpha$, $\beta$) model that accurately reflects the given prior information. In many cases, there’s no single “right” answer, but rather multiple “reasonable” answers.
+
+a. Your friend applied to a job and tells you: “I think I have a 40% chance of getting the job, but I’m pretty unsure.” When pressed further, they put their chances between 20% and 60%.
+
+```{r}
+
+plot_beta(alpha = 14, beta = 21) +
+  geom_vline(xintercept = .4, color = "purple") +
+  geom_vline(xintercept = .2, color = "blue") +
+  geom_vline(xintercept = .6, color = "blue") +
+  scale_x_continuous(breaks = seq(0,1,.1))
+
+```
+
+
+b. A scientist has created a new test for a rare disease. They expect that the test is accurate 80% of the time with a variance of 0.05.
+
+```{r}
+
+plot_beta(alpha = 255, beta = 65) +
+  geom_vline(xintercept = .8, color = "purple") +
+  geom_vline(xintercept = .775, color = "blue") +
+  geom_vline(xintercept = .825, color = "blue") +
+  scale_x_continuous(breaks = seq(0,1,.1)) +
+  coord_cartesian(xlim = c(.7, 1))
+
+```
+
+c. Your Aunt Jo is a successful mushroom hunter. She boasts: “I expect to find enough mushrooms to feed myself and my co-workers at the auto-repair shop 90% of the time, but if I had to give you a likely range it would be between 85% and 100% of the time.”
+
+```{r}
+
+plot_beta(alpha = 36, beta = 2) +
+  geom_vline(xintercept = .9, color = "purple") +
+  geom_vline(xintercept = .85, color = "blue") +
+  geom_vline(xintercept = 1, color = "blue") +
+  scale_x_continuous(breaks = seq(0,1,.1)) +
+  coord_cartesian(xlim = c(.75, 1))
+
+```
+
+d. Sal (who is a touch hyperbolic) just interviewed for a job, and doesn’t know how to describe their chances of getting an offer. They say, “I couldn’t read my interviewer’s expression! I either really impressed them and they are absolutely going to hire me, or I made a terrible impression and they are burning my resumé as we speak.”
+
+```{r}
+
+plot_beta(alpha = 2, beta = 2) +
+  geom_vline(xintercept = .5, color = "purple") +
+  scale_x_continuous(breaks = seq(0,1,.1))
+
+```
+
+
+### Exercise 3.2 (Tune your Beta prior: Take II) 
+
+As in Exercise 3.1, tune an appropriate Beta( $\alpha$, $\beta$) prior model for each situation below.
+
+a. Your friend tells you “I think that I have a 80% chance of getting a full night of sleep tonight, and I am pretty certain.” When pressed further, they put their chances between 70% and 90%.
+
+```{r}
+
+plot_beta(alpha = 58, beta = 15) +
+  geom_vline(xintercept = .8, color = "purple") +
+  geom_vline(xintercept = .7, color = "blue") +
+  geom_vline(xintercept = .9, color = "blue") +
+  scale_x_continuous(breaks = seq(0,1,.1)) +
+  coord_cartesian(xlim = c(.6, 1))
+
+```
+
+b. A scientist has created a new test for a rare disease. They expect that it’s accurate 90% of the time with a variance of 0.08.
+
+```{r}
+
+plot_beta(alpha = 450, beta = 50) +
+  geom_vline(xintercept = .9, color = "purple") +
+  geom_vline(xintercept = .86, color = "blue") +
+  geom_vline(xintercept = .94, color = "blue") +
+  scale_x_continuous(breaks = seq(0,1,.04)) +
+  coord_cartesian(xlim = c(.8, 1))
+
+```
+
+c. Max loves to play the video game Animal Crossing. They tell you: “The probability that I play Animal Crossing in the morning is somewhere between 75% and 95%, but most likely around 85%.”
+
+```{r}
+
+plot_beta(alpha = 38, beta = 7) +
+  geom_vline(xintercept = .85, color = "purple") +
+  geom_vline(xintercept = .75, color = "blue") +
+  geom_vline(xintercept = .95, color = "blue") +
+  scale_x_continuous(breaks = seq(0,1,.1)) +
+  coord_cartesian(xlim = c(.7, 1))
+
+```
+
+d. The bakery in Easthampton, Massachusetts often runs out of croissants on Sundays. Ben guesses that by 10 a.m., there is a 30% chance they have run out, but is pretty unsure about that guess.
+
+```{r}
+
+plot_beta(alpha = 2.5, beta = 4.5) +
+  geom_vline(xintercept = .3, color = "purple") +
+  scale_x_continuous(breaks = seq(0,1,.1))
+
+```
+
+### Exercise 3.9 (Interpreting priors)
+
+What do you call a sweet carbonated drink: pop, soda, coke, or something else? Let $\pi$ be the proportion of U.S. residents that prefer the term “pop.” Two different beverage salespeople from different regions of the country have different priors for $\pi$. The first salesperson works in North Dakota and specifies a Beta(8,2) prior. The second works in Louisiana and specifies a Beta(1,20) prior.
+
+a. Calculate the prior mean, mode, standard deviation of $\pi$ for both salespeople.
+
+```{r}
+
+a <- summarize_beta(8,2)
+a
+
+b <- summarize_beta(1,20)
+b
+
+```
+
+b. Plot the prior pdfs for both salespeople.
+
+```{r}
+
+plot_beta(8,2) +
+  geom_vline(xintercept = a$mean, color = "purple") +
+  geom_vline(xintercept = 1, color = "blue") +
+  geom_vline(xintercept = a$mean - (a$sd * 2), color = "blue")
+  
+
+plot_beta(1,20) +
+  geom_vline(xintercept = b$mean, color = "purple") +
+  geom_vline(xintercept = b$mean + (b$sd * 2), color = "blue") +
+  geom_vline(xintercept = 0, color = "blue")
+ 
+```
+
+c. Compare, in words, the salespeople’s prior understandings about the proportion of U.S. residents that say “pop.”
+
+**The first salesperson believes that many US residents say "pop," and the second salesperson believes that very few US residents say "pop."**
+
+## 3.8.2 Practice: Beta-Binomial models
+
+### Exercise 3.10 (Different priors, different posteriors) 
+
+Continuing Exercise 3.9, we poll 50 U.S. residents and 12 (24%) prefer the term “pop.”
+
+a. Specify the unique posterior model of $\pi$ for both salespeople. We encourage you to construct these posteriors from scratch.
+
+**eeek**
+
+b. Plot the prior pdf, likelihood function, and posterior pdf for both salespeople.
+Compare the salespeople’s posterior understanding of $\pi$.
+
+```{r}
+
+summarize_beta_binomial(8,2, y = 12, n = 50)
+summarize_beta_binomial(1,20, y = 12, n = 50)
+
+plot_beta_binomial(8,2, y = 12, n = 50)
+plot_beta_binomial(1,20, y = 12, n = 50)
+
+```
+
+c. Compare the salespeople’s posterior understanding of $\pi$.
+
+The first salesperson's posterior understanding of $\pi$ is much lower than the prior model. However, the second salesperson estimated too low in the prior model, but they were closer to the polls results, thus, the posterior understanding did not change as much as the first salesperson.
+
+

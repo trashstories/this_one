@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: 97b4889f-9770-4614-8b37-73df77fd79cc
+      url: 'https://trashstories.quarto.pub/ifpl'

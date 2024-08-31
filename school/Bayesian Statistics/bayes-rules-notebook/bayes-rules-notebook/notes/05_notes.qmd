@@ -1,0 +1,75 @@
+---
+title: "5: Conjugate Families"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r load-packages, warning=FALSE, message=FALSE}
+
+# Load packages that will be used in this chapter
+library(bayesrules)
+library(tidyverse)
+library(janitor)
+
+```
+
+# 5.2 Gamma-Poisson conjugate family
+
+```{r}
+# Plot the Gamma(10, 2) prior
+plot_gamma(shape = 10, rate = 2)
+```
+
+```{r}
+plot_poisson_likelihood(y = c(6, 2, 2, 1), lambda_upper_bound = 10)
+```
+
+```{r}
+plot_gamma_poisson(shape = 10, rate = 2, sum_y = 11, n = 4)
+```
+
+```{r}
+summarize_gamma_poisson(shape = 10, rate = 2, sum_y = 11, n = 4)
+```
+
+# 5.3 Normal-Normal conjugate family
+
+```{r}
+plot_normal(mean = 6.5, sd = 0.4)
+```
+
+```{r}
+# Load the data
+data(football)
+concussion_subjects <- football %>%
+  filter(group == "fb_concuss")
+
+concussion_subjects %>%
+  summarize(mean(volume))
+
+ggplot(concussion_subjects, aes(x = volume)) + 
+  geom_density()
+```
+
+```{r}
+plot_normal_likelihood(y = concussion_subjects$volume, sigma = 0.5)
+```
+
+```{r}
+plot_normal_normal(mean = 6.5, sd = 0.4, sigma = 0.5,
+                   y_bar = 5.735, n = 25)
+```
+
+```{r}
+summarize_normal_normal(mean = 6.5, sd = 0.4, sigma = 0.5,
+                        y_bar = 5.735, n = 25)
+```
+
+
+
+
+
+
+
+
+

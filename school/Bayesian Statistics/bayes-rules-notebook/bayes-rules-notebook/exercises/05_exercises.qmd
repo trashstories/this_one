@@ -1,0 +1,89 @@
+---
+title: "5: Conjugate Families"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r load-packages, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+
+```
+
+## 5.7.1 Practice: Gamma-Poisson
+
+###Exercise 5.1 (Tuning a Gamma prior) 
+
+For each situation below, tune an appropriate Gamma($s$,$r$) prior model for $\lambda$.
+
+a. The most common value of $\lambda$ is 4, and the mean is 7.
+b. The most common value of $\lambda$ is 10 and the mean is 12.
+c. The most common value of $\lambda$ is 5, and the variance is 3.
+d. The most common value of $\lambda$ is 14, and the variance is 6.
+e. The mean of $\lambda$ is 4 and the variance is 12.
+f. The mean of $\lambda$ is 22 and the variance is 3.
+
+### Exercise 5.2 (Poisson likelihood functions) 
+
+For each situation below, we observe the outcomes for a random sample of Poisson variables, $Y_i | \lambda \stackrel{ind}{\sim} \text{Pois}(\lambda)$. Specify and plot the likelihood function of $\lambda$.
+
+a. $(y_1,y_2,y_3) = (3,7,19)$
+b. $(y_1,y_2,y_3,y_4) = (12,12,12,0)$
+c. $y_1 = 12$
+d. $(y_1,y_2,y_3,y_4,y_5) = (16,10,17,11,11)$
+ 
+### Exercise 5.3 (Finding the Gamma-Poisson posterior) 
+
+Assume a prior model of $\lambda \sim \text{Gamma}(24, 2)$. Specify the posterior models of $\lambda$ corresponding to the data in each scenario of Exercise 5.2.
+
+### Exercise 5.4 (Finding the Gamma-Poisson posterior with a different prior)
+
+Assume a prior model of $\lambda \sim \text{Gamma}(2, 2)$. Specify the posterior models of $\lambda$ corresponding to the data in each scenario of Exercise 5.2.
+
+### Exercise 5.5 (Text messages) 
+
+Let random variable $\lambda$ represent the rate of text messages people receive in an hour. At first, you believe that the typical number of messages per hour is 5 with a standard deviation of 0.25 messages.
+
+a. Tune and plot an appropriate Gamma($s,r$) prior model for $\lambda$.
+B. What is the prior probability that the rate of text messages per hour is larger than 10? Hint: learn about `pgamma()`.
+
+### Exercise 5.6 (Text messages with data) 
+
+Continuing with Exercise 5.5, you collect data from six friends. They received 7, 3, 8, 9, 10, 12 text messages in the previous hour.
+
+a. Plot the resulting likelihood function of $\lambda$.
+b. Plot the prior pdf, likelihood function, and the posterior pdf of $\lambda$.
+c. Use `summarize_gamma_poisson()` to calculate descriptive statistics for the prior and the posterior models of $\lambda$.
+d. Comment on how your understanding about $\lambda$ changed from the prior (in the previous exercise) to the posterior based on the data you collected from your friends.
+
+### Exercise 5.7 (World Cup) 
+
+Let $\lambda$ be the average number of goals scored in a Women’s World Cup game. We’ll analyze $\lambda$ by the following Gamma-Poisson model where data $Y_i$ is the observed number of goals scored in a sample of World Cup games:
+
+$\begin{split}
+Y_i | \lambda & \stackrel{ind}{\sim} \text{Pois}(\lambda) \\
+\lambda & \sim \text{Gamma}(1, 0.25) \\
+\end{split}$
+ 
+
+a. Plot and summarize our prior understanding of $\lambda$.
+
+b. Why is the Poisson model a reasonable choice for our data $Y_i$?
+
+cThe wwc_2019_matches data in the fivethirtyeight package includes the number of goals scored by the two teams in each 2019 Women’s World Cup match. Define, plot, and discuss the total number of goals scored per game:
+
+library(fivethirtyeight)
+data("wwc_2019_matches")
+wwc_2019_matches <- wwc_2019_matches %>% 
+  mutate(total_goals = score1 + score2)
+Identify the posterior model of  
+$\lambda
+  and verify your answer using summarize_gamma_poisson().
+
+Plot the prior pdf, likelihood function, and posterior pdf of  
+$\lambda
+ . Describe the evolution in your understanding of  
+$\lambda
+  from the prior to the posterior.

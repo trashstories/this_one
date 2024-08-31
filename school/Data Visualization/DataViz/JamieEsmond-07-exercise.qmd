@@ -1,0 +1,262 @@
+---
+title: "Exercise 7"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+While regression is a good way to determine correlations and their significance, it is not a method that is familiar to everyone, so visualizing the relationship with less math is important. The uncertainty of regression coefficients is probably the hardest to explain that using point ranges on a plot can visualize the range of possible correlation between two variables. It is clear if the range crosses zero, that the correlation may not exist, but if the range is far from in zero line the more evidence for the truth of the correlation.
+
+\newpage
+
+# Task 2: Combining plots
+
+```{r load-libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(patchwork)
+library(broom)
+library(ggridges)   # For ridge plots
+library(gghalves)   # For half geoms
+library(scales)
+library(marginaleffects)
+
+
+colors <- c("#7400CC", "#3ACC14", "#CC0AA4", "#CCAC14", "#0E0ACC")
+
+results_2016 <- read_csv("data/results_2016.csv")
+```
+
+Make 2--3 plots of anything you want from the `results_2016` data (histogram, density, boxplot, scatterplot, whatever) and combine them with {patchwork}. Look at [the documentation](https://patchwork.data-imaginist.com/articles/guides/assembly.html) to see fancy ways of combining them, like having two rows inside a column.
+
+```{r combine-plots}
+#| fig-cap: "Voting Patterns, Race, and Income"
+# Make some plots and combine them here
+
+results <- results_2016 %>% 
+  mutate(black = ifelse(percent_black >= 50, "Majority Black", "Not Majority Black"),
+         white = ifelse(percent_white >= 50, "Majority White", "Not Majority White"))
+
+b_pop <- results %>% 
+  drop_na(black) %>% 
+  ggplot(aes(percent_dem, per_capita_income, color = black, fill = black)) +
+  geom_point(aes(size = total_population), shape = 21, color = "black") +
+  geom_smooth() +
+  scale_size(labels = comma) +
+  scale_fill_manual(values = colors) +
+  scale_color_manual(values = colors) +
+  scale_x_continuous(labels = label_percent(scale = 1)) +
+  scale_y_continuous(labels = label_dollar(accuracy = 1)) +
+  labs(x = "% Democrat",
+       y = "Per Capita Income",
+       fill = NULL,
+       color = NULL,
+       size = "Total Population",
+       title = "Voting Patterns and Income") +
+  theme_light() +
+  theme(panel.grid.major.x = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(family = "serif"),
+        axis.text.y = element_text(family = "serif"),
+        legend.position = "right")
+
+results_long <- results %>% 
+  pivot_longer(c(percent_white, percent_black, percent_hispanic)) %>% 
+  mutate(race = case_when(name == "percent_black" ~ "Black",
+                          name == "percent_white" ~ "White",
+                          name == "percent_hispanic" ~ "Hispanic"))
+
+race <- results_long %>% 
+  ggplot() +
+  geom_density(aes(value, color = race, fill = race), 
+               size = 1, alpha = .5) +
+  scale_x_continuous(labels = label_percent(scale = 1)) +
+  labs(x = "Percent of Population",
+       y = "Density",
+       Fill = "Race",
+       title = "Distribution of Racial Percent of Population") +
+  theme_light() +
+  theme(panel.grid.major.x = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.major.y = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(family = "serif"),
+        axis.text.y = element_text(family = "serif"))
+
+b_pop + race +
+  plot_layout(ncol = 1, heights = c(0.55, 0.45))
+
+
+```
+
+```{r plot2}
+#| fig-cap: "Distribution of Median Rent (for fun)"
+
+results %>% 
+  filter(state == "Georgia" | 
+           state == "Florida" | 
+           state == "Alabama" | 
+           state == "South Carolina" | 
+           state == "Tennessee") %>% 
+  ggplot(aes(state, median_rent, color = state, fill = state)) +
+  geom_half_point(side = "l", size = .4, alpha = .75) + 
+  geom_half_boxplot(side = "l", width = .6, 
+                    alpha = 0.3, nudge = 0.1) +
+  geom_half_violin(side = "r", alpha = .75) +
+  scale_fill_manual(values = colors, guide = "none") +
+  scale_color_manual(values = colors, guide = "none") +
+  scale_y_continuous(labels = label_dollar(accuracy = 1)) +
+  scale_x_discrete(limits = rev) +
+  labs(x = NULL,
+       y = "Median Rent",
+       fill = NULL,
+       color = NULL,
+       title = "Distribution of Median Rent",
+       subtitle = "in Georgia and Surrounding States") +
+  coord_flip() +
+  theme_light() +
+  theme(panel.grid.major.x = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(family = "serif"),
+        axis.text.y = element_text(family = "serif"))
+  
+    
+
+```
+
+\newpage
+
+# Task 3: Visualizing regression
+
+## Coefficient plot
+
+Use the `results_2016` data to create a model that predicts the percent of Democratic votes in a precinct based on age, race, income, rent, and state (hint: the formula will look like this: `percent_dem ~ median_age + percent_white + per_capita_income + median_rent + state`)
+
+Use `tidy()` in the {broom} package and `geom_pointrange()` to create a coefficient plot for the model estimates. You'll have 50 rows for all the states, and that's excessive for a plot like this, so you'll want to filter out the state rows. You can do that by adding this:
+
+```{r example-filtering, eval=FALSE}
+tidy(...) %>%
+  filter(!str_detect(term, "state"))
+```
+
+The `str_detect()` function looks for the characters "state" in the term column. The `!` negates it. This is thus saying "only keep rows where the word 'state' is not in the term name".
+
+You should also get rid of the intercept (`filter(term != "(Intercept)")`).
+
+```{r coefplot}
+#| fig.cap: "Coefficient Estimates for Several Variables"
+
+dems <- lm(percent_dem ~ median_age + percent_white + per_capita_income + median_rent + state,
+           data = results)
+
+dems1 <- tidy(dems, conf.int = TRUE) %>% 
+  filter(!str_detect(term, "state"),
+         term != "(Intercept)") %>% 
+  mutate(name = case_when(term == "median_age" ~ "Median Age",
+                          term == "percent_white" ~ "Percent White",
+                          term == "per_capita_income" ~ "Per Capita Income",
+                          term == "median_rent" ~ "Median Rent"))
+
+dems1 %>% 
+  ggplot(aes(x = estimate, y = name)) +
+  geom_vline(xintercept = 0, color = "#CC0AA4", linetype = "dotted") +
+  geom_pointrange(aes(xmin = conf.low, xmax = conf.high), color = "#7400CC") + 
+  labs(x = "Coefficient estimate", 
+       y = NULL,
+       title = "Coefficient Estimates for Several Variables") +
+  theme_light() +
+  theme(panel.grid.major.x = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.major.y = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(family = "serif"),
+        axis.text.y = element_text(family = "serif"))
+
+```
+
+## Predicted values
+
+Show what happens to `percent_dem` as one (or more) of your model's variables changes. To make life easy, refer to the ["Predicted values and marginal effects in 2023"](https://datavizs23.classes.andrewheiss.com/example/07-example.html#predicted-values-and-marginal-effects-in-2023) section in this session's example and use `predictions()` rather than creating your own `newdata` data set by hand. You'll do something like this (assuming you're manipulating `per_capita_income`; try using a different variable when you do the assignment, though):
+
+```{r example-predictions, eval=FALSE}
+my_predictions <- predictions(
+  model_name,
+  newdata = datagrid(per_capita_income = seq(9000, 60000, by = 100),
+                     state = "Georgia"))
+```
+
+Plot your varied variable on the x-axis, the fitted values (`predicted`) on the y-axis, show the relationship with a line, and add a ribbon to show the 95% confidence interval.
+
+```{r precog}
+#| fig-cap: "Democratic Predictions"
+
+precog <- predictions(
+  dems,
+  newdata = datagrid(median_rent = seq(200, 2000, by = 10))
+)
+
+ggplot(precog, aes(x = median_rent, y = estimate)) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high),
+              fill = "#CC0AA4", alpha = 0.5) + 
+  geom_line(size = 1, color = "#CC0AA4") +
+  scale_y_continuous(labels = label_percent(scale = 1)) +
+  scale_x_continuous(labels = label_dollar(accuracy = 1)) +
+  labs(x = "Median Rent", 
+       y = "Predicted Democrat Votes (percent)",
+       title = "Democratic Predictions",
+       subtitle = "Considering Median Rent Costs") +
+  theme_light() +
+  theme(panel.grid.major.x = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.major.y = element_line(color = "#FDDEED", linetype = "longdash"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(family = "serif"),
+        axis.text.y = element_text(family = "serif"))
+
+```
+
+\newpage
+
+**(I want to come back to these...)**
+
+# Bonus task 1! Correlograms
+
+**This is entirely optional but might be fun.**
+
+For extra fun times, if you feel like it, create a correlogram heatmap, either with `geom_tile()` or with points sized by the correlation. Use any variables you want from `results_2016`.
+
+# Bonus task 2! Marginal effects
+
+**This is also entirely optional but will be super useful if you use regression for anything in your own work.**
+
+For extra super bonus fun times, create a more complex model that predicts `percent_dem` that uses polynomial terms (e.g. age squared) and/or interaction terms (e.g. age × state). Plot predictions from the model, use `marginaleffects()` to find the slopes of those predictions at different values, and plot the slopes in a marginal effects plot. (The ["Predicted values and marginal effects in 2023"](https://datavizs23.classes.andrewheiss.com/example/07-example.html#predicted-values-and-marginal-effects-in-2023) section from the example will be indispensable here.)

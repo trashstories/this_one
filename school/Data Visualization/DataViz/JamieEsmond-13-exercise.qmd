@@ -1,0 +1,391 @@
+---
+title: "Exercise 13"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+Word clouds are generally unuseful for all the reasons we discussed, but I think a big problem with them is also that there is so much variation in words that mean the same thing. However, a potential situation where they might be more useful is for #hashtags. Hashtags are more uniform, and there is usually only one of each hashtag per post; mapping hashtag trends over time by platform *could* be conducive to a word cloud, maybe faceted by year or month. This might do a decent job of showing the popularity of different hashtags throughout a season, campaign, or term in office. (Still probably not the best choice, but if the point is specifically an analysis of social media, it could work.)
+
+\newpage
+
+# Task 2: Word frequencies
+
+Download 4+ books by some author on [Project Gutenberg](http://www.gutenberg.org/). Jane Austen, Victor Hugo, Emily Brontë, Lucy Maud Montgomery, Arthur Conan Doyle, Mark Twain, Henry David Thoreau, Fyodor Dostoyevsky, Leo Tolstoy. Anyone. Just make sure it's all from the same author.
+
+Make these two plots and describe what each tell about your author's books:
+
+1.  Top 10 most frequent words *in each book*
+2.  Top 10 most unique words *in each book* (i.e. tf-idf)
+
+```{r load-libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(tidytext)
+library(gutenbergr)
+library(stringr)
+
+colors <- c("#CC0AA4", "#0ACCC5", "#3ACC14", "#7400CC", "#CCAC14")
+
+```
+
+\newpage
+
+## Oscar Wilde
+
+```{r}
+
+wilde_raw <- gutenberg_download(c(174, 844, 902, 854, 885),
+                                meta_fields = "title",
+                                mirror = "http://mirrors.xmission.com/gutenberg/")
+
+```
+
+```{r}
+
+speaker <- "^[A-Z][A-Z ]+."
+direction <- "\\s*\\[.*?\\]\\s*"
+
+wilde <- wilde_raw %>% 
+  slice(82:n()) %>% 
+  drop_na(text) %>% 
+  mutate(text = ifelse(str_detect(text, "^CHAPTER"), text,
+                       str_replace(text, speaker, ""))) %>% 
+  mutate(text = str_replace(text, direction, "")) %>% 
+  select(-gutenberg_id) 
+
+wilde_toptext <- wilde %>% 
+  mutate(text = str_replace(text, speaker, "")) %>% 
+  drop_na(text) %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words) %>% 
+  count(title, word, sort = TRUE) %>% 
+  group_by(title) %>% 
+  top_n(10) %>% 
+  ungroup() %>% 
+  mutate(word = fct_inorder(word)) 
+
+wilde_topbi <- wilde %>% 
+  drop_na(text) %>% 
+  mutate(text = str_replace(text, speaker, "")) %>% 
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>% 
+  drop_na(bigram) %>% 
+  separate(bigram, c("word1", "word2"), sep = " ") %>% 
+  filter(!word1 %in% stop_words$word,
+         !word2 %in% stop_words$word) %>% 
+  unite(bigram, word1, word2, sep = " ") %>% 
+  count(title, bigram, sort = TRUE) %>%
+  group_by(title) %>% 
+  top_n(10) %>% 
+  ungroup() %>% 
+  mutate(bigram = fct_inorder(bigram))
+
+wilde_uniq <- wilde %>% 
+  drop_na() %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words) %>% 
+  count(title, word, sort = TRUE) %>% 
+  bind_tf_idf(word, title, n) %>% 
+  arrange(desc(tf_idf)) %>% 
+  group_by(title) %>% 
+  top_n(10) %>% 
+  ungroup() %>% 
+  mutate(word = fct_inorder(word))
+  
+
+```
+
+```{r plot1}
+#| fig-cap: "Oscar Wilde's Favorite Words"
+#| fig-height: 8
+#| fig-width: 7.5
+
+wilde_toptext %>% 
+  ggplot() +
+  geom_col(aes(n, fct_rev(word), fill = title)) +
+  facet_wrap(~fct_rev(title), ncol = 2, 
+             scales = "free_y",
+             labeller = label_wrap_gen(width = 35)) +
+  scale_fill_manual(values = colors, guide = "none") +
+  labs(x = NULL,
+       y = NULL,
+       title = "Oscar Wilde's Favorite Words") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "#2B004D", face = "bold"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(family = "serif"),
+        axis.ticks = element_blank())
+
+```
+
+```{r plot2}
+#| fig-cap: "Oscar Wilde's Most Common Bigrams"
+#| fig-height: 8
+#| fig-width: 7.5
+
+wilde_topbi %>% 
+  ggplot() +
+  geom_col(aes(n, fct_rev(bigram), fill = title)) +
+  facet_wrap(~fct_rev(title), ncol = 2, 
+             scales = "free_y",
+             labeller = label_wrap_gen(width = 35)) +
+  scale_fill_manual(values = colors, guide = "none") +
+  labs(x = NULL,
+       y = NULL,
+       title = "Oscar Wilde's Most Common Bigrams") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "#2B004D", face = "bold"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(family = "serif"),
+        axis.ticks = element_blank())
+
+```
+
+```{r plot3}
+#| fig-cap: "Uniquest Oscar Wilde Words"
+#| fig-height: 8
+#| fig-width: 7.5
+
+wilde_uniq %>% 
+  ggplot() +
+  geom_col(aes(tf_idf, fct_rev(word), fill = title)) +
+  facet_wrap(~fct_rev(title), ncol = 2, 
+             scales = "free_y",
+             labeller = label_wrap_gen(width = 35)) +
+  scale_fill_manual(values = colors, guide = "none") +
+  labs(x = "tf-idf",
+       y = NULL,
+       title = "Uniquest Oscar Wilde Words") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "#2B004D", face = "bold"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text = element_text(family = "serif"),
+        axis.ticks = element_blank())
+
+```
+
+\newpage
+
+## Andor
+
+Just for fun because I had all the episode scripts already downloaded:
+
+```{r}
+
+andor_raw <- read_lines("data/andor.txt")
+
+andor_raw <- tibble(text = read_lines("data/andor.txt")) %>% 
+  filter(text != "")
+
+```
+
+```{r}
+
+nonverbal <- "\\s*\\(.*?\\)\\s*"
+speaker2 <- ".*?:\\s*"
+
+andor <- andor_raw %>% 
+  mutate(text = str_replace_all(text, nonverbal, " ")) %>% 
+  mutate(text = str_replace_all(text, speaker2, "")) %>% 
+  filter(text != " ") %>% 
+  mutate(ep_start = str_detect(text, "^Episode"),
+         ep_num = cumsum(ep_start)) %>% 
+  mutate(arc = case_when(ep_num <= 3 ~ "Arc 1 - Intro",
+                         ep_num %in% c(4,5,6) ~ "Arc 2 - Aldhani Heist",
+                         ep_num %in% c(7,8,9) ~ "Arc 3 - Prison Break",
+                         TRUE ~ "Arc 4 - Finale")) %>% 
+  select(-ep_start)
+
+andor_toptext <- andor %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words) %>% 
+  filter(!(word %in% c("im", "dont", "hes", "ill", "id", "weve", "whats",
+                       "ive", "theyre", "youve", "shes", "youll", "youre"))) %>% 
+  count(arc, word, sort = TRUE) %>% 
+  group_by(arc) %>% 
+  top_n(15) %>% 
+  ungroup() %>% 
+  mutate(word = fct_inorder(word)) 
+
+andor_bi <- andor %>% 
+  drop_na(text) %>% 
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>% 
+  drop_na(bigram) %>% 
+  separate(bigram, c("word1", "word2"), sep = " ") %>% 
+  filter(!word1 %in% stop_words$word,
+         !word2 %in% stop_words$word) %>% 
+  unite(bigram, word1, word2, sep = " ") %>% 
+  filter(!(bigram == "5 2")) %>% 
+  count(arc, bigram, sort = TRUE) %>%
+  group_by(arc) %>% 
+  top_n(10) %>% 
+  ungroup() %>% 
+  mutate(bigram = fct_inorder(bigram))
+
+andor_uniq <- andor %>% 
+  drop_na() %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words) %>% 
+  count(arc, word, sort = TRUE) %>% 
+  bind_tf_idf(word, arc, n) %>% 
+  arrange(desc(tf_idf)) %>% 
+  group_by(arc) %>% 
+  top_n(10) %>% 
+  ungroup() %>% 
+  mutate(word = fct_inorder(word))
+  
+```
+
+```{r plot4}
+#| fig-cap: "Top Andor Words"
+#| fig-height: 8
+#| fig-width: 7.5
+
+places <- c("ferrix", "aldhani", "kenari", "alkenzi", "alderaan")
+ppl <- c("cassian", "bix", "andor", "bee", "clem", "kreegyr", "paak",
+         "kassa", "keef", "ulaf", "caleen", "girgo", "lonni", "haye",
+         "anto")
+
+andor_toptext %>%
+  mutate(color =  case_when(grepl("\\bimperial\\b", word, 
+                                  ignore.case = TRUE) ~ "Imperial Words",
+                            grepl("\\bempire\\b", word, 
+                                  ignore.case = TRUE) ~ "Imperial Words",
+                            word %in% places ~ "Place Names",
+                            word %in% ppl ~ "Character Names",
+                            TRUE ~ "Other")) %>%
+  ggplot() +
+  geom_col(aes(n, fct_rev(word), fill = color)) +
+  facet_wrap(~ arc, scales = "free_y", ncol = 2) +
+  scale_x_continuous(breaks = seq(0,60, 15)) +
+  scale_fill_manual(values = colors, limits = c("Place Names",
+                                                "Character Names",
+                                                "Imperial Words",
+                                                "Other")) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "Top Andor Words") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "#2B004D", face = "bold"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        axis.text = element_text(family = "serif", size = 10),
+        axis.ticks = element_blank())
+
+ggsave("andor.png", width = 7.5, height = 9)
+
+```
+
+```{r plot5}
+#| fig-cap: "Top Andor Phrases"
+#| fig-height: 8
+#| fig-width: 7.5
+
+places1 <- c("rix road", "pre mor", "preox morlana")
+ppl1 <- c("cassian andor", "uncle harlo", "dedra meero", 
+          "anto kreegyr", "lieutenant gorn", "keef girgo", 
+          "mon mothma", "tay kolma", "supervisor meero",
+          "dr gorst", "bix bix", "salman paak")
+
+andor_bi %>%
+  mutate(color =  case_when(grepl("\\bimperial\\b", bigram, 
+                                  ignore.case = TRUE) ~ "Imperial Words",
+                            grepl("\\bempire\\b", bigram, 
+                                  ignore.case = TRUE) ~ "Imperial Words",
+                            bigram %in% places1 ~ "Place Names",
+                            bigram %in% ppl1 ~ "Character Names",
+                            TRUE ~ "Other")) %>% 
+  ggplot() +
+  geom_col(aes(n, fct_rev(bigram), fill = color)) +
+  facet_wrap(~ arc, scales = "free_y", ncol = 2) +
+  scale_x_continuous(breaks = seq(0,15,3)) +
+  scale_fill_manual(values = colors, limits = c("Place Names",
+                                                "Character Names",
+                                                "Imperial Words",
+                                                "Other")) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "Top Andor Phrases") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "#2B004D", face = "bold"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position = "bottom",
+        axis.text = element_text(family = "serif", size = 10),
+        axis.ticks = element_blank())
+
+ggsave("andor1.png", width = 7.5, height = 8)
+
+```
+
+```{r plot6}
+#| fig-cap: "Uniquest Andor Words"
+#| fig-height: 8
+#| fig-width: 7.5
+
+andor_uniq %>% 
+  mutate(color =  case_when(grepl("\\bimperial\\b", word, 
+                                  ignore.case = TRUE) ~ "Imperial",
+                            grepl("\\bempire\\b", word, 
+                                  ignore.case = TRUE) ~ "Imperial",
+                            word %in% places ~ "Place Names",
+                            word %in% ppl ~ "Character Names",
+                            TRUE ~ "Other")) %>%
+  ggplot() +
+  geom_col(aes(tf_idf, fct_rev(word), fill = color)) +
+  facet_wrap(~ arc, ncol = 2, 
+             scales = "free_y",
+             labeller = label_wrap_gen(width = 35)) +
+  scale_fill_manual(values = colors, limits = c("Place Names",
+                                                "Character Names",
+                                                "Imperial",
+                                                "Other")) +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       title = "Uniquest Andor Words") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "#2B004D", face = "bold"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(family = "serif"),
+        axis.ticks = element_blank(),
+        legend.position = "bottom")
+
+ggsave("andor2.png", width = 7.5, height = 8)
+
+```

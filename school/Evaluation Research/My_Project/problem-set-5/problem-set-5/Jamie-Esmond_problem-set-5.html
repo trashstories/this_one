@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jamie Esmond">
+<meta name="dcterms.date" content="2023-03-29">
+
+<title>Problem set 5: Do police reduce car thefts?</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="Jamie-Esmond_problem-set-5_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Jamie-Esmond_problem-set-5_files/libs/quarto-html/quarto.js"></script>
+<script src="Jamie-Esmond_problem-set-5_files/libs/quarto-html/popper.min.js"></script>
+<script src="Jamie-Esmond_problem-set-5_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Jamie-Esmond_problem-set-5_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Jamie-Esmond_problem-set-5_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Jamie-Esmond_problem-set-5_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Jamie-Esmond_problem-set-5_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Jamie-Esmond_problem-set-5_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Jamie-Esmond_problem-set-5_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>
+    .quarto-title-block .quarto-title-banner {
+      color: #744FC6;
+    }
+    </style>
+
+<script src="Jamie-Esmond_problem-set-5_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="Jamie-Esmond_problem-set-5_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Problem set 5: Do police reduce car thefts?</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jamie Esmond </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">March 29, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#research-design" id="toc-research-design" class="nav-link active" data-scroll-target="#research-design">1. Research design</a></li>
+  <li><a href="#trends" id="toc-trends" class="nav-link" data-scroll-target="#trends">2. Trends</a></li>
+  <li><a href="#difference-in-differences-by-hand-ish" id="toc-difference-in-differences-by-hand-ish" class="nav-link" data-scroll-target="#difference-in-differences-by-hand-ish">3. Difference-in-differences by hand-ish</a></li>
+  <li><a href="#difference-in-differences-with-regular-ols" id="toc-difference-in-differences-with-regular-ols" class="nav-link" data-scroll-target="#difference-in-differences-with-regular-ols">4. Difference-in-differences with regular OLS</a></li>
+  <li><a href="#difference-in-differences-with-fixed-effects-ols" id="toc-difference-in-differences-with-fixed-effects-ols" class="nav-link" data-scroll-target="#difference-in-differences-with-fixed-effects-ols">5. Difference-in-differences with fixed effects OLS</a></li>
+  <li><a href="#translate-results-to-something-more-interpretable" id="toc-translate-results-to-something-more-interpretable" class="nav-link" data-scroll-target="#translate-results-to-something-more-interpretable">6. Translate results to something more interpretable</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<div style="page-break-after: always;"></div>
+<p>In 2004, Rafael Di Tella and Ernesto Schargrodsky published a study that analyzed the effect of increased police presence on crime. You looked at this study previously in your threats to validity assignment. To measure this effect, Di Tella and Schargrodsky leveraged a quasi-experiment. Following a synagogue bombing in Buenos Aires, Argentina on July 18, 1994, extra municipal police were assigned to protect synagogues around the city. The increase of police patrols on some city blocks, but not others, means that there is arguably a treatment group and control group for increased police presence, which Di Tella and Schargrodsky used to measure the effect of extra police on car thefts.</p>
+<p>The dataset I’ve provided (<code>MonthlyPanel.dta</code>) is a Stata data file nearly 10,000 observations. It comes directly from <a href="https://www.aeaweb.org/articles?id=10.1257/000282804322970733">Di Tella and Schargrodsky’s data appendix available at their study’s <em>AER</em> webpage</a>. This is non-experimental data that includes counts of car thefts for every city block in Buenos Aires from April to December 1994. There are 12 variables:</p>
+<ul>
+<li><code>observ</code> (we’ll rename to <code>block</code>): The ID number of the block</li>
+<li><code>barrio</code>: The barrio (neighborhood) for the block</li>
+<li><code>calle</code>: The street for the block</li>
+<li><code>altura</code>: The street number</li>
+<li><code>institu1</code> (we’ll rename to <code>same_block</code>): Indicator variable marking if there’s a Jewish institution on the block (1 if yes, 0 if no)</li>
+<li><code>institu3</code>: Indicator variable marking if there’s a Jewish institution within one block (1 if yes, 0 if no)</li>
+<li><code>distanci</code> (we’ll rename to <code>distance</code>): Distance to the nearest Jewish institution, measured in blocks</li>
+<li><code>edpub</code>: Indicator variable marking if there’s an educational building or embassy on the block (1 if yes, 0 if no)</li>
+<li><code>estserv</code>: Indicator variable marking if there’s a gas station on the block (1 if yes, 0 if no)</li>
+<li><code>banco</code>: Indicator variable marking if there’s a bank on the block (1 if yes, 0 if no)</li>
+<li><code>totrob</code> (we’ll rename to <code>car_theft</code>): Total number of car robberies</li>
+<li><code>mes</code> (we’ll rename to <code>month</code>): Month</li>
+</ul>
+<hr>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)     <span class="co"># For ggplot, %&gt;%, mutate, filter, group_by, and friends</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(haven)         <span class="co"># For loading data from Stata</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)         <span class="co"># For showing models as data frames</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fixest)        <span class="co"># For fast, nice, fixed effects regression</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modelsummary)  <span class="co"># For side-by-side regression tables</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># This turns off this message that appears whenever you use summarize():</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># `summarise()` ungrouping output (override with `.groups` argument)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">dplyr.summarise.inform =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Load terror data</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>terror <span class="ot">&lt;-</span> <span class="fu">read_stata</span>(<span class="st">"data/MonthlyPanel.dta"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># The attack happened on July 18. The authors omitted data from July 19-31, so</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># all July observations are from before the attack. Make a new indicator</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># variable `after` to mark if the row is from before or after the attack</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">after =</span> mes <span class="sc">&gt;</span> <span class="dv">7</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># There are some weird months in the data like 73. Filter out anything &gt; 12</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(mes <span class="sc">&lt;=</span> <span class="dv">12</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Rename some columns to be more readable</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">same_block =</span> institu1,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>         <span class="at">distance =</span> distanci,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">car_theft =</span> totrob,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>         <span class="at">month =</span> mes,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">block =</span> observ) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create indicator variables for the distance of each block to a synagogue</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">one_block_away =</span> <span class="fu">ifelse</span>(distance <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">two_blocks_away =</span> <span class="fu">ifelse</span>(distance <span class="sc">==</span> <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">more_than_two_away =</span> <span class="fu">ifelse</span>(distance <span class="sc">&gt;</span> <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Make these factors/categories</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">block =</span> <span class="fu">as.factor</span>(block),</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>         <span class="at">month =</span> <span class="fu">as.factor</span>(month),</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">same_block_factor =</span> <span class="fu">as.factor</span>(same_block))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div style="page-break-after: always;"></div>
+<section id="research-design" class="level1">
+<h1>1. Research design</h1>
+<p><strong>Imagine you went out and collected data on the presence of police in each city, and the amount of crime in each city, and found a positive relationship. Does this mean police <em>cause</em> crime? Explain.</strong></p>
+<ul>
+<li>Just because there is a positive relationship between police presence and crime in each city does not mean that police are the cause of the crime. Police presence may very well caused by the amount of crime, or both could be caused by something else entirely. Without other data, it is not possible to show causation between crime and police presence. Looking at trends overtime and assessing the comparability of the cities may strengthen or weaken the relationship.</li>
+</ul>
+<p>Di Tella and Ernesto Schargrodsky explore this question with a difference-in-difference design. They collected data on both the presence of police and car robberies in Buenos Aires city blocks both before and after the attack. Their interest is in seeing whether the extra police reduced the amount of car theft. <strong>How is this data suitable for a diff-in-diff design? What would we be comparing here? Be specific about the pre/post treatment/control groups.</strong></p>
+<ul>
+<li>This data is suitable for a diff-in-diff design because the researchers can compare the difference in amount of car thefts both before and after police presence was increased, <em>and</em> compare them to the blocks where police presence was unchanged. The <strong>pre-treatment</strong> groups are the data from different blocks before the change. The <strong>post-treatment groups</strong> are from after the change. The <strong>treatment</strong> group is the blocks where police presence was increased and the <strong>control</strong> group are blocks where the police presence did not change.</li>
+</ul>
+<p><strong>Why does it help the researchers that the police were dispatched to certain blocks <em>because of terrorist attacks</em>?</strong></p>
+<ul>
+<li>It is helpful that the change in police presence was initiated because of terrorist attacks because terrorist attacks are not directly related to car theft. Had the change been in response to an increase in car theft or something similar, it would be more difficult to argue that police presence had an impact on theft and not the other way around. Because the change was unrelated to the indicator measured, there is a better case for causation. Additionally, the “certain blocks” were determined by their proximity to a Jewish institution, which is also not correlated with car theft. This situation created optimal treatment and control groups for observational analysis.</li>
+</ul>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="trends" class="level1">
+<h1>2. Trends</h1>
+<p>One of the most crucial assumptions for difference-in-differences designs is the idea that the trends in the treatment and control groups need to be parallel prior to the intervention or program. <strong>Why?</strong></p>
+<ul>
+<li>The trends of the treatment and control groups must be parallel before the treatment for diff-in-diff to have validity. The assumption relies on the idea that if the trends were parallel before the intervention, it is likely they would have continued in that manner without intervention. It follows then, that the difference in the change from what was expected is the impact of the intervention.</li>
+</ul>
+<p>Create a plot that shows the average number of car thefts per month for blocks with synagogues and blocks without (Hints: it’ll be easiest if you make a smaller dataset using <code>group_by()</code> and <code>summarize()</code> and then plot that smaller dataset with <code>ggplot()</code> Make sure you group by <code>month</code> and <code>same_block_factor</code>. Add <code>group = same_block_factor</code> as an aesthetic so the line goes across the categorical months on the x-axis). Add a vertical line (<code>geom_vline(xintercept = "7")</code>) in the month where the terror attack happened.</p>
+<p><strong>What would you say about the parallel trends assumption here? Does it hold up? Maybe? Maybe not?</strong></p>
+<ul>
+<li>The parallel trends assumption does not hold up very well. Before the intervention the treatment groups had unstable trends going down and then way up and then way down. However, the control group has a steadier downward slope until the intervention, when it shot way back up. (It seems, if anything, the intervention <em>increased</em> car thefts in the non-treated blocks. This would make sense since would-be car thieves would have know about the increased police presence and avoided stealing cars near synagogues, and instead steal them elsewhere, perhaps in the <em>control areas</em>.)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Make a plot here</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>terror <span class="sc">%&gt;%</span> </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month, same_block_factor) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">theft =</span> <span class="fu">mean</span>(car_theft)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(month, theft, <span class="at">group =</span> same_block_factor, <span class="at">color =</span> same_block_factor)) <span class="sc">+</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="st">"7"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"purple"</span>, <span class="st">"green"</span>)) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Car Theft"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">color =</span> <span class="st">"Same Block"</span>) <span class="sc">+</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Jamie-Esmond_problem-set-5_files/figure-html/plot-trends-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="difference-in-differences-by-hand-ish" class="level1">
+<h1>3. Difference-in-differences by hand-ish</h1>
+<p>Calculate the average number of car thefts in the treatment and control groups before and after the attack. (Hint: group by <code>same_block</code> and <code>after</code> and find the average of <code>car_theft</code>.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate average of car_theft across same_block and after</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>blocktheft <span class="ot">&lt;-</span> terror <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(same_block, after) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">thefts =</span> <span class="fu">mean</span>(car_theft))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(blocktheft)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+# Groups:   same_block [2]
+  same_block after thefts
+       &lt;dbl&gt; &lt;lgl&gt;  &lt;dbl&gt;
+1          0 FALSE 0.0816
+2          0 TRUE  0.105 
+3          1 FALSE 0.0895
+4          1 TRUE  0.0351</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> blocktheft <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(same_block <span class="sc">==</span> <span class="dv">0</span>, after <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(thefts)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>B <span class="ot">&lt;-</span> blocktheft <span class="sc">%&gt;%</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(same_block <span class="sc">==</span> <span class="dv">0</span>, after <span class="sc">==</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(thefts)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>C <span class="ot">&lt;-</span> blocktheft <span class="sc">%&gt;%</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(same_block <span class="sc">==</span> <span class="dv">1</span>, after <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(thefts)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>D <span class="ot">&lt;-</span> blocktheft <span class="sc">%&gt;%</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(same_block <span class="sc">==</span> <span class="dv">1</span>, after <span class="sc">==</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(thefts)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>noblock_diff <span class="ot">&lt;-</span> B <span class="sc">-</span> A</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>block_diff <span class="ot">&lt;-</span> D <span class="sc">-</span> C</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>noblock_diff </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.02313766</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>block_diff </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.05439189</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>diff <span class="ot">&lt;-</span> block_diff <span class="sc">-</span> noblock_diff</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>diff</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.07752956</code></pre>
+</div>
+</div>
+<p>Calculate the difference-in-difference estimate given these numbers.</p>
+<table class="table">
+<colgroup>
+<col style="width: 37%">
+<col style="width: 22%">
+<col style="width: 21%">
+<col style="width: 18%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Before attack</th>
+<th>After attack</th>
+<th>Difference</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Block without synagogue</td>
+<td>0.0815703</td>
+<td>0.104708</td>
+<td>0.0231377</td>
+</tr>
+<tr class="even">
+<td>Block with synagogue</td>
+<td>0.089527</td>
+<td>0.0351351</td>
+<td>-0.0543919</td>
+</tr>
+<tr class="odd">
+<td>Difference</td>
+<td></td>
+<td></td>
+<td>-0.0775296</td>
+</tr>
+</tbody>
+</table>
+<p>Answer these questions (you don’t have to write your answers in list form—a paragraph is fine:</p>
+<ul>
+<li><strong>How did car thefts change from before-to-after in blocks <em>without</em> synagogues?</strong>
+<ul>
+<li>In the blocks <em>without</em> synagogues, the mean of car thefts rose by 0.0231377.</li>
+</ul></li>
+<li><strong>How did car thefts change from before-to-after in blocks <em>with</em> synagogues?</strong>
+<ul>
+<li>In the blocks <em>with</em> synagogues, the mean of car thefts fell by 0.0543919.</li>
+</ul></li>
+<li><strong>What’s the difference-in-differences?</strong>
+<ul>
+<li>The difference-in-difference is -0.0775296.</li>
+</ul></li>
+<li><strong>What does that mean? Interpret the finding.</strong>
+<ul>
+<li>Assuming that the car theft trends were parallel prior to the increase of police presence, this means that the impact of the increased police presence <em>caused</em> a -0.0775296 change in car thefts. However, since the trends were not parallel, and in all likelihood, the thefts simply occurred in the control areas instead.</li>
+</ul></li>
+</ul>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="difference-in-differences-with-regular-ols" class="level1">
+<h1>4. Difference-in-differences with regular OLS</h1>
+<p>Run a regression model to find the diff-in-diff estimate of the effect of the increased police presence (<code>after</code>) on car thefts (<code>car_theft</code>) (hint: remember that you’ll be using an interaction term).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code here</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(car_theft <span class="sc">~</span> same_block <span class="sc">*</span> after,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> terror)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>my_gof <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>raw, <span class="sc">~</span>clean, <span class="sc">~</span>fmt,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"nobs"</span>, <span class="st">"N"</span>, <span class="dv">0</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"r.squared"</span>, <span class="st">"R2"</span>, <span class="dv">2</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(model,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">output =</span> <span class="st">"kableExtra"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">estimate =</span> <span class="st">"{estimate}{stars}"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">statistic =</span> <span class="st">"statistic"</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>             <span class="at">gof_map =</span> my_gof,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">title =</span> <span class="st">"Diff-in-Diff"</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">fmt =</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>), <span class="at">background =</span> <span class="st">"#f7fabe"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Diff-in-Diff</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;"> &nbsp;(1) </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> (Intercept) </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> 0.08157*** </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;"> (19.55654) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> same_block </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> 0.00796 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;"> (0.39205) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> afterTRUE </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> 0.02314*** </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;"> (4.13469) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> same_block × afterTRUE </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> −0.07753** </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;box-shadow: 0px 1px">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (−2.84734) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> N </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> 7884 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> R2 </td>
+   <td style="text-align:center;"> 0.00 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<p><strong>How does this value compare with what you found in part 3 earlier? What is the advantage of doing this instead of making a table?</strong></p>
+<ul>
+<li>This value is the same as the the value I found doing it manually. The advantage to using this method instead of making a table is that there is no math or cacluations to do manually. All it needs is the two variables in a regression, and it does all the calculations automatically.</li>
+</ul>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="difference-in-differences-with-fixed-effects-ols" class="level1">
+<h1>5. Difference-in-differences with fixed effects OLS</h1>
+<p>The diff-in-diff coefficient you found in part 4 is accurate, but the standard errors and <span class="math inline">\(R^2\)</span> are wrong (run <code>glance()</code> on your model object to see how tiny the <span class="math inline">\(R^2\)</span> is)! This is because of a host of mathy reasons, but also because of the DAG. The effect of increased police presence is confounded by both month and block, but all we’ve really adjusted for binary before/after (for month) and binary synagogue/no synagogue (for block). By reducing these confounders to just binary variables, we lose a lot of the variation across months and blocks.</p>
+<p>To fix this, run a diff-in-diff model that includes two additional control variables: <code>block + month</code>.</p>
+<blockquote class="blockquote">
+<p><strong><em>Warning</em></strong>: this will be <em>incredibly</em> slow! There are 876 blocks and 9 months, and R is finding estimates for each block and month, and the math to do that is complex. Every time you knit this document, R will rerun the model, which takes 5-10 seconds, and the delay when knitting can be annoying. If you want to speed this up across knitting sessions, add the option <code>cache=TRUE</code> to the chunk options for this chunk. R will store the results in a temporary file and won’t re-run the model if the data hasn’t changed.</p>
+</blockquote>
+<p><strong>Don’t use <code>tidy</code> to view the results</strong>. You’ll get a table with almost 900 rows and it’ll take up pages and pages of your knitted document. If you really want to see the results, filter out the block and month rows (like this:).</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(name_of_model) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_starts</span>(term, <span class="st">"month"</span>), </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">str_starts</span>(term, <span class="st">"block"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="Jamie-Esmond_problem-set-5_cache/html/really-slow-fe-model_e8cb4f5526ef05075c48f653d652e8cd">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code here with block + month in the model</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># DON'T RUN tidy() or modelsummary() without filtering out month and block coefficients</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>model2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(car_theft <span class="sc">~</span> month <span class="sc">+</span> block <span class="sc">+</span> same_block <span class="sc">*</span> after,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">data =</span> terror)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model2) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_starts</span>(term, <span class="st">"month"</span>), </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>         <span class="sc">!</span><span class="fu">str_starts</span>(term, <span class="st">"block"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term                 estimate std.error statistic  p.value
+  &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)            0.0157    0.0770     0.204  0.839  
+2 same_block            NA        NA         NA     NA      
+3 afterTRUE             NA        NA         NA     NA      
+4 same_block:afterTRUE  -0.0775    0.0259    -2.99   0.00278</code></pre>
+</div>
+</div>
+<p>That slowness is miserable. You can get around that by using a different function for OLS that has built-in support for fixed effects (or indicator variables). The <code>feols()</code> (fixed-effects OLS) function from the <strong>fixest</strong> package lets you include indicator variables in regression in a more sophisticated way. The math is lighting fast, and the coefficients for each block and year are hidden by default (though you can still see them if you really want).</p>
+<p>The syntax for <code>feols()</code> is the same as <code>lm()</code>, but with a slight change to accommodate the fixed effects. Use the <code>|</code> character to specify a section of the formula that contains the fixed effects:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>model_name <span class="ot">&lt;-</span> <span class="fu">feols</span>(car_theft <span class="sc">~</span> same_block<span class="sc">*</span>after <span class="sc">|</span> block <span class="sc">+</span> month, </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> terror)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>One more cool thing that <code>feols()</code> can do that normal <code>lm()</code> can’t is provide robust standard errors. There is systematic variation within blocks and across time, and we can mathematically account for that variation in the standard errors of the regression. (If you’ve ever used Stata you do this with <code>reg y x, robust</code>). If you ever want to use robust and/or clustered standard errors with regular OLS regression in R, check out the <a href="https://declaredesign.org/r/estimatr/articles/getting-started.html#lm_robust"><code>lm_robust()</code> function in the <strong>estimatr</strong> package</a>. With <code>feols()</code>, you can add an argument to <code>tidy()</code> to get the robust standard errors.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stata's default robust SE algorithm is called "Huber-White standard errors", </span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># and we can get those same numbers here. Look at the documentation for </span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># summary.fixest() for more robustness and clustering options</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model_name, <span class="at">se =</span> <span class="st">"white"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Phew. Now that you know about <code>feols()</code> and robust standard errors, build a model that finds the diff-in-diff effect that includes fixed effects for block and month. Show the results with <code>tidy()</code> using Huber-White standard errors.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code for model A + use tidy() to show Huber-White robust standard errors</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>model3 <span class="ot">&lt;-</span> <span class="fu">feols</span>(car_theft <span class="sc">~</span> same_block <span class="sc">*</span> after <span class="sc">|</span> block <span class="sc">+</span> month, </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> terror)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model3, <span class="at">se =</span> <span class="st">"white"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+  term                 estimate std.error statistic  p.value
+  &lt;chr&gt;                   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 same_block:afterTRUE  -0.0775    0.0224     -3.46 0.000552</code></pre>
+</div>
+</div>
+<p>In the original study, the authors also considered the effect of two other treatment variables. Maybe the extra police presence in blocks with synagogues reduced car thefts not just for those blocks, but areas 1 block away or 2 blocks away.</p>
+<p>Run two more models. In the first, keep the <code>same_block*after</code> interaction term and add another diff-in-diff interaction for <code>one_block_away*after</code>. In the second, keep the same block and one block interaction terms and add one more diff-in-diff interaction for <code>two_blocks_away*after</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Code for models B and C + use tidy() to show Huber-White robust standard errors</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>model4 <span class="ot">&lt;-</span> <span class="fu">feols</span>(car_theft <span class="sc">~</span> same_block <span class="sc">*</span> after <span class="sc">+</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                one_block_away <span class="sc">*</span> after <span class="sc">|</span> block <span class="sc">+</span> month, </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> terror)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model4, <span class="at">se =</span> <span class="st">"white"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term                     estimate std.error statistic  p.value
+  &lt;chr&gt;                       &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 same_block:afterTRUE      -0.0801    0.0226    -3.55  0.000391
+2 afterTRUE:one_block_away  -0.0133    0.0139    -0.956 0.339   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>model5 <span class="ot">&lt;-</span> <span class="fu">feols</span>(car_theft <span class="sc">~</span> same_block <span class="sc">*</span> after <span class="sc">+</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                one_block_away <span class="sc">*</span> after <span class="sc">+</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                two_blocks_away <span class="sc">*</span> after <span class="sc">|</span> block <span class="sc">+</span> month, </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> terror)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model5, <span class="at">se =</span> <span class="st">"white"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term                      estimate std.error statistic  p.value
+  &lt;chr&gt;                        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 same_block:afterTRUE      -0.0808     0.0229    -3.52  0.000432
+2 afterTRUE:one_block_away  -0.0140     0.0145    -0.967 0.334   
+3 afterTRUE:two_blocks_away -0.00218    0.0123    -0.177 0.859   </code></pre>
+</div>
+</div>
+<p>Recreate columns A, B, and C from Table 3 from the original article with <code>modelsummary()</code>. You’ll need to show the results from your three <code>feols()</code> models (with one interaction term, with two interactions, and with three interactions). You can tell the table to show robust standard errors like the authors did in their original study by including the <code>se = "white"</code> argument, and you can control how many digits are used with the <code>fmt</code> (format) argument (the original article used 5 decimal points, so you can too). You can add significance stars by including <code>stars = TRUE</code>.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(<span class="fu">list</span>(models, go, here),</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">se =</span> <span class="st">"white"</span>, <span class="at">fmt =</span> <span class="st">"%.5f"</span>, <span class="at">stars =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">"A"</span> <span class="ot">=</span> model3, <span class="st">"B"</span> <span class="ot">=</span> model4, <span class="st">"C"</span> <span class="ot">=</span> model5),</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">se =</span> <span class="st">"white"</span>, </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">fmt =</span> <span class="st">"%.5f"</span>, </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">gof_map =</span> my_gof,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">stars =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">title =</span> <span class="st">"All Models"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>), <span class="at">background =</span> <span class="st">"#f7fabe"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table">
+<caption>All Models</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;"> A </th>
+   <th style="text-align:center;"> B </th>
+   <th style="text-align:center;"> C </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> same_block × afterTRUE </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> −0.07753** </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> −0.08007*** </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> −0.08080*** </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;"> (0.02351) </td>
+   <td style="text-align:center;"> (0.02361) </td>
+   <td style="text-align:center;"> (0.02394) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> afterTRUE × one_block_away </td>
+   <td style="text-align:center;background-color: #f7fabe !important;">  </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> −0.01326 </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> −0.01399 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> (0.01456) </td>
+   <td style="text-align:center;"> (0.01509) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> afterTRUE × two_blocks_away </td>
+   <td style="text-align:center;background-color: #f7fabe !important;">  </td>
+   <td style="text-align:center;background-color: #f7fabe !important;">  </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> −0.00218 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;box-shadow: 0px 1px">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (0.01239) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: #f7fabe !important;"> N </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> 7884 </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> 7884 </td>
+   <td style="text-align:center;background-color: #f7fabe !important;"> 7884 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> R2 </td>
+   <td style="text-align:center;"> 0.20 </td>
+   <td style="text-align:center;"> 0.20 </td>
+   <td style="text-align:center;"> 0.20 </td>
+  </tr>
+</tbody>
+<tfoot><tr><td style="padding: 0; " colspan="100%">
+<sup></sup> + p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001</td></tr></tfoot>
+</table>
+
+</div>
+</div>
+<p>Answer these questions: (again, you don’t have to keep this in list form when you answer):</p>
+<ul>
+<li><strong>Does having extra police reduce thefts on the same block? Is the effect significant?</strong>
+<ul>
+<li>Having more police <em>significantly</em> reduced thefts on the same block.</li>
+</ul></li>
+<li><strong>Does having extra police reduce thefts one block away? Is the effect significant?</strong>
+<ul>
+<li>Having more police did <em>not</em> significantly reduce thefts one block away.</li>
+</ul></li>
+<li><strong>Does having extra police reduce thefts two blocks away Is the effect significant?</strong>
+<ul>
+<li>Having more police did <em>not</em> significantly reduce thefts two or more blocks away.</li>
+</ul></li>
+</ul>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="translate-results-to-something-more-interpretable" class="level1">
+<h1>6. Translate results to something more interpretable</h1>
+<p>According to the third model, having additional police on a block caused a reduction of 0.081 car thefts per month on average. What the heck does that even mean though? This whole outcome variable is weird anyway—it’s the average number of thefts per block per month, and most block-months have 0 thefts. Having a number like 0.081 doesn’t quite represent the proportion of crime or anything logically interpretable or anything. It’s a little hard to talk about.</p>
+<p>To fix this, we can talk about percent changes instead. Recall from past classes (like microeconomics or GRE prep questions) that you can calculate the percent change (or growth) between two numbers with this formula:</p>
+<p><span class="math display">\[
+\text{percent change} = \frac{\text{new} - \text{old}}{\text{old}}
+\]</span></p>
+<p>You can remember this as <strong>NOO</strong>, for <strong>n</strong>ew minus <strong>o</strong>ld divided by <strong>o</strong>ld. With treatment and outcome groups, you can find the percent change because of a program or policy by using treatment as “new” and outcome as “old”.</p>
+<p>Imagine if after some program, the treatment group had an outcome of 3 while the control group had an outcome of 6. The percent change in outcome because of the causal effect of the program is <span class="math inline">\(\frac{3 - 6}{6}\)</span>, or -0.5:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">3</span> <span class="sc">-</span> <span class="dv">6</span>) <span class="sc">/</span> <span class="dv">6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.5</code></pre>
+</div>
+</div>
+<p>This means that this fake program <em>caused</em> a 50% reduction in the outcome.</p>
+<hr>
+<p>Find the percent change in car thefts because of the increase police presence after the July terror attack <em>using the results from Model C</em>.</p>
+<p>To do this, you need two numbers:</p>
+<ol type="1">
+<li>the average number of thefts in control blocks after the attack, and</li>
+<li>the average number of thefts in treatment blocks after the attack.</li>
+</ol>
+<p>Because you’re using Model C, your control group includes blocks that don’t have synagogues within two blocks.</p>
+<p>Use <code>group_by()</code> and <code>summarize()</code> to calculate the average number of thefts after the attack in control blocks (Hint: this will be just like the diff-in-diff by hand table you made in section 3, but instead of grouping by <code>same_block</code>, group by <code>more_than_two_away</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>blocktheft2 <span class="ot">&lt;-</span> terror <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(more_than_two_away, after) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">thefts =</span> <span class="fu">mean</span>(car_theft))</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>A1 <span class="ot">&lt;-</span> blocktheft2 <span class="sc">%&gt;%</span> </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(more_than_two_away <span class="sc">==</span> <span class="dv">1</span>, after <span class="sc">==</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(thefts)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>B1 <span class="ot">&lt;-</span> blocktheft2 <span class="sc">%&gt;%</span> </span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(more_than_two_away <span class="sc">==</span> <span class="dv">1</span>, after <span class="sc">==</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(thefts)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>counter <span class="ot">&lt;-</span> B1 <span class="sc">+</span> (<span class="sc">-</span><span class="fl">0.08080</span>)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>counter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.02705398</code></pre>
+</div>
+</div>
+<p>Subtract the diff-in-diff effect for “same_block × after” from Model C from the average in the control group to find the average number of car thefts in treatment blocks. (Note: It’ll be really tempting to just look at the table for the average for treatment + after, but this won’t be right! You need to use control + diff-in-diff, since that’s the counterfactual.)</p>
+<p>Finally, calculate the percent change in car thefts after the terror attack across treatment and control blocks (hint: the answer is in the third full paragraph on p.&nbsp;123 of the original article).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>(counter <span class="sc">-</span> B1) <span class="sc">/</span> B1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.749161</code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

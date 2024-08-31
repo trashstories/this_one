@@ -1,0 +1,145 @@
+---
+title: "trash"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+### Conviction rates
+
+-   **Measurable definition**: Appearing before the court as a non-detained defendant impacts the rate of conviction.
+-   **Ideal measurement**: Collect information regarding the detention status of defendants in court and how it correlates with conviction rates.
+-   **Feasible measurement**: In this case, the ideal measurement is available from the court records.
+-   **Measurement of program effect**: Bail reform allows most people arrested for a misdemeanor to be released from detention and return to the court for their next court date. If the rate of conviction is lower for non-detained defendants, this provides evidence that individuals are given more equitable proceedings when they are not brought to court directly from the jail.
+
+```{r names}
+
+n_judges <- 15
+n_prosecutors <- 25
+
+judgeHC_names <- randomNames(n_judges, 
+                           ethnicity = sample(c(1:6), n_judges, replace = TRUE, 
+                                              prob = c(.005, .01, .33, .15, .5, .005)),
+                           which.names = "last",
+                           return.complete.data = TRUE)
+prosecutorHC_names <- randomNames(n_prosecutors, 
+                           ethnicity = sample(c(1:6), n_prosecutors, replace = TRUE, 
+                                              prob = c(.005, .01, .33, .15, .5, .005)),
+                           which.names = "last",
+                           return.complete.data = TRUE)
+
+judgeOP_names <- randomNames(n_judges, 
+                           ethnicity = sample(c(1:6), n_judges, replace = TRUE, 
+                                              prob = c(.005, .01, .33, .15, .5, .005)),
+                           which.names = "last",
+                           return.complete.data = TRUE)
+prosecutorOP_names <- randomNames(n_prosecutors, 
+                           ethnicity = sample(c(1:6), n_prosecutors, replace = TRUE, 
+                                              prob = c(.005, .01, .33, .15, .5, .005)),
+                           which.names = "last",
+                           return.complete.data = TRUE)
+
+judgesHC <- judgeHC_names %>% 
+  select(last_name) %>% 
+  rename(judge = last_name) %>% 
+  mutate(judge_id = 1:n_judges,
+         racism_j = rtruncnorm(n_judges, 0, 1, .65, .25),
+         location = "Harris County")
+prosecutorsHC <- prosecutorHC_names %>% 
+  select(last_name) %>% 
+  rename(prosecutor = last_name) %>% 
+  mutate(prosecutor_id = 1:n_prosecutors,
+         racism_p = rtruncnorm(n_prosecutors, 0, 1, .65, .25),
+         location = "Harris County")
+
+judgesOP <- judgeOP_names %>% 
+  select(last_name) %>% 
+  rename(judge = last_name) %>% 
+  mutate(judge_id = 1:n_judges,
+         racism_j = rtruncnorm(n_judges, 0, 1, .65, .25),
+         location = "Other Place")
+prosecutorsOP <- prosecutorOP_names %>% 
+  select(last_name) %>% 
+  rename(prosecutor = last_name) %>% 
+  mutate(prosecutor_id = 1:n_prosecutors,
+         racism_p = rtruncnorm(n_prosecutors, 0, 1, .65, .25),
+         location = "Other Place")
+
+judges <- judgesHC %>% 
+  rbind(judgesOP)
+prosecutors <- prosecutorsHC %>% 
+  rbind(prosecutorsOP)
+
+# bail <- bail %>%
+#   left_join(judges, by = c("judge_id", "location")) %>%
+#   left_join(prosecutors, by = c("prosecutor_id", "location")) 
+
+```
+
+```{r}
+bail %>% 
+  ggplot(aes(result, fill = trial_status)) +
+    geom_bar() +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+
+bail %>% 
+  filter(detention < 120) %>%
+  ggplot(aes(ses, trial_status, color = result)) +
+    geom_point(alpha = .75, size = 4,
+               position = position_jitter(width = 0, height = 0.45, seed = 1234)) +
+    scale_color_manual(values = colors) + 
+    scale_x_continuous(breaks = seq(0,1,.1)) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+
+
+sum2 <- bail %>%
+  group_by(year, month, location) %>%
+  summarise(count = n()) 
+
+sum3 <- bail %>%
+  filter(result == "Guilty Plea") %>%
+  group_by(year, month, location) %>%
+  summarise(count_plea = n())
+
+sum2 <- sum2 %>% 
+  left_join(sum3, by = c("year", "month", "location")) 
+
+sum2 <- sum2 %>% 
+  mutate(rate = count_plea / count) %>% 
+  mutate(m_num = case_when(year == 2017 ~ 6,
+                           year == 2018 ~ 18,
+                           year == 2019 ~ 30,
+                           year == 2020 ~ 42,
+                           year == 2021 ~ 54,
+                           TRUE ~ 66)) %>% 
+  group_by(year, month) %>% 
+  mutate(m_id = group_indices()) 
+
+sum3 <- sum2 %>%  
+  group_by(year, location) %>% 
+  summarise(year_mean = mean(rate)) 
+
+sum <- sum3 %>% 
+  left_join(sum2, by = c("year", "location"))
+
+
+sum %>%
+  ggplot(aes(m_id, rate, color = location)) +
+    geom_vline(xintercept = 36, linewidth = 1) +
+    geom_point(size = 3) +
+    geom_line(linewidth = 1) +
+    geom_point(aes(m_num, year_mean, color = location), size = 4) +
+    geom_line(aes(m_num, year_mean, color = location), linewidth = 2) +
+    scale_color_manual(values = colors) +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0), breaks = seq(0,72,12)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+# 
+# saveRDS(bail, "bail.RDS")
+
+```

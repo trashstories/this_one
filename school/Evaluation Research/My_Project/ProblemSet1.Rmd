@@ -1,0 +1,56 @@
+---
+title: "Problem set 1"
+author: "Jamie Esmond"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r load-libraries-data, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+cars <- read_csv("data/cars.csv")
+```
+
+
+
+# Learning R
+
+Tell me that you worked through the primers and videos and examples at the example page for this week:
+
+I worked through all the primers and it took a long time, but I learned a lot.
+
+
+# My first plots
+
+Insert a chunk below and use it to create a scatterplot (hint: `geom_point()`) with displacement (`displ`) on the x-axis, city MPG (`cty`) on the y-axis, and with the points colored by drive (`drv`).
+
+```{r My_First_Plot, fig.dim=c(7,4)}
+cars %>%
+  ggplot() +
+    geom_point(mapping = aes(displ, cty, color = drv))
+```
+
+Insert a chunk below and use it to create a histogram (hint: `geom_histogram()`) with highway MPG (`hwy`) on the x-axis. Do not include anything on the y-axis (`geom_histogram()` will do that automatically for you). Choose an appropriate bin width. If you're brave, facet by drive (`drv`).
+
+```{r My_Second_Plot}
+cars %>%
+  ggplot() +
+    geom_histogram(mapping = aes(hwy), binwidth = 2, boundary = 0) +
+    facet_grid( ~ drv)
+```
+
+\newpage
+
+# My first data manipulation
+
+Insert a chunk below and use it to calculate the average city MPG (`cty`) by class of car (`class`). This won't be a plot---it'll be a table. Hint: use a combination of `group_by()` and `summarize()`.
+
+```{r My_First_Manipulation}
+cars %>%
+  group_by(class) %>%
+  summarise(cty_class = round(mean(cty), 1)) %>%
+  arrange(desc(cty_class))
+  
+```

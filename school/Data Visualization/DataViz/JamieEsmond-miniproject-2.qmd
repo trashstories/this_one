@@ -1,0 +1,248 @@
+---
+title: "Mini-Poject 2"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Code and Plots
+
+```{r load, warning=FALSE, message=FALSE}
+
+library(tidyverse)    # For ggplot, dplyr, and friends
+library(countrycode)  # For dealing with country names, abbreviations, and codes
+library(scales)
+library(sf)
+library(tigris)        # Access geographic data from the US Census
+library(rnaturalearth)
+library(ggrepel)
+library(patchwork)
+library(ggspatial)
+library(ggsn)
+library(waffle)
+
+
+colors <- c("#CC0AA4", "#0ACCC5", "#3ACC14", "#7400CC", "#CCAC14", "#0E0ACC")
+
+refugees_raw <- read_csv("data/refugee_status.csv", na = c("-", "X", "D"))
+
+non_countries <- c("Africa", "Asia", "Europe", "North America", "Oceania", 
+                   "South America", "Unknown", "Other", "Total")
+
+refugees_clean <- refugees_raw %>%
+  mutate(diff = `2015` - `2006`) %>% 
+  drop_na(diff) %>% 
+  # Make this column name easier to work with
+  rename(origin_country = `Continent/Country of Nationality`) %>%
+  # Get rid of non-countries
+  filter(!(origin_country %in% non_countries)) %>%
+  # Convert country names to ISO3 codes
+  mutate(iso3 = countrycode(origin_country, "country.name", "iso3c",
+                            custom_match = c("Korea, North" = "PRK"))) %>%
+  # Convert ISO3 codes to country names, regions, and continents
+  mutate(origin_country = countrycode(iso3, "iso3c", "country.name"),
+         origin_region = countrycode(iso3, "iso3c", "region"),
+         origin_continent = countrycode(iso3, "iso3c", "continent")) %>%
+  # Make this data tidy
+  gather(year, number, -origin_country, -iso3, -origin_region, 
+         -origin_continent, -diff) %>%
+  # Make sure the year column is numeric + make an actual date column for years
+  mutate(year = as.numeric(year),
+         year_date = ymd(paste0(year, "-01-01"))) %>% 
+  rename(ISO_A3 = iso3)
+
+
+world_map <- read_sf("data/ne_110m_admin_0_countries/ne_110m_admin_0_countries/ne_110m_admin_0_countries.shp")
+
+```
+
+```{r east}
+#| fig-cap: "Eastern Hemisphere"
+
+ref <- world_map %>% 
+  left_join(refugees_clean, by = "ISO_A3") %>%
+  filter(ISO_A3 != "ATA") %>% 
+  mutate(num = prettyNum(diff, big.mark = ","))
+  
+
+east <- ref %>% 
+  filter(REGION_UN != "Americas") %>% 
+  ggplot() +
+  geom_sf(aes(fill = diff)) +
+  scale_fill_steps2(low = "#3DE5FF",
+                    mid = "#D3F1FF",
+                    high = "#A64900",
+                    midpoint = 0,
+                    na.value = "white", 
+                    breaks = c(-5000,0,5000,15000),
+                    label = label_number(scale_cut = cut_short_scale())) +
+  geom_label_repel(data = ref %>% filter(year == 2015, diff > 5000),
+                  aes(label = paste0(origin_country, " 2015 +", num), 
+                      geometry = geometry),
+                  stat = "sf_coordinates", seed = 80085,
+                  size = 3, box.padding = 0.15, label.padding = 0.15,
+                  family = "serif", color = "#2B004D", fill = "#CCc1DA",
+                  alpha = .75) +
+  geom_label_repel(data = ref %>% filter(year == 2015, diff < -5000),
+                  aes(label = paste0(origin_country, " 2015 ", num), 
+                      geometry = geometry),
+                  stat = "sf_coordinates", seed = 80085,
+                  size = 3, box.padding = 0.15, label.padding = 0.15,
+                  family = "serif", color = "#003781", fill = "#CDE8FD",
+                  alpha = .75) +
+  north(location = "bottomright", scale = .375, symbol = 11, 
+        anchor = c(x = 20000000, y = -100000),
+        x.min = -4500000, x.max = 16750000, 
+        y.min = -5000000, y.max = 8500000) +
+  annotation_scale(bar_cols = c("#2B004D", "white"),
+                   height = unit(0.15, "cm")) +
+  scale_x_continuous(limits = c(-4500000, 16750000)) +
+  scale_y_continuous(limits = c(-5000000, 8500000)) +
+  coord_sf(crs = st_crs("ESRI:102023")) +  
+  labs(fill = "Change in Number\nof Refugees\n2006-2015",
+       title = "Eastern Hemisphere") +
+  theme_void() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(family = "serif", 
+                                  face = "bold", 
+                                  size = 16),
+        legend.text = element_text(family = "serif"),
+        legend.title.align = .5,
+        legend.title = element_text(face = "bold", size = 8),
+        plot.background = element_rect(fill = "white", color = "white"))
+
+east
+
+```
+
+```{r west}
+#| fig-cap: "Western Hemisphere"
+
+west <- ref %>% 
+  filter(REGION_UN == "Americas") %>% 
+  ggplot() +
+  geom_sf(aes(fill = diff)) +
+  scale_fill_steps2(low = "#3DE5FF",
+                    mid = "#D3F1FF",
+                    high = "#A64900",
+                    midpoint = 0,
+                    na.value = "white",
+                    breaks = c(-2000,-1000,0),
+                    limits = c(-2000,1000),
+                    label = label_number(scale_cut = cut_short_scale())) +
+  geom_label_repel(data = ref %>% filter(year == 2015, GEOUNIT == "Cuba"),
+    aes(label = paste0(origin_country, " 2015 ", num), geometry = geometry),
+    stat = "sf_coordinates", seed = 80085,
+    size = 3, box.padding = 0.15, label.padding = 0.15,
+    family = "serif", color = "#003781", fill = "#CDE8FD",
+    alpha = .75) +
+  geom_label_repel(data = ref %>% filter(year == 2015, GEOUNIT == "Colombia"),
+    aes(label = paste0(origin_country, " 2015 +", num), geometry = geometry),
+    stat = "sf_coordinates", seed = 80085,
+    size = 3, box.padding = 0.15, label.padding = 0.15,
+    family = "serif", color = "#2B004D", fill = "#CCc1DA",
+    alpha = .75) +
+  scale_x_continuous(limits = c(-4500000, 3500000)) +
+  scale_y_continuous(limits = c(-6000000, 3050000)) +
+  annotation_scale(bar_cols = c("#2B004D", "white"),
+                   height = unit(0.15, "cm")) +
+  coord_sf(crs = st_crs("ESRI:102043")) +
+  labs(fill = "Change in Number\nof Refugees\n2006-2015",
+       title = "Western Hemisphere") +
+  theme_void() +
+  theme(legend.position = "bottom",
+        plot.title = element_text(family = "serif", 
+                                  face = "bold", 
+                                  size = 16),
+        legend.text = element_text(family = "serif"),
+        legend.title.align = .5,
+        legend.title = element_text(face = "bold", size = 8),
+        plot.background = element_rect(fill = "white", color = "white"),
+        plot.margin = unit(c(0,80,0,0), "pt"))
+
+west
+
+```
+
+```{r area}
+#| fig-cap: "Area Chart"
+
+ref1 <- refugees_clean %>%
+  drop_na(number) %>% 
+  group_by(year, origin_region) %>% 
+  summarise(reg_num = sum(number)) %>% 
+  ggplot() +
+  geom_area(aes(year, reg_num, fill = origin_region),
+            linewidth = 1) +
+  facet_wrap(~ origin_region, nrow = 1) +
+  scale_x_continuous(breaks = seq(2006,2015,2)) +
+  scale_y_continuous(breaks = seq(0,25000,10000),
+                    label = label_number(scale_cut = cut_short_scale())) +
+  scale_fill_manual(values = colors, guide = "none") +
+  labs(x = NULL,
+       y = "Number of Refugees",
+       fill = NULL) +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "#2B004D", family = "serif", size = 7),
+        panel.grid = element_blank(),
+        axis.text = element_text(family = "serif", size = 7),
+        axis.title = element_text(size = 8),
+        axis.ticks.y = element_blank())
+
+ref1
+
+```
+
+```{r combo}
+#| fig-cap: "US Refugees from Around the World (2006-2015)"
+
+combo <- ((west + east) / ref1) +
+  plot_layout(heights = c(.75,.25), widths = c(.45,.55)) +
+  plot_annotation("US Refugees from Around the World", 
+                  caption = "Sources: ",
+                  theme = theme(plot.title = element_text(size = 20, 
+                                                          face = "bold", 
+                                                          hjust = .5))) 
+
+combo
+
+ggsave("output/combo.png", width = 8, height = 8 / 1.618)
+ggsave("output/combo.pdf", width = 8, height = 8 / 1.618)
+
+
+```
+
+\newpage
+
+# Final Graphic
+
+![US Refugees from Around the World (2005-2016)](output/enhanced.png)
+
+## Memo
+
+The US receives refugees from all over the world, and over time, the countries and regions they come from change. In 2005, more refugees were arriving from Eastern Europe and Sub-Saharan Africa. Over the next ten years, the US saw an increase in refugees from the Middle East and Southeast Asia, while the number of refugees from Europe decreased. It is important to note that refugees must be granted refugee status before they come to the US; however, many people fleeing oppression and atrocities may choose to come to the US to seek asylum. Asylum seekers and refugees are similar, but refugees receive legal immigration status *before* they make the journey. This distinction explains why many more refugees come from the Eastern Hemisphere.
+
+By utilizing a geographic visualization along with an area chart, the countries with more drastic changes between 2006 and 2016 are highlighted within the context of regional trends. The scale colors on the map uses a diverging palette to distinguish between countries where the number of refugees increased or decreased between 2006 and 2015, and the saturation increases with higher or lower changes. The countries represented on the map are grouped by region and the sum of refugees from those countries are represented by the colored area in each plot below the map. The edges of each element or plot are aligned with each other where ever possible to maintain a clean and polished graphic. The colors are contrasting but complimentary.
+
+While the data and this visualization tells part of the truth about refugees in the US, there is a lot of context missing; most importantly might be the number of people from each country who are denied refugee status (or what proportion of applicants are accepted). By taking this into consideration, as well as global events that have occurred (and the US's involvement in those events), this graphic can facilite the understanding of changes over the decade.

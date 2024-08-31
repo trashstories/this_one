@@ -1,0 +1,218 @@
+---
+title: "11: Extending the Normal Regression Model"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, warning=FALSE, message=FALSE}
+
+# Load some packages
+library(bayesrules)
+library(rstanarm)
+library(bayesplot)
+library(tidyverse)
+library(broom.mixed)
+library(tidybayes)
+
+colors <- c("#7400CC", "#CC0AA4", "#3ACC14", "#0E0ACC", "#CCAC14", 
+            "#CC5514", "#0ACCC5")
+
+```
+
+## Exercise 11.1 (Why multiple predictors?) 
+
+Briefly explain why we might want to build a regression model with more than one predictor.
+
+## Exercise 11.2 (Categorical predictors: cars) 
+
+Let’s say that you want to model a car’s miles per gallon in a city ($Y$) by the make of the car: Ford, Kia, Subaru, or Toyota. This relationship can be written as $\mu = \beta_0 + \beta_1X_{1} + \beta_2X_{2}+\beta_3X_{3}$, where $X_1, X_2, X_3$ are indicators for whether or not the cars are Kias, Subarus, or Toyotas, respectively:
+
+a. Explain why there is no indicator term for the Ford category. 
+   - **Ford is the reference group**
+b. Interpret the regression coefficient $\beta_2$. 
+   - **The expected change in MPG if the car is a Subaru**
+c. Interpret the regression coefficient $\beta_0$. 
+   - **The mean MPG if the car is a Ford**
+
+## Exercise 11.3 (Categorical and quantitative predictors: tomatoes) 
+
+You have recently taken up the hobby of growing tomatoes and hope to learn more about the factors associated with bigger tomatoes. As such, you plan to model a tomato’s weight in grams ($Y$) by the number of days it has been growing ($X_1$) and its type, Mr. Stripey or Roma. Suppose the expected weight of a tomato is a linear function of its age and type, $\mu = \beta_0 + \beta_1X_{1} + \beta_2X_{2}$, where $X_2$ is an indicator for Roma tomatoes.
+
+a. Interpret each regression coefficient, $\beta_0$, $\beta_1$, and $\beta_2$.
+   i. **$\beta_0 =$ y-intercept (expected mean of Mr. Stripey tomatoes and zero days)** 
+   ii. **$\beta_1 =$ expected change for Mr. Stripey tomatoes with each additional day**
+   iii. **$\beta_2 =$ expected change if Roma tomatoes if days are held constant**
+b. What would it mean if $\beta_2$ were equal to zero?
+   - **Mr. Stripey tomatoes (reference group)**
+
+## Exercise 11.4 (Interactions: tomatoes) 
+
+Continuing your quest to understand tomato size, you incorporate an interaction term between the tomato grow time ($X_1$) and type ($X_2$) into your model: $\mu = \beta_0 + \beta_1X_{1} + \beta_2X_{2}+ \beta_3X_{1}X_{2}$.
+
+a. Explain, in context, what it means for $X_1$ and $X_2$ to interact.
+   - **That there is an added effect when $X_1$ and $X_2$ both change in addition to the effect of only one changing**
+b. Interpret $\beta_3$.
+   - **$\beta_3 =$ the additional expected change when tomatoes are Roma and increase by one day**
+
+## Exercise 11.5 (Interaction terms)
+
+a. Sketch a model that would benefit from including an interaction term between a categorical and quantitative predictor.
+b. Sketch a model that would not benefit from including an interaction term between a categorical and quantitative predictor.
+c. Besides visualization, what are two other ways to determine if you should include interaction terms in your model?
+
+## Exercise 11.6 (Improving your model: shoe size) 
+
+Let’s say you model a child’s shoe size ($Y$) by two predictors: the child’s age in years ($X_1$) and an indicator of whether the child knows how to swim ($X_2$).
+
+a. Generally speaking, why can it be beneficial to add predictors to models?
+   - **To achieve a better comparison across similar groups**
+b. Generally speaking, why can it be beneficial to remove predictors from models?
+   - **Too many predictors can hide the strength of correlations by attributing it to another (i.e. higher age = more likely to swim, making swimming look like a predictor but truly it is age)**
+c. What might you *add* to this model to improve your predictions of shoe size? Why?
+   - **Gender, since boys and girls may have different average show size by gender**
+d. What might you *remove* from this model to improve it? Why?
+   - **Ability to swim since age probably does a better job of predicting shoe size than ability to swim**
+
+## Exercise 11.7 (What makes a good model?) 
+
+We don’t expect our regression models to be perfect, but we do want to do our best. It can be helpful to think about what we want and expect from our models.
+
+a. What are qualities of a good model?
+   - **Enough predictors to explain any confounding factors**
+b. What are qualities of a bad model?
+   - **Too many or too few predictors that over or under inflate correlations**
+
+## Exercise 11.8 (Is our model good / better?) 
+
+What techniques have you learned in this chapter to assess and compare your models? Give a brief explanation for each technique.
+
+## Exercise 11.9 (Bias-variance trade-off) 
+
+In your own words, briefly explain what the bias-variance tradeoff is and why it is important.
+
+
+# 11.7.2 Applied exercises
+
+In the next exercises you will use the `penguins_bayes` data in the **bayesrules** package to build various models of penguin `body_mass_g.` Throughout, we’ll utilize weakly informative priors and a basic understanding that the average penguin weighs somewhere between 3,500 and 4,500 grams. Further, one predictor of interest is penguin `species`: Adelie, Chinstrap, or Gentoo. We’ll get our first experience with a 3-level predictor like this in Chapter 12. If you’d like to work with only 2 levels as you did in Chapter 11, you can utilize the `penguin_data` which includes only Adelie and Gentoo penguins:
+
+```{r}
+
+# Alternative penguin data
+penguin_data <- penguins_bayes %>% 
+  filter(species %in% c("Adelie", "Gentoo"))
+
+```
+
+## Exercise 11.10 (Penguins! Main effects) 
+
+Let’s begin our analysis of penguin `body_mass_g` by exploring its relationship with `flipper_length_mm` and `species`.
+
+a. Plot and summarize the observed relationships among these three variables.
+
+```{r}
+
+penguin_data %>% 
+  ggplot(aes(body_mass_g, flipper_length_mm, color = species)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  scale_color_manual(values = colors) +
+  theme_light()
+
+penguin_data %>% 
+  ggplot(aes(body_mass_g, fill = species)) + 
+  geom_density(alpha = 0.5) +
+  scale_fill_manual(values = colors) +
+  theme_light()
+
+sum <- penguin_data %>% 
+  drop_na(body_mass_g, flipper_length_mm) %>% 
+  group_by(species) %>% 
+  summarise(bm = mean(body_mass_g),
+            fl = mean(flipper_length_mm))
+
+sum
+
+```
+
+b. Use `stan_glm()` to simulate a posterior Normal regression model of `body_mass_g` by `flipper_length_mm` and `species`, without an interaction term.
+
+```{r, cache=TRUE}
+
+peng_model <- stan_glm(body_mass_g ~ flipper_length_mm + species, 
+                       data = penguin_data, 
+                       family = gaussian,
+                       prior_intercept = normal(4000, 250),
+                       prior = normal(0, 2.5, autoscale = TRUE), 
+                       prior_aux = exponential(1, autoscale = TRUE),
+                       chains = 4, iter = 5000*2, seed = 84735,
+                       prior_PD = TRUE)
+
+
+```
+
+c. Create and interpret both visual and numerical diagnostics of your MCMC simulation.
+
+```{r}
+
+set.seed(84735)
+penguin_data %>%
+  drop_na(flipper_length_mm, body_mass_g) %>% 
+  add_predicted_draws(peng_model, n = 100) %>%
+  ggplot(aes(x = .prediction, group = .draw)) +
+    geom_density() + 
+    xlab("body_mass_g")
+
+penguin_data %>%
+  drop_na(flipper_length_mm, body_mass_g) %>% 
+  add_fitted_draws(peng_model, n = 100) %>%
+  ggplot(aes(flipper_length_mm, body_mass_g, color = species)) +
+    geom_line(aes(y = .value, group = paste(species, .draw)))
+
+# MCMC diagnostics
+mcmc_trace(peng_model, size = 0.1)
+mcmc_dens_overlay(peng_model)
+mcmc_acf(peng_model)
+
+```
+
+d. Produce a `tidy()` summary of this model. Interpret the non-intercept coefficients’ posterior median values in context.
+
+```{r}
+
+# Posterior summary statistics
+peng_tidy <- tidy(peng_model, effects = c("fixed", "aux"),
+     conf.int = TRUE, conf.level = 0.80) %>% 
+  select(-std.error)
+
+peng_tidy
+
+as.data.frame(peng_model) %>% 
+  mutate(adelie = `(Intercept)`, 
+         gentoo = `(Intercept)` + speciesGentoo) %>% 
+  mcmc_areas(pars = c("adelie", "gentoo"))
+
+```
+
+e. Simulate, plot, and describe the posterior predictive model for the body mass of an Adelie penguin that has a flipper length of 197.
+
+```{r}
+
+# Simulate a set of predictions
+set.seed(84735)
+bm_predict <- posterior_predict(peng_model,
+                                newdata = data.frame(flipper_length_mm = 197, 
+                                                     species = "Adelie"))
+mean(bm_predict)
+
+# Plot the posterior predictive models
+mcmc_areas(bm_predict) +
+  scale_y_discrete(labels = "Adelie") + 
+  xlab("body_mass_g")
+
+```
+
+
+
+
+
+

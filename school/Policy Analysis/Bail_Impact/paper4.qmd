@@ -1,0 +1,638 @@
+---
+title: "Paper 4"
+subtitle: "Baseline Impact and Alternatives Analysis"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+bibliography: Bail_Reform.bib
+csl: "https://raw.githubusercontent.com/citation-style-language/styles/master/apa.csl"
+lof: true
+lot: true
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    latex_engine: xelatex
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+    knitr:
+      opts_chunk:
+        dev: "cairo_pdf"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE, cache = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(scales)
+library(extrafont)
+library(modelsummary)
+library(broom.mixed)
+library(udpipe)
+library(gt)
+library(kableExtra)
+library(matrixStats)
+library(equatiomatic)
+library(tidycensus)
+
+colors <- c("#7400CC", "#3ACC14", "#6DA4DB", "#0E0ACC", "#CC0AA4", 
+            "#CCAC14", "#0ACCC5", "#CC1F14", 
+            "#805713", "#4F008C", "#B785DD")
+
+th_bail <- theme_light() + 
+  theme(panel.grid.major = element_line(color = "#FFD1F9", 
+                                        linewidth = .35, 
+                                        linetype = "longdash"),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_line(color = "#FFD1F9", 
+                                          linewidth = .5, 
+                                          linetype = "dotted"),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_text(color = "#310873", 
+                                 family = "Cambria"),
+        axis.title = element_text(color = "#310873", 
+                                  family = "Changa"),
+        plot.title = element_text(color = "#310873", 
+                                  size = 14, 
+                                  face = "bold", 
+                                  family = "Changa"),
+        plot.subtitle = element_text(color = "#310873", 
+                                  size = 13, 
+                                  family = "Changa"),
+        plot.caption = element_text(color = "#310873", 
+                                  size = 8, 
+                                  family = "Cambria"),
+        legend.text = element_text(color = "#310873", 
+                                   family = "Changa"))
+
+# setwd("data/harris/")
+# files <- list.files(pattern="*.csv")
+# harris_raw <- do.call(rbind, lapply(files, fread))
+
+# saveRDS(harris_raw, "harris_raw.RDS")
+
+```
+
+```{r data}
+
+
+if (file.exists("harris_m.RDS")) {
+  harris_m <- readRDS("harris_m.RDS") 
+} else {
+
+  harris_raw <- readRDS("harris_raw.RDS")
+  
+  # Add unique identifier for each arrest
+  harris_ <- harris_raw %>%
+    mutate(id = unique_identifier(harris_raw, 
+                                  fields = c("fda", "def_nam", "def_dob")))
+  
+  # Concatenate charges and dispositions for each arrest
+  uniq <- harris_ %>%
+    group_by(id) %>%
+    summarise(n = n(),
+              bam_sum = sum(bam, na.rm = TRUE),
+              types = paste0(curr_l_d, collapse = ", "),
+              disp_all = paste0(disposition, collapse = ", "))
+  
+  harris_m <- harris_ %>%
+    inner_join(uniq, by = "id") %>% # Combine with concatenated data
+    distinct(id, .keep_all = TRUE) %>% # Remove duplicates
+    filter(!str_detect(types, "F")) %>% # Filter for only misdemeanor arrests
+    mutate(plea = ifelse(str_detect(disp_all, "PLEA"), 1, 0), # Plea dummy
+           date = ymd(fda), 
+           m_y = format(date, "%Y-%m"),
+           year = format(date, "%Y"),
+           casetime = as.Date(dispdt) - date, # Days from arrest to disposition 
+           after = ifelse(date > as.Date("2019-11-01"), 1, 0), # After dummy
+           male = ifelse(def_sex != "M", 0, 1), # Gender dummy
+           race = factor(case_when(def_rac == "W" ~ "White", 
+                                   def_rac == "B" ~ "Black",
+                                   TRUE ~ "Other"), 
+                         levels = c("White", 
+                                    "Black", 
+                                    "Other")), # Race categories
+           age = interval(as.Date(def_dob), date), # Age at arrest
+           homeless = ifelse(str_detect(def_stnam, "HOMELESS"), 
+                             1, 0), # Homeless dummy
+           disp = case_when(
+             str_detect(disp_all, "PLEA") ~ "Guilty Plea",
+             !str_detect(disp_all, "PLEA") &
+               str_detect(disp_all, "CONVICTION") ~ "Conviction (No Plea)",
+             !str_detect(disp_all, "PLEA") &
+               !str_detect(disp_all, "CONVICT") &
+               str_detect(disp_all, "PROBATION") ~ "Probation (No Plea)",
+             !str_detect(disp_all, "PLEA") &
+               !str_detect(disp_all, "CONVICT") &
+               !str_detect(disp_all, "PROBATION") &
+               str_detect(disp_all, "ACQUITTAL") ~ "Acquitted",
+             !str_detect(disp_all, "PLEA") &
+               !str_detect(disp_all, "CONVICT") &
+               !str_detect(disp_all, "PROBATION") &
+               str_detect(disp_all, "NOT GUILTY") ~ "Acquitted",
+             !str_detect(disp_all, "PLEA") &
+               !str_detect(disp_all, "CONVICT") &
+               str_detect(disp_all, "DEFERRED") ~ "Deferred",
+             !str_detect(disp_all, "PLEA") &
+               !str_detect(disp_all, "CONVICT") &
+               !str_detect(disp_all, "PROBATION") &
+               !str_detect(disp_all, "ACQUITTAL") &
+               !str_detect(disp_all, "NOT GUILTY") &
+               str_detect(disp_all, "DISM") ~ "Dismissed",
+             !str_detect(disp_all, "PLEA") &
+               !str_detect(disp_all, "CONVICT") &
+               !str_detect(disp_all, "PROBATION") &
+               !str_detect(disp_all, "ACQUITTAL") &
+               !str_detect(disp_all, "NOT GUILTY") &
+               str_detect(disp_all, "NO BILL") ~ "Dismissed",
+             !str_detect(disp_all, "PLEA") &
+               !str_detect(disp_all, "CONVICT") &
+               !str_detect(disp_all, "PROBATION") &
+               !str_detect(disp_all, "ACQUITTAL") &
+               !str_detect(disp_all, "NOT GUILTY") &
+               str_detect(disp_all, "CASE QUASHED") ~ "Dismissed",
+             TRUE ~ "Other"), # Disposition categories
+           violent = case_when(str_detect(offcat, "Sex") ~ 1,
+                               str_detect(offcat, "Violence") ~ 1,
+                               str_detect(offcat, "Assault") ~ 1,
+                               str_detect(offcat, "Child") ~ 1,
+                               str_detect(offcat, "Weapons") ~ 1,
+                               str_detect(offcat, "Arson") ~ 1,
+                               str_detect(offcat, "Kidnapping") ~ 1,
+                               TRUE ~ 0), # Violent crime dummy
+           bailcat = ifelse(!is.na(bam_notes), "Bond Denied",
+                            ifelse(bam_sum == 0, "No bail",
+                            cut(bam_sum,
+                                c(0,5000,50000,100000,
+                                  250000,1000000)))), # Cut bail into categories
+           bailcat = factor(case_when(bailcat == "1" ~ "$5,000 and Under",
+                                      bailcat == "2" ~ "$5,000-$50,000",
+                                      bailcat == "3" ~ "$50,000-$100,000",
+                                      bailcat == "4" ~ "Over $100,000",
+                                      TRUE ~ bailcat), 
+                            levels = c("Bond Denied",
+                                       "No bail",
+                                       "$5,000 and Under",
+                                       "$5,000-$50,000",
+                                       "$50,000-$100,000",
+                                       "Over $100,000")), # Label bail categories
+           dism_defer = ifelse(disp == "Dismissed" | disp == "Deferred",
+                               TRUE, FALSE), # Dismissal/Deferred dummy
+           drop = ifelse(dism_defer == TRUE & 
+                           casetime <= 3,  # Drop dummy for arrests 
+                         TRUE, FALSE)) %>% # dismissed/deferred within 3 days
+    drop_na(plea, dispdt) %>%
+    select(id, date, m_y, year, dispdt, casetime, after, plea,
+           bam, bam_sum, bam_notes, bailcat, n, violent, 
+           race, age, male, homeless, def_zip,
+           disposition, disp_all, disp, dism_defer, drop)
+    
+    
+  saveRDS(harris_m, "harris_m.RDS")
+
+}
+
+# Check for unusual cases
+nobail <- harris_m %>% 
+  filter(bailcat == "No bail") %>% 
+  filter(dism_defer == FALSE,
+         drop == FALSE,
+         plea == 0) %>%
+  select(date, bam, bam_sum, disp, disp_all, casetime)
+
+
+harris <- harris_m %>% 
+  filter(drop == FALSE, 
+         bailcat != "Bond Denied") %>%
+  select(id, date, m_y, year, casetime, after, plea, bam_sum, bailcat, n, 
+         race, age, male, homeless, def_zip, violent, disp, dism_defer) 
+
+```
+
+\newpage
+
+# Evaluation Strategy
+
+While there are arguably many positive outcomes that could be impacted by bail reform and the elimination of cash bail, the most important outcomes may include greater equality in the justice system, reduced negative social and economic impact, reduction of factors that contribute to poverty, and reduced crime and harm in general. Several of these outcomes have begun to garner attention from advocates publishing data on changes after these reforms [@widraWhatDoesSuccessful2022; @heatonEffectsMisdemeanorBail2022]. Some of these outcomes are broad and difficult to measure, but inequality in the justice system can be measured in part by assessing disparities around racial identity in who chooses to accept a guilty plea deal. Administrative court records are available from Harris County for the bond amount and the outcome of the charges along with demographic attributes.
+
+To measure equality in the justice system, racial disparities must be considered. An obvious place to start might be with the rate of arrests, convictions, and sentencing across individuals with different racial backgrounds because this could illuminate clear patterns of discrimination inherent in the system.
+
+Many individuals have stated that they chose to agree to a plea deal because they could not afford bail and the alternative was to wait in jail for a court appearance [@subramanianShadowsReviewResearch2020]. If the cost of bail was no longer an obstacle, the rate of individuals accepting plea deals should decrease because innocent people would not normally agree to a guilty plea without the coercion of pretrial detention. To measure the impact of bail reform on economic disparity in the justice system, we will use the rate of individuals agreeing to plea deals after arrest for each month several years before and after implementation. If the rate changes after the elimination of cash bail for misdemeanors in Harris County, there is evidence that detention was a primary reason for considering a plea deal.
+
+# Data
+
+The data comes from the Harris County court records which are available to the public on the county’s website [@harriscountyHarrisCountyCriminal2023]. The data is available to download by offense category. Data for each offense from 2015 through 2022 were downloaded and combined into a single dataset. The cleaned data was filtered to include only misdemeanor arrests; in the case of multiple charges, only arrests that did not include a felony charge were included. The data was summarized by year, month, and race to determine the rate of cases that resulted in a guilty plea agreement. Each arrest record and each month in the summarized data was labeled to indicate if it was before or after the consent decree in November 2019. For the primary analysis, the unit of analysis is each month, and the outcome variable is the rate of guilty pleas.
+
+## Scope
+
+```{r zips}
+#| label: fig-map
+#| fig-cap: "Misdemeanor Arrests in Harris County by Defendant's Zip Code" 
+#| fig-align: 'center'
+
+# Clean zipcodes for mapping
+zip <- harris %>% 
+  group_by(def_zip) %>% 
+  summarise(n = n()) %>% 
+  filter(def_zip != "00000",
+         def_zip != "0000 ",
+         def_zip != "     ",
+         def_zip != "",
+         def_zip != "99999") %>% 
+  subset(nchar(trimws(def_zip)) == 5) %>% 
+  mutate(zip_char = paste0('"', def_zip, '"'))
+
+write.csv(zip, "harris_zips.csv")
+
+knitr::include_graphics("map.png")
+
+```
+
+The scope of the issue is made evident in the data. By using the defenants’ zip codes (when reported) and mapping those to see the geographic scope, the map below shows that individuals from every state in the US (Hawaii and Alaska are not shown) have been arrested for a misdemeanor crime in Harris County over the eight years in this analysis (@fig-map). Detention is a stressful situation in any case, but the financial strain is easily exasperated by detention far from home and support structures, and may very well cause expensive travel disruptions.
+
+## Summary Statistics
+
+When summarizing the data by bail amount (divided into five categories) and time of arrest (before or after implementation), it is notable that the vast majority (96.7%) of defendants had a bail amount set between \$1 and \$50,000, and 85.7% were between \$1 and \$5,000 (@tbl-outcomes). Additionally, the rate of guilty pleas accepted feel substantially in every bail category under \$50,000, with the largest drop for bail amounts under \$5,000. Though public safety is often the concern about releasing defendants pretrial, the total number of arrests fell dramatically in the years following the initial injunction (@tbl-year).
+
+```{r bail}
+#| tbl-cap: "Summary of Case Outcomes"
+#| label: tbl-outcomes
+
+gt_pct <- function(x, page_width = 6) {
+  if (knitr::pandoc_to("latex")) {
+    paste0(page_width * (x / 100), "in")
+  } else {
+    gt::pct(x)
+  }
+}
+
+# bail_ <- harris %>% 
+#   group_by(bailcat) %>% 
+#   summarise(n = n(),
+#             t = sum(bail_$n)) %>% 
+#   mutate(r = n / t)
+  
+
+bail <- harris %>% 
+  group_by(bailcat, after, disp) %>% 
+  summarise(n = n()) %>% 
+  pivot_wider(id_cols = c(bailcat, after),
+              names_from = disp,
+              values_from = n) %>%
+  rename(Conviction = `Conviction (No Plea)`,
+         Plea = `Guilty Plea`,
+         Probation = `Probation (No Plea)`) %>% 
+  mutate(total = rowSums(across(c(Acquitted:Probation)), 
+                          na.rm = TRUE),
+         rateA = Acquitted / total,
+         rateC = Conviction / total,
+         rateDe = Deferred / total,
+         rateDi = Dismissed / total,
+         ratePl = Plea / total,
+         rateO = Other / total,
+         ratePr = Probation / total,
+         a = ifelse(after == 0, "Before", "After"))
+
+bail %>% 
+  select(bailcat, after, a, Plea, ratePl, 
+         Dismissed, rateDi, Deferred, rateDe,
+         Probation, ratePr, Conviction, rateC, 
+         Acquitted, rateA) %>% 
+  gt() %>% 
+  sub_missing(missing_text = "-") %>% 
+  tab_spanner(md("**Guilty Plea**"),
+              columns = c(Plea, ratePl)) %>% 
+  tab_spanner(md("**Dismissed**"),
+              columns = c(Dismissed, rateDi)) %>% 
+  tab_spanner(md("**Deferred**"),
+              columns = c(Deferred, rateDe)) %>% 
+  tab_spanner(md("**Probation**"),
+              columns = c(Probation, ratePr)) %>% 
+  tab_spanner(md("**Conviction**"),
+              columns = c(Conviction, rateC)) %>% 
+  tab_spanner(md("**Acquitted**"),
+              columns = c(Acquitted, rateA)) %>% 
+  cols_label(columns = !starts_with("rate") ~ "Count",
+             columns = starts_with("rate") ~ "Rate",
+             a ~ "") %>% 
+  tab_row_group("Over $100,000", 
+                rows = c(9,10)) %>% 
+  tab_row_group("$50,000-$100,000", 
+                rows = c(7,8)) %>% 
+  tab_row_group("$5,000-$50,000", 
+                rows = c(5,6)) %>% 
+  tab_row_group("$5,000 and Under", 
+                rows = c(3,4)) %>% 
+  tab_row_group("No Bail", 
+                rows = c(1,2)) %>% 
+  fmt_number(columns = !starts_with("rate"), 
+             decimals = 0) %>% 
+  fmt_percent(columns = starts_with("rate"), 
+              decimals = 1, 
+              drop_trailing_zeros = TRUE) %>% 
+  opt_stylize(style = 6, color = "pink", 
+              add_row_striping = TRUE) %>% 
+  cols_width(c(Plea, ratePl, Dismissed, rateDi) ~ gt_pct(6.5),
+             c(Deferred, rateDe) ~ gt_pct(6),
+             !c(Plea, ratePl, Dismissed, rateDi, Deferred, rateDe, a) ~ gt_pct(3.8),
+             a ~ gt_pct(5.65)) 
+
+```
+
+```{r sum}
+#| tbl-cap: "Summary of Guilty Plea Rates by Year"
+#| label: tbl-year
+
+# Summary by year
+year_ <- harris %>%
+  drop_na(plea) %>% 
+  group_by(year) %>% 
+  summarise(n_year = n()) 
+
+year_1 <- harris %>%
+  drop_na(plea) %>% 
+  group_by(year, plea) %>% 
+  summarise(n = n()) %>% 
+  left_join(year_, by = "year")
+
+year_sum <- harris %>%
+  drop_na(plea) %>% 
+  group_by(year) %>% 
+  summarise(total = n()) %>% 
+  left_join(year_1, by = "year", 
+            relationship = "many-to-many") %>% 
+  mutate(rate = n / total)
+
+year_sum %>% 
+  filter(plea == 1) %>% 
+  select(year, rate, n, n_year) %>% 
+  gt() %>% 
+  cols_label(year = md("**Year**"),
+             rate = md("**Rate**"),
+             n = md("**Guilty Pleas**"),
+             n_year = md("**Arrests**")) %>% 
+  cols_align(align = "center") %>% 
+  fmt_percent(columns = rate) %>% 
+  fmt_number(columns = c(n, n_year), decimals = 0) %>% 
+  opt_stylize(style = 6, color = "pink", 
+              add_row_striping = TRUE)
+
+# Summary by month and year
+month_ <- harris %>%
+  drop_na(plea) %>% 
+  group_by(m_y, plea) %>% 
+  summarise(n = n()) 
+
+month_sum <- harris %>%
+  drop_na(plea) %>% 
+  group_by(m_y) %>% 
+  summarise(total = n()) %>% 
+  left_join(month_, by = "m_y", 
+            relationship = "many-to-many") %>% 
+  mutate(rate = n / total,
+         m_y = as.Date(paste0(m_y, "-01")),
+         after = ifelse(m_y > as.Date("2019-11-01"), 1, 0))
+
+race_ <- harris %>% 
+  group_by(race) %>% 
+  summarise(n = n()) %>% 
+  mutate(pct = n / 337336)
+
+month_race_ <- harris %>%
+  drop_na(plea) %>% 
+  group_by(m_y, plea, race) %>% 
+  summarise(n = n()) 
+month_race_sum <- harris %>%
+  drop_na(plea) %>% 
+  group_by(m_y, race) %>% 
+  summarise(total = n()) %>% 
+  left_join(month_race_, by = c("m_y", "race"), 
+            relationship = "many-to-many") %>% 
+  mutate(rate = n / total,
+         m_y = as.Date(paste0(m_y, "-01")),
+         after = ifelse(m_y > as.Date("2019-11-01"), 1, 0))
+
+```
+
+```{r plot_year}
+#| fig-cap: "Harris County Guilty Pleas by Year"
+#| fig-width: 4
+#| fig-height: 2.472188
+#| label: fig-year
+
+h <- get_acs(geography = "County",
+             variables = "DP05_0071",
+             summary_var = "DP05_0070",
+             year = 2020,
+             state = "TX") %>% 
+  mutate(r = estimate / summary_est) %>% 
+  filter(NAME == "Harris County, Texas") %>% 
+  pluck(8) * 100
+
+
+year_sum %>% 
+  filter(plea == 1) %>% 
+  ggplot(aes(year, rate)) +
+  geom_point(size = 3, 
+             color = "#7400CC") +
+  geom_line(aes(group = factor(plea)), 
+            linewidth = 1.5, 
+            color = "#7400CC") +
+  scale_y_continuous(labels = label_percent(),
+                     limits = c(0,1),
+                     expand = expansion(mult = .01, add = .01)) +
+  labs(x = NULL,
+       y = "Rate of Guilty Pleas",
+       title = "Harris County Guilty Pleas by Year",
+       subtitle = "Misdemeanors 2015-2022") +
+  th_bail 
+
+```
+
+## Trends
+
+With eight years worth of arrests aggregated by month and year, a noticeable downward trend for the rate of guilty pleas after the injunction and through full implementation is unambiguous in @fig-month. @fig-month plainly shows a consistent downward slope between the beginning of 2017 when the initial injunction was filed and the end of 2019 when the consent decree was issues and full implementation was required. While there appears to be little to no disparity between White and Black defendants, it is important to note that Hispanic ethnicity is not available in the data. Approximately 43% of Harris County identifies as Hispanic according the 2020 American Community Survey (@uscensusbureauAmericanCommunitySurvey2020). However, many Hispanic defendants may have been recorded as White when the police arrested them. More nuanced data about the individuals arrested is needed to say conclusively whether their is a racial disparity for people accepting guilty pleas after arrest.
+
+```{r plot_month}
+#| fig-cap: "Harris County Guilty Pleas by Month"
+#| fig-width: 6
+#| fig-height: 3.708282
+#| label: fig-month
+
+month_race_sum %>% 
+  filter(plea == 1) %>% 
+  ggplot(aes(m_y, rate)) +
+  # geom_point(aes(color = race), size = 2) +
+  geom_line(data = month_sum %>% filter(plea == 1), 
+            aes(group = factor(plea),
+                linetype = "Overall"),
+            linewidth = 1.25, 
+            color = "#CC0AA4") +
+  geom_line(aes(color = race, group = race),
+            linewidth = 1) +
+  geom_vline(xintercept = c(as.Date("2019-12-01"), 
+                            as.Date("2017-02-01")),
+             linewidth = .75,
+             color = "#CC0AA4") +
+  annotate("text",
+           x = as.Date("2017-02-01") - 400, 
+           y = .92,
+           label = "Initial\nInjunction",
+           color = "#CC0AA4",
+           family = "Changa") +
+  annotate(geom = "segment", 
+           x = as.Date("2017-02-01") - 250, 
+           xend = as.Date("2017-02-01") - 50, 
+           y = .92, yend = .97, 
+           color = "#CC0AA4", 
+           linewidth = .6,
+           arrow = arrow(angle = 25, 
+                         length = unit(0.5, "lines"))) +
+  annotate("text",
+           x = as.Date("2019-12-01") + 400, 
+           y = .82,
+           label = "Consent\nDecree",
+           color = "#CC0AA4",
+           family = "Changa") +
+  annotate(geom = "segment", 
+           x = as.Date("2019-12-01") + 250, 
+           xend = as.Date("2019-12-01") + 50, 
+           y = .81, yend = .76, 
+           color = "#CC0AA4", 
+           linewidth = .6,
+           arrow = arrow(angle = 25, 
+                         length = unit(0.5, "lines"))) +
+  scale_x_date(breaks = date_breaks(width = "1 year"),
+               labels = date_format("%Y"),
+               expand = expansion(mult = .01, add = .01)) +
+  scale_y_continuous(labels = label_percent(),
+                     limits = c(0,1),
+                     expand = expansion(mult = .01, add = .01)) +
+  scale_color_manual(values = colors) +
+  labs(x = NULL,
+       y = "Rate of Guilty Pleas",
+       color = NULL,
+       linetype = NULL,
+       title = "Harris County Guilty Pleas by Month",
+       subtitle = "Misdemeanor Arrests 2015-2022",
+       caption = "Note: 'Other' accounts for fewer than 4% of all arrests.") +
+  th_bail +
+  theme(legend.position = "bottom")
+
+ggsave("harris.png", width = 7, height = 7 / 1.618)
+
+```
+
+# Methods
+
+The arrest data provides attributes about each case including the race of the defendant and the bail amount. Using OLS regression models to evaluate the correlations between time (mainly before and after the change) and the rate of guilty pleas in Harris County, we can examine the trends as the policy took effect. This approach also allows us to control for racial identity as it relates to case outcomes. For this analysis, race is divided into three categories: White, Black, and Other. Notably, the data does not include ethnicity, and individuals who identify as Hispanic are likely classified as White. As a robustness check, the case outcomes for all arrests individually are also assessed controlling for the bail amount for each case. The equations below illustrate how each model is calculated.
+
+$$
+\begin{aligned}
+\text{Model 1:} \operatorname{Rate} = \alpha + & \beta_{1}(\operatorname{Year}) + \epsilon \\
+\\
+\text{Model 2:} \operatorname{Rate} = \alpha + & \beta_{1}(\operatorname{After}) + \epsilon \\
+\\
+\text{Model 3:} \operatorname{Rate} = \alpha + & \beta_{1}(\operatorname{After}) + 
+\beta_{2}(\operatorname{Race}_{\operatorname{Black}}) +  \beta_{3}(\operatorname{Race}_{\operatorname{Other}}) + \epsilon \\
+\\
+\text{Model 4:} \operatorname{Plea} = \alpha + & \beta_{1}(\operatorname{After}) + 
+\beta_{2}(\operatorname{Race}_{\operatorname{Black}}) +  \beta_{3}(\operatorname{Race}_{\operatorname{Other}}) + \\  &\beta_{4}(\operatorname{Bail}_{\operatorname{\$5,000\ and\ Under}}) +   \beta_{5}(\operatorname{Bail}_{\operatorname{\$5,000-50,000}}) + \\  &\beta_{6}(\operatorname{Bail}_{\operatorname{\$50,000-100,000}}) +  \beta_{7}(\operatorname{Bail}_{\operatorname{Over\ \$100,000}}) + \epsilon
+\end{aligned}
+$$
+
+# Results
+
+The first model shows an estimated 5.6 percentage point drop associated with each passing year since 2015; this association is statistically significant at the p \< .001 level. When comparing before and after full implementation at the end of 2019, an estimated 18.8 percentage point drop in the rate of guilty pleas accepted. When controlling for racial identity, this correlation does not change because there is no meaningful difference between identified races in Harris County. The confidence intervals for each of these coefficients are all negative, which concludes that predicted values for the rate of guilty pleas will be lower than before implementation (see Table 3).
+
+As a robustness check, the full data of individual arrests was analyzed as well. The correlation between the probability of accepting a guilty plea before and after implementation was also negative and significant to a higher degree. The case outcome model showed an even stronger correlation that the policy lowered the probabiltiy that someone would accept a guilty plea. Additionally, the higher the bail amount the higher the probability of taking a plea deal both before and after the policy change. With each increase in the bail amount category, the probability of accepting a guilty plea increases (see Table 3).
+
+```{r regress}
+#| tbl-cap: "Regression Models"
+
+my_gof <- tribble(
+  ~raw, ~clean, ~fmt,
+  "nobs", "N", 0,
+  "r.squared", "R2", 2)
+
+notes <- c("confidence intervals in brackets",
+           "(+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001)")
+
+model1 <- lm(plea ~ bailcat + after + race, 
+             data = harris)
+
+model2 <- lm(rate ~ as.numeric(year), 
+             data = year_sum %>% filter(plea == 1))
+
+model3 <- lm(rate ~ after, 
+             data = month_race_sum %>% filter(plea == 1))
+
+model4 <- lm(rate ~ race + after, 
+             data = month_race_sum %>% filter(plea == 1))
+
+# extract_eq(model1)
+# extract_eq(model2)
+# extract_eq(model3)
+# extract_eq(model4)
+
+m_ <- modelsummary(list("Year" = model2,
+                        "Month" = model3,
+                        "Month and Race" = model4,
+                        "Case Outcome" = model1),
+                   coef_rename = c(
+    `bailcat$5,000 and Under` = "$5,000 & Under",
+    `bailcat$5,000-$50,000` = "$5,000-50,000",
+    `bailcat$50,000-$100,000` = "$50,000-100,000",
+    `bailcatOver $100,000` = "Over $100,000",
+    after = "After",
+    raceBlack = "Black",
+    raceOther = "Other",
+    `bailcat$5,000 and Under:after` = "After + $5,000 and Under",
+    `bailcat$5,000-$50,000:after` = "After + $5,000-50,000",
+    `bailcat$50,000-$100,000:after` = "After + $50,000-100,000",
+    `bailcatOver $100,000:after` = "After + Over $100,000",
+    `as.numeric(year)` = "Year"),
+             output = "kableExtra",
+             estimate = "{estimate}{stars}",
+             statistic = "conf.int",
+             fmt = 3,
+             gof_map = my_gof) %>% 
+  row_spec(c(11,13,15,17), background = "#FFD1F9") %>% 
+  row_spec(c(1,7,9), background = "#FFF3FC") %>% 
+  row_spec(c(3,5), color = "white", background = "#CC0AA4") %>% 
+  column_spec(1, width = "7.35em") %>% 
+  column_spec(c(2:5), width = "7.85em") %>% 
+  kable_classic() %>%
+  footnote(general = notes, footnote_as_chunk = TRUE)
+
+m_
+
+```
+
+# Discussion
+
+While these results appear to be convincing evidence of the success of bail reform policy changes in Harris County, these models have limitations. Without a control group or data on more personal factors than are available, there is no clear path to assert conclusively that the policy change caused the reduced guilty plea rate and arrests. However, by comparing Harris County to a similar county with parallel trends in guilty plea rates and arrests prior to the chang, to provide a counterfactual outcome, we could isolate the casual impact of the reform. Without data from a comparison county, these results remain merely descriptive of changes in Harris County, and they are not necessarily representative of another location. Future research could use this analysis as a template to compare other locations to determine if a similar policy change might be appropriate.
+
+As stated earlier, the data available from Harris County does not identify individuals who identity as Hispanic. Since the ethnicity accounting for almost half of the county’s residents is not represented in the data, the question of racial disparity remains elusive. The wealth of research around inequities in the criminal justice system suggests that this missing attribute in the data may be essential in revealing the truth about racial equality in the Harris County judical system.
+
+Furthermore, these models assume that the large sample size over eight years is large enough to provide comparable groups before and after the policy change. The sample begins two years before the initial injunction, spans the three years until the official consent decree, and three years since full implementation. The cutoff date for the analysis is November 2019, the date of the consent decree, but many courts were already reducing or eliminating bail amounts prior to full implementation; this could mean that the impact might have been even more substantial if the judge in each case were held constant. However, for this simple analysis, the assumption that a large sample should account for many potential confounding variables.
+
+The impact analysis may warrant further investigation for a true causal claim, but the cost-benefit analysis is overwhelmingly positive in terms of benefits to society and enormous cost-savings for the county, with little upfront costs. While the impact analysis may need further review to stand its own, combined with the immense positive implications of the cost-benefit analysis, the policy seems to have few drawbacks economically and socially.
+
+# Alternatives
+
+\newpage
+
+# References

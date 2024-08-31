@@ -1,0 +1,21 @@
+---
+title: "8: Posterior Inference & Prediction"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, warning=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(rstan)
+library(bayesplot)
+library(broom.mixed)
+library(janitor)
+
+# Load data
+data("moma_sample")
+
+```
+

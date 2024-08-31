@@ -1,0 +1,64 @@
+---
+title: "iFPL News and Activities"
+---
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# load packages
+library(tidyverse)
+library(googlesheets4)
+library(gt)
+
+```
+
+```{r news}
+
+# Load data from google sheets
+# COPY WORKSHEET AND UPDATE URL
+gs4_deauth()
+news <- read_sheet("https://docs.google.com/spreadsheets/d/1y8z7K6wvSj6C7SiskjfTmh-ouFeT7WtDmdOcsJDDbj8/edit#gid=0", sheet = "News") %>% 
+  mutate(Date = as.Date(Date))
+
+# Format table with gt package
+news %>% 
+  select(Date, Event) %>% 
+  arrange(desc(Date)) %>% 
+  gt() %>% 
+  cols_label(Date = md("**Date**"),
+             Event = md("**News / Activity**")) %>% 
+  fmt_date(columns = Date,
+           date_style = "month_day_year") %>% 
+  cols_width(Date ~ pct(15),
+             Event ~ pct(65)) %>% 
+  cols_align(2, align = "left")  %>% 
+  cols_align(c(1), align = "center")  %>% 
+  fmt_date(columns = Date,
+           date_style = "m_day_year") %>% 
+  opt_stylize(style = 1, color = "cyan", 
+              add_row_striping = FALSE)
+
+```
+
+<!-- Create margin column -->
+::: column-margin
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<!-- Insert clipart, fixed width -->
+![](airplane.png){width="200"}
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<!-- Insert clipart, fixed width -->
+![](train.png){width="200"}
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<!-- Insert clipart, fixed width -->
+![](bridge2.png){width="200"}
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+<!-- Insert clipart, fixed width -->
+![](ev.png){width="200"}
+:::

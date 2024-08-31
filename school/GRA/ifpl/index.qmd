@@ -1,0 +1,84 @@
+---
+title: "Infrastructure Finance & Policy Lab (iFPL)"
+lof: true
+format: 
+  html: 
+    toc: true
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: header2.png
+    title-block-banner-color: "#000000"
+    title-block-banner-face: "bold"
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# load packages
+library(tidyverse)
+library(googlesheets4)
+library(gt)
+
+# Additional colors
+# "#34402B" - dark green
+# "#A4CA89" - light green
+# "#F4939B" - light red
+# "#91CABA" - light blue
+# "#D3DF76" - light yellow
+
+colors <- c("#7ABF49", "#F24957", "#50BFA0", "#C5D932", "#F29441")
+
+
+```
+
+<!-- Insert clipart, aligned right, fixed width -->
+::: {style="float:right;"}
+![](airplane.png){width="150"}
+:::
+
+<br><br><br>
+
+<!-- Insert graphic made in PowerPoint with alt text, fit to page  -->
+![](mission.png){width="100%" fig-alt="The Core iFPL Mission Centers on Advancing Interdisciplinary Theories and Practices on Infrastructure Finance, Policy, and Governance: To Integrate and Advance Interdisciplinary Theories on Infrastructure-Related Issues, To Develop and Promote Innovative, Efficient, and Effective Infrastructure Financing Practices, To Promote and Advocate Sound Infrastructure Governance and Policies, To Support Climate-Resilient, Sustainable, and Socially Equitable Infrastructure Development"}
+
+<br> <br>
+
+# iFPL Core Research Areas
+
+<!-- Insert graphic made in PowerPoint with alt text, fit to page  -->
+![](research.png){width="100%" fig-alt="The iFPL Focuses on Infrastructure Finance, Governance, Policy, and Sustainability Issues at the National and Sub-National levels (State, City, County, Special District), in Both Domestic and International Contexts, Utilizing Interdisciplinary Theories and a Variety of Empirical Techniques: Infrastructure Finance in Traditional and New Sectors (e.g., Transportation, Water, Utilities, Climate-Resilience, EV Charging Infrastructure), Infrastructure Governance & Policy Infrastructure Sustainability (Environmental, Economic Development, Fiscal Sustainability, and Social Equity), Capital Planning & Budgeting, Infrastructure Performance and Asset Management, Debt Financing, Public-Private Partnerships (PPPs)"}
+
+<!-- Insert clipart, aligned left, fixed width -->
+::: {style="float:left; margin-left: 10px;"}
+![](train.png){width="200"}
+:::
+
+<br><br><br><br>
+
+# iFPL Recent Funded Research Projects
+
+```{r projects}
+
+# Load data from google sheets
+# COPY WORKSHEET AND UPDATE URL
+gs4_deauth()
+projects <- read_sheet("https://docs.google.com/spreadsheets/d/1y8z7K6wvSj6C7SiskjfTmh-ouFeT7WtDmdOcsJDDbj8/edit#gid=0", sheet = "Research Projects")
+
+# Format table with gt package
+projects %>% 
+  gt() %>% 
+  cols_align(1, align = "left") %>% 
+  cols_align(2, align = "left") %>% 
+  cols_align(3, align = "center") %>% 
+  cols_label(Project = md("**Project**"),
+             Source = md("**Source**"),
+             Status = md("**Status**")) %>% 
+  cols_width(Project ~ pct(55),
+             Source ~ pct(35),
+             Status ~ pct(10)) %>% 
+  opt_stylize(style = 1, color = "cyan", add_row_striping = FALSE)
+
+```

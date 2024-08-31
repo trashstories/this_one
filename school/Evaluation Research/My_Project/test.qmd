@@ -1,0 +1,139 @@
+---
+title: "Test Data"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+lof: true
+lot: true
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+
+library(tidyverse)
+library(broom)
+library(modelsummary)
+library(kableExtra)
+library(ggdag)
+library(scales)
+library(truncnorm)
+library(lubridate)
+library(randomNames)
+
+```
+
+
+```{r test}
+
+set.seed(80)
+n_ppl <- 50
+
+esteem <- tibble(id = 1:n_ppl) %>% 
+  # Dates
+  mutate(year = sample(2017:2022, n_ppl, replace = TRUE)) %>% 
+  mutate(month = sample(1:12, n_ppl, replace = TRUE)) %>% 
+  mutate(day = sample(1:31, n_ppl, replace = TRUE),
+         day = case_when(month == 2 & day > 28 ~ sample(1:28, n_ppl, replace = TRUE),
+                         month %in% c(4, 6, 9, 11) & day > 30 ~ sample(1:30, n_ppl, replace = TRUE),
+                         TRUE ~ day)) %>% 
+  mutate(date = make_date(year, month, day)) %>% 
+  # Demographics 
+  mutate(age = round(rtruncnorm(n_ppl, 16, 65, 18, 5), 0)) %>% 
+  mutate(race = sample(c("Black", "Latinx", "White", "Other"), n_ppl,
+                       replace = TRUE, prob = c(.4, .2, .3, .1)),
+         race_num = case_when(race == "Black" ~ 1,
+                              race == "Latinx" ~ 2,
+                              race == "White" ~ 3,
+                              race == "Other" ~ 4)) %>% 
+  mutate(gender = sample(c("Man", "Woman"), n_ppl, replace = TRUE, 
+                         prob = c(.45, .55)),
+         woman = case_when(gender == "Man" ~ 0,
+                           gender == "Woman" ~ 1)) %>% 
+  # Social Media
+  mutate(social_base = rtruncnorm(n_ppl, 1, 10, 5, 2.5),
+         age_social = age * rtruncnorm(n_ppl, -.05, 0, -.025, .0025),
+         gender_social = case_when(gender == "Man" ~ rnorm(n_ppl, 1, 2),
+                                   gender == "Woman" ~ rnorm(n_ppl, 4, 1)),
+         race_social = case_when(race == "Black" ~ rnorm(n_ppl, 3, 2),
+                                 race == "Latinx" ~ rnorm(n_ppl, 1, 1.5),
+                                 race == "White" ~ rnorm(n_ppl, 0, 2.5),
+                                 race == "Other" ~ rnorm(n_ppl, 2, 2)),
+         social = social_base + age_social + gender_social + race_social,
+         social = case_when(social < 1 ~ 1, 
+                            social > 10 ~ 10,
+                            TRUE ~ round(social))) %>% 
+  # Self-esteem
+  mutate(esteem_base = rtruncnorm(n_ppl, 1, 10, 5, 1.25),
+         age_esteem = age * rtruncnorm(n_ppl, -.25, 0, -.15, .05),
+         age_gender = ifelse(gender == "Woman", age * rtruncnorm(n_ppl, -.4, 0, -.2, .05), age_esteem),
+         gender_esteem = case_when(gender == "Man" ~ rnorm(n_ppl, 2.5, 1),
+                                   gender == "Woman" ~ rnorm(n_ppl, -2, .75)),
+         race_esteem = case_when(race == "Black" ~ rnorm(n_ppl, -1.5, .75),
+                                 race == "Latinx" ~ rnorm(n_ppl, -1, .5),
+                                 race == "White" ~ rnorm(n_ppl, 2, .75),
+                                 race == "Other" ~ rnorm(n_ppl, -1, .5)),
+         social_esteem = social * rtruncnorm(n_ppl, -.5, 0, -.175, .05),
+         esteem = esteem_base + age_social + gender_esteem + race_esteem + social_esteem,
+         esteem = case_when(esteem < 1 ~ 1, 
+                            esteem > 10 ~ 10,
+                            TRUE ~ round(esteem))) %>% 
+  select(id, date, age, gender, woman, race, race_num, social, esteem)
+
+write.csv(esteem, "esteem.csv", row.names=FALSE)
+
+m1 <- lm(esteem ~ social, data = esteem)
+tidy(m1)
+m2 <- lm(esteem ~ social + age, data = esteem)
+tidy(m2)
+m3 <- lm(esteem ~ social + gender, data = esteem)
+tidy(m3)
+m4 <- lm(esteem ~ social + age + gender, data = esteem)
+tidy(m4)
+m5 <- lm(esteem ~ social + age + gender + race, data = esteem)
+tidy(m5)
+
+notes <- c("t statistics in parentheses",
+           "confidence intervals in brackets",
+           "(+ p < 0.1, * p < 0.05, ** p < 0.01, *** p < 0.001)")
+
+together <- modelsummary(list("Social Media" = m1,
+                              "+ Age" = m2,
+                              "+ Gender" = m3,
+                              "+ Age & Gender" = m4,
+                              "+ Age, Gender, & Race" = m5),
+             coef_rename = c(social = "Social Media",
+                             age = "Age",
+                             genderWoman = "Woman",
+                             raceWhite = "White"),
+             coef_omit = c(5, 6),
+             output = "kableExtra",
+             estimate = "{estimate}{stars}",
+             statistic = "({statistic}) <br> p = {p.value} <br> [{conf.low}, {conf.high}]",
+             fmt =  3,
+             gof_omit = "IC|Log|Adj|p\\.value|statistic|se_type|F|RMSE|R2") %>% 
+  row_spec(c(1,3,5,7,9), background = "#0A297D", color = "white", bold = TRUE) %>% 
+  column_spec(1:5, width = "9em") %>% 
+  footnote(general = notes, general_title = "", footnote_as_chunk = FALSE)
+
+together %>% 
+  kable_styling(font_size = 14)
+
+  
+  
+```

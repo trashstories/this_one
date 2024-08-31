@@ -1,0 +1,385 @@
+---
+title: "16: (Normal) Hierarchical Models without Predictors"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(rstanarm)
+library(bayesplot)
+library(tidybayes)
+library(broom.mixed)
+library(forcats)
+library(patchwork)
+library(ggridges)
+
+data(climbers_sub)
+data(coffee_ratings)
+
+```
+
+## Exercise 16.2 (Grouping variable or predictor?)
+
+a. The `climbers_sub` data in the `bayesrules` package contains outcomes for 2076 climbers that have sought to summit a Himalayan mountain peak. In a model of climber `success`, is `expedition_id` a potential predictor or a grouping variable? Explain.
+   - **Group because there are many climbers for each `expedition_id`**
+b. In a model of climber `success`, is `season` a potential predictor or a grouping variable? Explain.
+   - **Potential predictor because it may influence success for individual climbers and the expedition as a group**
+c. The `coffee_ratings` data in the `bayesrules` package contains ratings for 1339 different coffee batches. In a model of coffee ratings (`total_cup_points`), is `processing_method` a potential predictor or a grouping variable? Explain.
+   - ***Maybe* Group because there are multiple methods for each `farm_name`, or maybe not heirarchical with thses variables**
+d. In a model of coffee ratings (`total_cup_points`), is `farm_name` a potential predictor or a grouping variable? Explain.
+   - ***Maybe* Potential predictor because it may influence cup points for individual farms, or maybe not heirarchical with thses variables**
+   
+## Exercise 16.3 (Speed typing: interpret the coefficients) 
+
+Alicia loves typing. To share the appreciation, she invites four friends to each take 20 speed-typing tests. Let $Y_{ij}$ be the time it takes friend $j$ to complete test $i$.
+
+a. In modeling $Y_{ij}$, explain why it’s important to account for the grouping structure introduced by observing each friend multiple times.
+b. Suppose we were to model the outcomes $Y_{ij}$ by (16.5). Interpret the meaning of all model coefficients in terms of what they might illuminate about typing speeds: $(\mu_j,\mu,\sigma_y,\sigma_\mu)$.
+   - $\mu_j =$ mean typing time per person
+   - $\mu =$ global priors
+   - $\sigma_y =$ variation within each friend
+   - $\sigma_\mu = $ variation between friends
+   
+## Exercise 16.4 (Speed typing: sketch the data) 
+
+In the spirit of Figure 16.8, sketch what density plots of your four friends’ typing speed outcomes $Y_{ij}$ might look like under each scenario below.
+
+a. The overall results of the 20 timed tests are remarkably similar among the four friends.
+b. Each person is quite consistent in their typing times, but there are big differences from person to person – some tend to type much faster than others.
+c. Within the subjects, there doesn’t appear to be much correlation in typing time from test to test.
+
+# 16.9.2 Applied exercises
+
+## Exercise 16.6 (Big words: getting to know the data) 
+
+Recall from Section 16.7 the Abdul Latif Jameel Poverty Action Lab (J-PAL) study into the effectiveness of a digital vocabulary learning program, the Big Word Club (BWC) (Kalil, Mayer, and Oreopoulos 2020). In our analysis of this program, we’ll utilize weakly informative priors with a baseline understanding that the average student saw 0 change in their vocabulary scores throughout the program. We’ll balance these priors by the `big_word_club` data in the **bayesrules** package. For each student participant, `big_word_club` includes a `school_id` and the *percentage change* in vocabulary scores over the course of the study period (`score_pct_change`). We keep only the students that participated in the BWC program (`treat == 1`), and thus eliminate the control group.
+
+```{r}
+
+data("big_word_club")
+big_word_club <- big_word_club %>% 
+  filter(treat == 1) %>% 
+  select(school_id, score_pct_change) %>% 
+  na.omit()
+
+```
+
+a. How many schools participated in the Big Word Club? **26**
+
+```{r}
+
+sum <- big_word_club %>% 
+  group_by(school_id) %>% 
+  summarise(mean = mean(score_pct_change))
+
+```
+
+b. What’s the range in the number of student participants per school? **12-17**
+
+```{r}
+
+sum2 <- big_word_club %>% 
+  group_by(school_id) %>% 
+  summarise(n = n())
+
+min(sum2$n)
+max(sum2$n)
+
+```
+
+c. On average, at which school did students exhibit the greatest improvement in vocabulary? The least? **17**
+
+d. Construct and discuss a plot which illustrates the variability in `score_pct_change` within and between schools. 
+
+```{r}
+#| fig.height: 6
+
+w <- big_word_club %>% 
+  ggplot(aes(score_pct_change, fill = school_id)) +
+  geom_density(alpha = .5, color = "white") +
+  theme_light() +
+  theme(legend.position = "none")
+
+b <- sum %>% 
+  ggplot(aes(mean)) +
+  geom_density(fill = "#7400CC", color = "white", alpha = .5) +
+  theme_light()
+
+w / b
+
+w2 <- big_word_club %>% 
+  ggplot(aes(score_pct_change, school_id, fill = school_id)) +
+  geom_density_ridges(alpha = .75, color = "white") +
+  theme_light() +
+  theme(legend.position = "none")
+
+b2 <- sum %>% 
+  ggplot(aes(mean)) +
+  geom_density(fill = "#7400CC", color = "white", alpha = .75) +
+  theme_light()
+
+w2 / b2 +
+  plot_layout(heights = c(80, 20))
+
+```
+
+## Exercise 16.7 (Big words: setting up the model) 
+
+In the next exercises you will explore a hierarchical one-way ANOVA model (16.12) of $Y_{ij}$, the percentage change in vocabulary scores, for student $i$ in school $j$.
+
+a. Why is a hierarchical model, vs a complete or no pooled model, appropriate in our analysis of the BWC program?
+   - **To account for variation within and between schools**
+b. Compare and contrast the meanings of model parameters $\mu$ and $\mu_j$ in the context of this vocabulary study.
+   - $\mu_j =$ mean score change time per school
+   - $\mu =$ global priors
+c. Compare and contrast the meanings of model parameters $\sigma_y$ and $\sigma_\mu$ in the context of this vocabulary study.
+   - $\sigma_y =$ variation within each school
+   - $\sigma_\mu = $ variation between schools
+
+## Exercise 16.8 (Big words: simulating the model)
+
+a. Simulate the hierarchical posterior model of parameters $(\mu_j,\mu,\sigma_y,\sigma_\mu)$ using 4 chains, each of length 10000.
+
+```{r, cache=TRUE}
+
+big_hier <- stan_glmer(
+  score_pct_change ~ (1 | school_id), 
+  data = big_word_club , family = gaussian,
+  prior_intercept = normal(5, 2.5, autoscale = TRUE),
+  prior_aux = exponential(1, autoscale = TRUE),
+  prior_covariance = decov(reg = .1, conc = 1, shape = 1, scale = 1),
+  chains = 4, iter = 5000*2, seed = 84735)
+
+```
+
+b. Construct and discuss Markov chain trace, density, and autocorrelation plots.
+
+```{r}
+
+# Confirm the prior tunings
+prior_summary(big_hier)
+
+mcmc_trace(big_hier)
+mcmc_dens_overlay(big_hier)
+mcmc_acf(big_hier)
+neff_ratio(big_hier)
+rhat(big_hier)
+
+```
+
+c. Construct and discuss a `pp_check()` of the chain output.
+
+```{r}
+
+pp_check(big_hier) + 
+  xlab("score change")
+
+# Store the simulation in a data frame
+big_hier_df <- as.data.frame(big_hier)
+
+# Check out the first 3 and last 3 parameter labels
+big_hier_df %>% 
+  colnames() %>% 
+  as.data.frame() %>% 
+  slice(1:3, 13:14)
+
+```
+
+## Exercise 16.9 (Big words: global parameters) 
+
+In this exercise, we’ll explore the global parameters of our BWC model: $(\mu,\sigma_y,\sigma_\mu)$.
+
+a. Construct and interpret a 95% credible interval for $\mu$.
+   - **There's a 95% chance that the average school saw an increase between 4.19 and 8.44.**
+
+```{r}
+
+tidy(big_hier, effects = "fixed", 
+     conf.int = TRUE, conf.level = 0.95)
+
+```
+
+b. Is there ample evidence that, on average, student vocabulary levels improve throughout the vocabulary program? Explain.
+   - **There is ample evidence that, on average, student vocabulary levels improved throughout the vocabulary program by at least 4.19. According to the global parameters of the model 95% of the simulated outcomes were between 4.19 and 8.44.**
+c. Which appears to be larger: the variability in vocabulary performance *between* or *within* schools? Provide posterior evidence and explain the implication of this result in the context of the analysis.
+   - **The variation within schools (16.9) was much higher than the variation between schools (2.88).**
+
+```{r}
+
+tidy(big_hier, effects = "ran_pars")
+
+```
+
+## Exercise 16.10 (Big words: focusing on schools) 
+
+Next, let’s dig into the school-specific means, $\mu_j$.
+
+a. Construct and discuss a plot of the 80% posterior credible intervals for the average percent change in vocabulary score for all schools in the study, $\mu_j$.
+
+```{r}
+
+school_sum <- tidy(big_hier, effects = "ran_vals", 
+                   conf.int = TRUE, conf.level = 0.80)
+
+# Check out the results for the first & last 2 artists
+school_sum %>% 
+  select(level, conf.low, conf.high) 
+
+# Get MCMC chains for each mu_j
+school_chains <- big_hier %>%
+  spread_draws(`(Intercept)`, b[,school_id]) %>% 
+  mutate(mu_j = `(Intercept)` + b) 
+
+# Check it out
+school_chains %>% 
+  select(school_id, `(Intercept)`, b, mu_j) %>% 
+  head(4)
+
+# Get posterior summaries for mu_j
+school_sum_scaled <- school_chains %>% 
+  select(-`(Intercept)`, -b) %>% 
+  mean_qi(.width = 0.80) %>% 
+  mutate(school_id = fct_reorder(school_id, mu_j))
+
+# Check out the results
+school_sum_scaled %>% 
+  select(school_id, mu_j, .lower, .upper) %>% 
+  head(4)
+
+ggplot(school_sum_scaled, 
+       aes(school_id, mu_j, ymin = .lower, ymax = .upper)) +
+  geom_pointrange() +
+  geom_hline(yintercept = 0, color = "red") +
+  xaxis_text(angle = 90, hjust = 1) +
+  theme_light()
+
+```
+
+b. Construct and interpret the 80% posterior credible interval for $\mu_10$.
+
+```{r}
+
+sum %>% 
+  filter(school_id %in% c("10"))
+
+# Simulate School 10's posterior predictive model
+set.seed(84735)
+chains10 <- big_hier_df %>%
+  rename(b = `b[(Intercept) school_id:10]`) %>% 
+  select(`(Intercept)`, b, sigma) %>% 
+  mutate(mu_10 = `(Intercept)` + b,
+         y_10 = rnorm(20000, mean = mu_10, sd = sigma))
+
+# Check it out
+head(chains10, 3)
+
+# Posterior summary of Y_new,j
+chains10 %>% 
+  mean_qi(y_10, .width = 0.80)    
+
+# Posterior summary of mu_j
+school_sum_scaled %>% 
+  filter(school_id == "school_id:10")
+
+```
+
+c. Is there ample evidence that, on average, vocabulary scores at School 10 improved by more than 5% throughout the duration of the vocabulary program? Provide posterior evidence.
+   - **Yes because the lower confidence level is 2.36 for school 10.**
+
+## Exercise 16.11 (Big words: predicting vocab levels) 
+
+Suppose we *continue* the vocabulary study at each of Schools 6 and 17 (which participated in the current study) and Bayes Prep, a school which is new to the study. In this exercise you’ll make predictions about $Y_{\text{new},j}$, the vocabulary performance of a student that’s new to the study from each of these three schools $j$.
+
+a. *Without* using the `posterior_predict()` shortcut function, simulate posterior predictive models of $Y_{\text{new},j}$ for School 6 and Bayes Prep. Display the first 6 posterior predictions for both schools.
+
+```{r}
+
+set.seed(84735)
+bp_chains <- big_hier_df %>%
+  mutate(sigma_mu = sqrt(`Sigma[school_id:(Intercept),(Intercept)]`),
+         mu_bp = rnorm(20000, `(Intercept)`, sigma_mu),
+         y_bp = rnorm(20000, mu_bp, sigma))
+
+# Posterior predictive summaries
+bp_chains %>% 
+  mean_qi(y_bp, .width = 0.80)
+
+# Simulate School 6's posterior predictive model
+set.seed(84735)
+chains6 <- big_hier_df %>%
+  rename(b = `b[(Intercept) school_id:6]`) %>% 
+  select(`(Intercept)`, b, sigma) %>% 
+  mutate(mu_6 = `(Intercept)` + b,
+         y_6 = rnorm(20000, mean = mu_6, sd = sigma))
+
+# Posterior summary of Y_new,j
+chains6 %>% 
+  mean_qi(y_6, .width = 0.80)    
+
+head(bp_chains, 6)
+
+head(chains6, 6)
+
+```
+
+b. Using your simulations from part (a), construct, interpret, and compare the 80% posterior predictive intervals of $Y_{\text{new},j}$ for School 6 and Bayes Prep.
+
+```{r}
+
+# Posterior predictive summaries
+bp_chains %>% 
+  mean_qi(y_bp, .width = 0.80)
+chains6 %>% 
+  mean_qi(y_6, .width = 0.80)
+
+```
+
+c. Using `posterior_predict()` this time, simulate posterior predictive models of $Y_{\text{new},j}$ for each of School 6, School 17, and Bayes Prep. Illustrate your simulation results using `mcmc_areas()` and discuss your findings.
+
+```{r}
+
+set.seed(84735)
+prediction_shortcut <- posterior_predict(
+  big_hier,
+  newdata = data.frame(school_id = c("6", "10", "BP")))
+
+```
+
+d. Finally, construct, plot, and discuss the 80% posterior prediction intervals for all schools in the original study.
+
+```{r}
+
+# Posterior predictive model plots
+mcmc_areas(prediction_shortcut, prob = 0.8) +
+  scale_y_discrete(labels = c("6", "10", "BP")) +
+  geom_vline(xintercept = 0, color = "red")
+
+```
+
+## Exercise 16.12 (Big words: shrinkage) 
+
+Re-examine the posterior predictive plots from Exercise 16.11. Would you say that there is a little or a lot of shrinkage in this analysis? Provide evidence and explain why you think this is the case.
+
+```{r}
+
+set.seed(84735)
+predictions_hierarchical <- posterior_predict(big_hier, 
+                                              newdata = sum)
+
+# Posterior predictive plots
+ppc_intervals(sum$mean, yrep = predictions_hierarchical, 
+              prob_outer = 0.80) +
+  scale_x_continuous(labels = sum$school_id, 
+                     breaks = 1:nrow(sum)) +
+  xaxis_text(angle = 90, hjust = 1) + 
+  geom_hline(yintercept = mean(big_word_club))
+
+```
+
+
+
+

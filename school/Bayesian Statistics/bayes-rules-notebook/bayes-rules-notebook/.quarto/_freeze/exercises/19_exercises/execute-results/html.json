@@ -1,0 +1,14 @@
+{
+  "hash": "0c27af5acedeccbb1be941a59fe6cad1",
+  "result": {
+    "markdown": "---\ntitle: \"19: Adding More Layers\"\neditor_options: \n  chunk_output_type: console\n---\n\n::: {.cell}\n\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

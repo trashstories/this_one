@@ -1,0 +1,188 @@
+---
+title: "Untitled"
+format: html
+---
+
+```{r}
+
+h17 <- harris_m %>% 
+  filter(year == "2017",
+         bailcat != "No bail",
+         bam > 2500)
+
+h_ <- harris_m %>% 
+  filter(bailcat != "No bail",
+         bam > 500)
+
+h17_ <- harris_m %>% 
+  filter(year == "2017")
+
+harris_nv <- harris_m %>% 
+  filter(violent == 0)
+
+
+
+nv_sum_month <- harris_nv %>%
+  drop_na(plea) %>% 
+  group_by(m_y, plea) %>% 
+  summarise(n = n()) 
+
+nv_sum_month1 <- harris_nv %>%
+  drop_na(plea) %>% 
+  group_by(m_y) %>% 
+  summarise(total = n()) %>% 
+  left_join(nv_sum_month, by = "m_y", 
+            relationship = "many-to-many") %>% 
+  mutate(rate = n / total,
+         m_y = as.Date(paste0(m_y, "-01")))
+
+
+harris_m %>% 
+  filter(n_judge > 5000) %>%
+  ggplot(aes(Judge, fill = factor(disp)), 
+         color = "white") +
+  geom_bar() +
+  scale_fill_manual(values = colors) +
+  theme_light()
+
+# judge <- harris_m %>%
+#   group_by(Judge) %>%
+#   summarise(n_judge = n())
+# 
+# harris_m <- harris_m %>%
+#   left_join(judge, by = "Judge")
+# 
+# saveRDS(judge, "judge.RDS")
+
+# judge <- readRDS("data/judge.RDS")
+
+judge %>% 
+  filter(n_judge < 10000) %>%
+  ggplot(aes(n_judge)) +
+  geom_histogram(binwidth = 100, 
+                 fill = "blue", 
+                 color = "white", 
+                 boundary = 0) +
+  theme_light()
+
+judge17 <- h17_ %>%
+  group_by(Judge) %>%
+  summarise(n_judge = n())
+
+```
+
+```{r}
+
+harris_m %>% 
+  ggplot(aes(bailcat, fill = factor(violent))) +
+  geom_bar() +
+  scale_fill_manual(values = colors) +
+  th_bail
+
+
+harris_nv %>% 
+  ggplot(aes(bam)) +
+  geom_histogram(binwidth = 1000, 
+                 boundary = 0, 
+                 fill = "blue", 
+                 color = "white") +
+  # scale_y_continuous(limits = c(0,1100)) +
+  th_bail
+
+harris_m %>% 
+  ggplot(aes(race, fill = bailcat)) +
+  geom_bar() +
+  scale_fill_manual(values = colors) +
+  th_bail +
+  theme(legend.position = "bottom")
+
+sum <- harris_m %>% 
+  drop_na(bam) %>% 
+  group_by(race) %>% 
+  summarise(bailmean = mean(bam))
+
+model <- lm(bam ~ male * race + after, 
+            data = harris_nv)
+
+modelsummary(model,
+             stars = TRUE)
+
+  
+
+```
+
+```{r}
+
+
+# Run a prior simulation
+plea_model <- stan_glm(plea ~ bailcat_num * after,
+                       data = harris,
+                       family = binomial,
+                       prior_intercept = normal(0, 0.5),
+                       prior = normal(0, 2.5, autoscale = TRUE), 
+                       chains = 4, iter = 5000*2, seed = 84735,
+                       prior_PD = TRUE)
+
+saveRDS(plea_model, "plea_model.rds")
+
+tidy(plea_model, effects = "fixed", conf.int = TRUE, conf.level = 0.80)
+
+color_scheme_set("purple")
+ppc_dens_overlay(y = harris$plea,
+                 yrep = posterior_predict(plea_model, draws = 50))
+
+mini <- expand_grid(plea = c(0,1),
+                    after = c(0,1),
+                    bailcat = factor(c("No bail",
+                                       "<=$5,000",
+                                       "$5,000-$50,000",
+                                       "$50,000-$100,000",
+                                       "$100,000-$250,000",
+                                       ">$250,000"),
+                                     levels = c("No bail",
+                                                "<=$5,000",
+                                                "$5,000-$50,000",
+                                                "$50,000-$100,000",
+                                                "$100,000-$250,000",
+                                                ">$250,000")))
+
+plea_model %>% 
+  epred_draws(newdata = mini,
+              ndraws = 100) %>% 
+  ggplot(aes(.epred, bailcat, fill = bailcat)) +
+  stat_halfeye() +
+  th_bail
+
+plea_model %>% 
+  gather_draws(bailcat_num, after) %>% 
+  ggplot(aes(.value, .variable)) +
+  stat_halfeye(.width = c(0.8, 0.95), 
+               aes(fill = .variable), 
+               alpha = .85) +
+  th_bail
+
+tidy(plea_model)
+
+```
+
+```{r years}
+
+# Year counts
+years <- harris %>% 
+  filter(bailcat != "No bail",
+         bailcat != "Bond Denied", 
+         bam_sum > 2500) %>% 
+  group_by(year) %>% 
+  summarise(n = n()) %>% 
+  mutate(m = mean(n))
+
+years %>% 
+  select(year, n) %>% 
+  gt() %>% 
+  cols_label(year = md("**Year**"),
+             n = md("**Arrests**")) %>% 
+  cols_align(align = "center") %>% 
+  fmt_number(columns = n, decimals = 0)
+  
+
+```

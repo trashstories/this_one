@@ -1,0 +1,735 @@
+---
+title: "Problem set 7"
+subtitle: "Education and Wages + Public Housing and Health"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+lof: true
+lot: true
+format: 
+  pdf: 
+    toc: true
+    toc-depth: 4
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+  html: 
+    toc: true
+    toc-depth: 4
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+library(tidyverse)     # For ggplot, mutate(), filter(), and friends
+library(broom)         # For converting models to data frames
+library(estimatr)      # For lm_robust() and iv_robust()
+library(modelsummary)  # For showing side-by-side regression tables
+library(kableExtra)
+library(colorspace) 
+library(scales)
+```
+
+\newpage
+
+# Task 1: Education, wages, and kids
+
+Let's look once again at the effect of education on earnings. You'll use data from the 1976 Current Population Survey run by the US Census. The data is available as `wage` in the **wooldridge** R package---here I've just taken a subset of variables and renamed them. There are three columns:
+
+| Variable name  | Description                                | 
+| -------------- | ------------------------------------------ |
+| `wage`         | Average hourly earnings (in 1976 dollars)  |
+| `education`    | Years of education                         |
+| `n_kids`       | Number of dependents living at home        |
+
+You're interested in estimating $\beta_1$ in:
+
+$$
+\text{Wage}_i = \beta_0 + \beta_1 \text{Education}_i + \epsilon_i
+$$
+
+However, there is an issue with omitted variable bias and endogeneity. Instrumental variables can potentially help address the endogeneity.
+
+## Step 1
+
+Load and look at the dataset
+
+```{r load-wage-data, message=FALSE}
+wages <- read_csv("data/wages.csv")
+```
+
+## Step 2
+
+We need an instrument for education, since part of it is endogenous. *Do you think the variable `n_kids` (the number of children) would be a valid instrument? Does it meet the three requirements of a valid instrument?*
+
+### Relevance
+
+```{r plot}
+#| label: fig-plot
+#| fig-cap: "Education and Wages"
+
+wages %>% 
+  ggplot(aes(education, wage)) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    geom_point(aes(fill = n_kids), color = "#68169E", pch=21, size=3) +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_fill_continuous_sequential(palette = "Purples", l1 = 20, c2 = 70, p1 = 1,
+                                     labels = label_number(accuracy = 1)) +
+    labs(x = "Years of Education",
+         y = "Hourly Wage",
+         title = "Education and Wages",
+         fill = "# of children") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+As seen in @fig-plot, education *does* appear to be correlated with wage. The points have been colored to indicated the number of children.
+
+### Excudability
+
+```{r plot1}
+#| label: fig-plot1
+#| fig-cap: "Number of Children and Wages"
+
+wages %>% 
+  ggplot(aes(n_kids, wage)) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    geom_point(color = "#68169E", fill = "#A338EA", pch=21, size=2) +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Number of Children",
+         y = "Hourly Wage",
+         title = "Number of Children and Wages") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+However, according to @fig-plot1, the number of children is *not* correlated with wage.
+
+### Exogeneity
+
+While we cannot test specifically for exogeneity, it does not seem likely that the number of children someone has would not be influenced both by wage and education, as well as many other factors.
+
+```{r naive}
+#| label: tbl-regression
+#| tbl-cap: "Education and Wages (Naive)"
+
+model <- lm(wage ~ education, data = wages)
+
+modelsummary(list("Naive Model" = model),
+             coef_rename = c(education = "Years of Education"),
+             gof_omit = "IC|Log|Adj|p\\.value|statistic|se_type",
+             stars = TRUE) %>% 
+  row_spec(c(1,3,5,7), background = "#8DE4FF")
+
+```
+
+*Explain why it passes or fails each of the three requirements for a valid instrument. Test the requirements where possible using scatterplots and regression.*
+
+**The only requirement that number of children passes to be a valid instrument is relevance, and that is only between education and wage. Number of children does not appear to have a positive influence on wages (if anything, the influence is negative). As far as exogeneity, there is no way to confirm, but it is not likely that the number of children is not influenced by many other factors.**
+
+## Step 3
+
+Assume that the number of children is a valid instrument (regardless of whatever you concluded earlier). Using the number of children (`n_kids`) as an instrument for education (`education`), estimate the effect of education on wages via two-stage least squares (2SLS) instrumental variables (IV).
+
+Do this by hand: create a first stage model, extract the predicted education, and use predicted education in the second stage.
+
+*Interpret the coefficient that gives the effect of education on wages ($\beta_1$) and its significance.*
+
+```{r manual-2SLS}
+
+first_stage <- lm(education ~ n_kids, data = wages)
+
+wages_predict <- augment_columns(first_stage, wages) %>% 
+  rename(educ_hat = .fitted)
+head(wages_predict)
+
+second_stage <- lm(wage ~ educ_hat, data = wages_predict)
+tidy(second_stage)
+
+```
+
+**By calculating the expected wage according to how many children, we can use the expected value of education to determine how much of wage is caused by education. As the expected level of education increases, based on the number of children, the expected wage increases by `r round(second_stage$coefficients[2], 3)`. However, it is not statistically significant because the p value is .218, well above the .05 cutoff.**
+
+
+(Remember that you can also use the `iv_robust()` function from the **estimatr** package to run IV/2SLS models in one step with: `iv_robust(y ~ x | z, data = data)`, where `y` is the outcome, `x` is the policy/program, and `z` is the instrument. Try doing this to check your manual two-stage model.)
+
+```{r robust-2SLS}
+
+model_2sls <- iv_robust(wage ~ education | n_kids, data = wages)
+tidy(model_2sls)
+
+```
+
+## Step 4
+
+Run a naive model predicting the effect of education on wages (i.e. without any instruments). 
+
+*How does this naive model compare with the IV model?*
+
+```{r naive-dup}
+
+tidy(model)
+
+```
+
+**The coefficient for the naive model is much higher and significant at `r round(model$coefficients[2], 3)`. However the instrument model is no longer significant and decreased by `r round(model$coefficients[2]-second_stage$coefficients[2], 3)`, to `r round(second_stage$coefficients[2], 3)`.** 
+
+Show the results side-by-side here:
+
+```{r table}
+#| label: tbl-all-wages
+#| tbl-cap: "Education and Wages (All Models)"
+
+modelsummary(list("Naive (OLS)" = model,
+                  "2SLS (manual)" = second_stage, 
+                  "2SLS (automatic)" = model_2sls),
+             coef_rename = c(education = "Years of Education",
+                             educ_hat = "Expected Years of Education"),
+             gof_omit = "IC|Log|Adj|p\\.value|statistic|se_type",
+             stars = TRUE) %>%
+  row_spec(c(3, 5), background = "#F5ABEA") %>% 
+  row_spec(c(1, 7, 9), background = "#F9E6EE")
+
+```
+
+## Step 6
+
+*Explain which estimates (OLS vs. IV/2SLS) you would trust more (or why you distrust both).*
+
+**The IV/2SLS models are more trustworthy than the OLS model because it is less significant and less substantial. Since the logic that more children would increase wages only through education makes no sense, it would be surprising to find a significant correlation. Having more children is most certainly influenced by many factors that also influence education and wages. Education and wages themselves influence the number of children someone might have.**
+
+**The OLS model is even less trustworthy because it does not take into account any other factors at all. While it may be true that higher education causes higher wages, this model is insufficient to confirm that. Education can be influenced by a number of factors which also influence wages. Neither of these estimates are trustworthy.**
+
+---
+
+\newpage
+
+# Task 2: Public housing and health
+
+[Economic research shows](https://dx.doi.org/10.1002/pam.20288) that there is a potential (albeit weak) connection between health outcomes and residency in public housing. You are interested in finding the effect of public housing assistance on health outcomes. In the absence of experimental data, you must use observational data collected by the Georgia Department of Public Health. You have access to a dataset of 1,000 rows with the following columns:
+
+| Variable name         | Description                                                                      |
+| --------------------- | -------------------------------------------------------------------------------- |
+| `HealthStatus`        | Health status on a scale from 1 = poor to 20 = excellent                         |
+| `HealthBehavior`      | Omitted variable (you can't actually measure this!)                              |
+| `PublicHousing`       | Number of years spent in public housing                                          |
+| `Supply`              | Number of available public housing units in the city per 100 eligible households |
+| `ParentsHealthStatus` | Health status of parents on a scale from 1 = poor to 20 = excellent              |
+| `WaitingTime`         | Average waiting time before obtaining public housing in the city (in months)     |
+| `Stamp`               | Dollar amount of food stamps (SNAP) spent each month                             |
+| `Age`                 | Age                                                                              |
+| `Race`                | Race; 1 = White, 2 = Black, 3 = Hispanic, 4 = Other                              |
+| `Education`           | Education; 1 = Some high school, 2 = High school, 3 = Bachelor's, 4 = Master's   |
+| `MaritalStatus`       | Marital status; 1 = Single, 2 = Married, 3 = Widow, 4 = Divorced                 |
+
+(This is simulated data, but it's based on analysis by [Angela R. Fertig and David A. Reingold](https://dx.doi.org/10.1002/pam.20288))
+
+Your goal is to measure the effect of living in public housing (`PublicHousing`) on health (`HealthStatus`). There is omitted variable bias, though, since people who care more about their health might be more likely to self-select into public housing and report a better health status score. The magic variable `HealthBehavior` measures this omitted variable, and you can use it as reference to make sure you get the models right (this is the same as "ability" in the examples in class), but don't include it in any of your actual models, since it's not real.
+
+This data includes four potential instruments:
+
+- `Supply`: Number of available public housing units in the city per 100 eligible households
+- `ParentsHealthStatus`: Health status of parents on a scale from 1 = poor to 5 = excellent
+- `WaitingTime`: Average waiting time before obtaining public housing in the city (in months)
+- `Stamp`: Dollar amount of food stamps (SNAP) spent each month
+
+You have three tasks:
+
+## Evaluate
+
+1. Evaluate the suitability of each of the four potential instruments. 
+
+```{r load-housing-data, message=FALSE}
+# problem-set-7/problem-set-7/
+housing <- read_csv("data/public_housing.csv")
+```
+
+### Supply
+
+#### Relavance
+
+Check if they (1) have *relevance* with a scatterplot and model and F-test, 
+
+```{r relevance-supply}
+#| label: fig-housing-supply-rel
+#| fig-cap: "Public Housing and Health Status"
+
+housing %>%
+  ggplot(aes(PublicHousing, HealthStatus)) +
+    geom_point(aes(fill = Supply), color = "#68169E", pch=21, size=3) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_fill_continuous_sequential(palette = "Purples", l1 = 20, c2 = 70, p1 = 1,
+                                     labels = label_number(accuracy = 1)) +
+    labs(x = "Number of Years in Public Housing",
+         y = "Health status (1 = poor, 20 = excellent)",
+         title = "Public Housing and Health Status",
+         fill = "Supply") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+```{r f-test-supply}
+
+supply <- lm(HealthStatus ~ Supply, data = housing)
+tidy(supply)
+
+glance(supply)
+
+```
+
+**FAILED** - Okay on relevance, but low f statistic.
+
+#### Excudability
+
+(2) meet the *excludability* assumption, and 
+
+```{r excludability-supply}
+#| label: fig-housing-supply-excl
+#| fig-cap: "Supply and Health Status"
+
+housing %>%
+  ggplot(aes(Supply, HealthStatus)) +
+    geom_point(fill = "#68169E", pch=21, size=2) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0), 
+                       labels = label_number(accuracy = 1)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Supply",
+         y = "Health status (1 = poor, 20 = excellent)",
+         title = "Supply and Health Status") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+**FAILED** - The slope is relatively flat so there may be other ways that supply influences health status.
+
+#### Exogeneity
+
+(3) meet the *exogeneity* assumption. 
+
+```{r exogeneity-supply}
+#| label: fig-housing-supply-exog
+#| fig-cap: "Health Behavior and Supply"
+
+housing %>%
+  ggplot(aes(HealthBehavior, Supply)) +
+    geom_point(fill = "#68169E", pch=21, size=2) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0), 
+                       labels = label_number(accuracy = 1)) +
+    labs(x = "Health Behavior",
+         y = "Supply",
+         title = "Health Behavior and Supply") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+
+```
+
+**PASSED!** - Health behavior is not correlated with supply.
+
+### Parents Health Status
+
+#### Relavance
+
+```{r relevance-parents}
+#| label: fig-housing-parents-rel
+#| fig-cap: "Public Housing and Health Status"
+
+housing %>%
+  ggplot(aes(PublicHousing, HealthStatus)) +
+    geom_point(aes(fill = ParentsHealthStatus), color = "#68169E", pch=21, size=3) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_fill_continuous_sequential(palette = "Purples", l1 = 20, c2 = 70, p1 = 1) +
+    labs(x = "Number of Years in Public Housing",
+         y = "Health status (1 = poor, 20 = excellent)",
+         title = "Public Housing and Health Status",
+         fill = "Parents Health Status") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+```{r f-test-parents}
+
+parents <- lm(HealthStatus ~ ParentsHealthStatus, data = housing)
+tidy(parents)
+
+glance(parents)
+
+```
+
+**FAILED** - Okay on relevance, but low f statistic.
+
+#### Excudability
+
+(2) meet the *excludability* assumption, and 
+
+```{r excludability-parents}
+#| label: fig-housing-parents-excl
+#| fig-cap: "Parents Health Status and Health Status"
+
+housing %>%
+  ggplot(aes(ParentsHealthStatus, HealthStatus)) +
+    geom_point(fill = "#68169E", pch=21, size=2) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Parents Health Status",
+         y = "Health status (1 = poor, 20 = excellent)",
+         title = "Parents Health Status and Health Status") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+**FAILED** - The slope is relatively flat so there may be other ways that supply influences health status.
+
+#### Exogeneity
+
+(3) meet the *exogeneity* assumption. 
+
+```{r exogeneity-parents}
+#| label: fig-housing-parents-exog
+#| fig-cap: "Health Behavior and Parents Health Status"
+
+housing %>%
+  ggplot(aes(HealthBehavior, ParentsHealthStatus)) +
+    geom_point(fill = "#68169E", pch=21, size=2) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Health Behavior",
+         y = "Parents Health Status",
+         title = "Health Behavior and Parents Health Status") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+
+```
+
+**FAILED** - Though it is not extreme, there is a bit of upward slope indicating a possible correlation between health behavior and parents health status.
+
+### Waiting Time
+
+#### Relavance
+
+```{r relevance-wait}
+#| label: fig-housing-wait-rel
+#| fig-cap: "Public Housing and Health Status"
+
+housing %>%
+  ggplot(aes(PublicHousing, HealthStatus)) +
+    geom_point(aes(fill = WaitingTime), color = "#68169E", pch=21, size=3) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_fill_continuous_sequential(palette = "Purples", l1 = 20, c2 = 70, p1 = 1) +
+    labs(x = "Number of Years in Public Housing",
+         y = "Health status (1 = poor, 20 = excellent)",
+         title = "Public Housing and Health Status",
+         fill = "Waiting Time") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+```{r f-test-wait}
+
+wait <- lm(HealthStatus ~ WaitingTime, data = housing)
+tidy(wait)
+
+glance(wait)
+
+```
+
+**PASSED!** - High relevance and high f statistic.
+
+#### Excudability
+
+(2) meet the *excludability* assumption, and 
+
+```{r excludability-wait}
+#| label: fig-housing-wait-excl
+#| fig-cap: "Waiting Time and Health Status"
+
+housing %>%
+  ggplot(aes(WaitingTime, HealthStatus)) +
+    geom_point(fill = "#68169E", pch=21, size=2) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Waiting Time",
+         y = "Health status (1 = poor, 20 = excellent)",
+         title = "Waiting Time and Health Status") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+**PASSED!** - The slope is substantial in a positive direction. There is a significant correlation between waiting time and health status.
+
+#### Exogeneity
+
+(3) meet the *exogeneity* assumption. 
+
+```{r exogeneity-wait}
+#| label: fig-housing-wait-exog
+#| fig-cap: "Health Behavior and Waiting Time"
+
+housing %>%
+  ggplot(aes(HealthBehavior, WaitingTime)) +
+    geom_point(fill = "#68169E", pch=21, size=2) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Health Behavior",
+         y = "Waiting Time",
+         title = "Health Behavior and Waiting Time") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+
+```
+
+**PASSED!** - Health behavior is not correlated with waiting time.
+
+### SNAP benefits
+
+#### Relavance
+
+```{r relevance-SNAP}
+#| label: fig-housing-SNAP-rel
+#| fig-cap: "Public Housing and Health Status"
+
+housing %>%
+  ggplot(aes(PublicHousing, HealthStatus)) +
+    geom_point(aes(fill = Stamp), color = "#68169E", pch=21, size=3) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_fill_continuous_sequential(palette = "Purples", l1 = 20, c2 = 70, p1 = 1,
+                                     labels = dollar) +
+    labs(x = "Number of Years in Public Housing",
+         y = "Health status (1 = poor, 20 = excellent)",
+         title = "Public Housing and Health Status",
+         fill = "SNAP benefits") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+```{r f-test-SNAP}
+
+SNAP <- lm(HealthStatus ~ Stamp, data = housing)
+tidy(SNAP)
+
+glance(SNAP)
+
+```
+
+**FAILED** - Low relevance and very low f statistic.
+
+#### Excudability
+
+(2) meet the *excludability* assumption, and 
+
+```{r excludability-SNAP}
+#| label: fig-housing-SNAP-excl
+#| fig-cap: "SNAP benefits and Health Status"
+
+housing %>%
+  ggplot(aes(Stamp, HealthStatus)) +
+    geom_point(fill = "#68169E", pch=21, size=2) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0), 
+                       labels = dollar) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "SNAP benefits",
+         y = "Health status (1 = poor, 20 = excellent)",
+         title = "SNAP benefits and Health Status") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+```
+
+**FAILED** - The slope is almost completely flat so there may be other ways that supply influences health status.
+
+#### Exogeneity
+
+(3) meet the *exogeneity* assumption. 
+
+```{r exogeneity-SNAP}
+#| label: fig-housing-SNAP-exog
+#| fig-cap: "Health Behavior and SNAP benefits"
+
+housing %>%
+  ggplot(aes(HealthBehavior, Stamp)) +
+    geom_point(fill = "#68169E", pch=21, size=2) +
+    geom_smooth(method = lm, color = "#68169E", fill = "#A338EA") +
+    scale_x_continuous(expand = expansion(mult = 0.01, add = 0)) +
+    scale_y_continuous(expand = expansion(mult = 0.01, add = 0), 
+                       labels = dollar) +
+    labs(x = "Health Behavior",
+         y = "SNAP benefits",
+         title = "Health Behavior and SNAP benefits") +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          text = element_text(family = "serif"))
+
+
+```
+
+**PASSED!** - Health behavior is not correlated with SNAP benefits.
+
+*Choose one of these as your main instrument and justify why it's the best. Explain why the other three are not.*
+
+| Instrument            | Relevance | Excudability | Exogeneity | 
+| --------------------- | --------- | ------------ | ---------- |
+| `Supply`              |   FAIL    |     FAIL     |    PASS    |
+| `ParentsHealthStatus` |   FAIL    |     FAIL     |    FAIL    |
+| `WaitingTime`         | **PASS**  |   **PASS**   |  **PASS**  |
+| `Stamp`               |   FAIL    |     FAIL     |    PASS    |
+
+**The obvious choice here for an instrument would be waiting time. It is the only variable that fulfills all three requirements. None of the other three variables even pass the relevance and excudability tests, let alone exogeneity which would not actually be testable in a real world situation.**
+
+## Naive Model
+
+2. Estimate a naive model of the effect of public housing on health status (i.e. without any instruments). You can include any control variables you feel appropriate (i.e. that fit in your causal model). If you use variables that are categorical like race, education, or marital status, make sure you wrap them with `as.factor()` to treat them as categories instead of numbers (e.g. `as.factor(education)`).
+
+```{r naive2}
+#| label: tbl-regression2
+#| tbl-cap: "Public Housing and Health Outcomes (Naive)"
+
+modelh <- lm(HealthStatus ~ PublicHousing, data = housing)
+
+modelh2 <- lm(HealthStatus ~ PublicHousing + 
+              Age + as.factor(Race) + as.factor(Education) + as.factor(MaritalStatus), 
+            data = housing)
+
+modelsummary(list("Naive Model" = modelh,
+                  "Naive + Controls" = modelh2),
+             coef_omit = c(-1, -2),
+             coef_rename = c(PublicHousing = "Years in Public Housing"),
+             gof_omit = "IC|Log|Adj|p\\.value|statistic|se_type",
+             stars = TRUE) %>% 
+  row_spec(c(1,3,5,7), background = "#8DE4FF")
+
+```
+
+## 2SLS IV Model
+
+3. Estimate the effect of public housing on health status using 2SLS IV. You can use `iv_robust()` to do it all in one step if you want (but you'll still need to run a first-stage model to find the F statistic). Compare the results with the naive model. 
+
+```{r manual-2SLS-2}
+
+first_stage2 <- lm(PublicHousing ~ WaitingTime, data = housing)
+
+health_predict <- augment_columns(first_stage2, housing) %>%
+  rename(public_hat = .fitted) %>% 
+  select(PublicHousing, WaitingTime, public_hat, HealthStatus)
+head(health_predict)
+
+second_stage2 <- lm(HealthStatus ~ public_hat, data = health_predict)
+tidy(second_stage2)
+
+```
+
+```{r robust-2SLS-2}
+
+model_2sls2 <- iv_robust(HealthStatus ~ PublicHousing | WaitingTime, 
+                         data = housing)
+tidy(model_2sls2)
+
+```
+
+```{r robust-2SLS-all}
+#| label: tbl-all-IV
+#| tbl-cap: "Public Housing and Health Outcomes (All Instruments)"
+
+forbidden <- lm(HealthStatus ~ PublicHousing + HealthBehavior,
+                data = housing)
+
+model_2sls_supply <- iv_robust(HealthStatus ~ PublicHousing | Supply, 
+                         data = housing)
+
+model_2sls_parents <- iv_robust(HealthStatus ~ PublicHousing | ParentsHealthStatus, 
+                         data = housing)
+
+model_2sls_SNAP <- iv_robust(HealthStatus ~ PublicHousing | Stamp, 
+                         data = housing)
+
+modelsummary(list("Waiting Time" = model_2sls2,
+                  "Supply" = model_2sls_supply,
+                  "Parents Health" = model_2sls_parents,
+                  "SNAP benefits" = model_2sls_SNAP,
+                  "Forbidden" = forbidden),
+             coef_rename = c(PublicHousing = "Years in Public Housing"),
+             gof_omit = "IC|Log|Adj|p\\.value|statistic|se_type",
+             stars = TRUE) %>%
+  row_spec(c(3), background = "#F5ABEA") %>% 
+  row_spec(c(1, 5, 7), background = "#F9E6EE") %>% 
+  column_spec(2:6, width = "4em")
+
+```
+
+## All Models
+
+```{r table2}
+#| label: tbl-all-health
+#| tbl-cap: "Public Housing and Health Outcomes (Waiting Time as an Instrumental Variable)"
+
+modelsummary(list("Naive (OLS)" = modelh,
+                  "Naive + Controls (OLS)" = modelh2,
+                  "2SLS (manual)" = second_stage2,
+                  "2SLS (automatic)" = model_2sls2,
+                  "Forbidden" = forbidden),
+             coef_omit = c(-1, -2, -13, -14),
+             coef_rename = c(PublicHousing = "Years in Public Housing",
+                             public_hat = "Expected Years in Public Housing"),
+             gof_omit = "IC|Log|Adj|p\\.value|statistic|se_type",
+             stars = TRUE) %>%
+  row_spec(c(3, 5), background = "#F5ABEA") %>% 
+  row_spec(c(1, 7, 9, 11), background = "#F9E6EE") %>% 
+  column_spec(1, width = "8em") %>% 
+  column_spec(2:6, width = "5em")
+
+```
+
+*Which model do you trust (if any), and why?*
+
+**While the naive model is significant, even when controlling for other factors, there are still unobserved variables that could be influencing health and housing. By using waiting time as an instrument, we assume that wait time for a public housing unit influences health outcomes only through housing. We can assume that wait time does not influence health behavior because people waiting for public housing are not fundamentally different from people already in public housing in regard to their health behavior. If our assumptions are correct, if follows logically, that the direct impact of public housing on health outcomes is significant and positive. For each additional year in public housing, using wait time as an instrument, health status is expected to increase `r round(model_2sls2$coefficients[2], 3)`. Though these are assumptions we would usually not be able to prove, the forbidden model shows that the "actual" causal effect of public housing on health outcomes is `r round(forbidden$coefficients[2], 3)`. This is only a `r round(forbidden$coefficients[2]-model_2sls2$coefficients[2], 3)` difference.**
+
+

@@ -1,0 +1,310 @@
+---
+title: "Exercise 3"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+Why is it important to visualize variables and data?
+
+What does it mean to map data to graph aesthetics?
+
+What data was mapped to which aesthetics in Rosling's video?
+
+\newpage
+
+# Task 2: Lord of the Rings
+
+## Load and clean data
+
+First we load, restructure, and clean the data.
+
+```{r load-clean-data, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+
+# You'll only need the tidyverse library for this exercise
+library(tidyverse)
+library(scales)
+
+colors <- c("#7400CC", "#0E0ACC", "#CC0AA4", "#CCAC14", "#3ACC14")
+my_num <- label_number(big.mark = ",", suffix = "\nwords")
+my_pct <- label_number(accuracy = 2, scale = 100, suffix = "%")
+
+# Load the separate datasets
+fellowship <- read_csv("data/The_Fellowship_Of_The_Ring.csv")
+tt <- read_csv("data/The_Two_Towers.csv")
+rotk <- read_csv("data/The_Return_Of_The_King.csv")
+
+# bind_rows() stacks data frames on top of each other
+lotr_wide <- bind_rows(fellowship, tt, rotk) %>% 
+  # Make the Film column a categorical variable (factor), and put it in the
+  # order the categories appear (so the films are in the correct order)
+  mutate(Film = fct_inorder(Film))
+
+# Make this wide data tidy
+lotr <- lotr_wide %>% 
+  # This is the new way to make data long
+  pivot_longer(cols = c(Female, Male), 
+               names_to = "Gender", values_to = "Words")
+```
+
+\newpage
+
+## Race
+
+Does a certain race dominate (i.e. speak the most) the entire trilogy? (hint: group by `Race`)
+
+```{r race}
+#| fig-height: 6
+
+race <- lotr %>% 
+  group_by(Race) %>% 
+  summarise(allwords = sum(Words))
+
+race %>% 
+  ggplot(aes(Race, allwords)) +
+  geom_col(fill = "#7400CC") +
+  geom_text(aes(Race, 
+                allwords - (allwords / 2), 
+                label = my_num(allwords), 
+                family = "serif"), 
+            color = "#FAA6F5", 
+            size = 9) +
+  scale_y_continuous(labels = label_comma(), 
+                     expand = expansion(mult = 0.01, add = 0.1)) +
+  labs(x = NULL,
+       y = "Total Words",
+       title = "Total Words by Race",
+       subtitle = "Across the Entire LOTR Trilogy") +
+  theme_light() +
+  theme(text = element_text(family = "serif"),
+        title = element_text(size = 18, 
+                             family = "sans", 
+                             face = "bold"),
+        axis.title.y = element_text(size = 16, 
+                                    family = "sans", 
+                                    color = "#310873"),
+        axis.text.x = element_text(size = 16, 
+                                   family = "sans", 
+                                   face = "bold", 
+                                   color = "#310873"),
+        axis.text.y = element_text(size = 10, 
+                                   color = "#310873"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#FAA6F5", linetype = "dashed"),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank())
+
+```
+
+\newpage
+
+## Gender and film
+
+Does a certain gender dominate a movie? (lolz of course it does, but still, graph it) (Hint: group by both `Gender` and `Film`.) Experiment with filling by `Gender` or `Film` and faceting by `Gender` or `Film`.
+
+```{r gender}
+#| fig-height: 5
+
+gender <- lotr %>% 
+  group_by(Gender, Film) %>% 
+  summarise(allwords = sum(Words))
+
+gender1 <- gender %>% 
+  group_by(Film) %>% 
+  summarise(filmwords = sum(allwords)) 
+
+gender <- gender1 %>% 
+  merge(gender) %>% 
+  mutate(pctwords = allwords / filmwords)
+
+gender %>% 
+  ggplot(aes(Film, allwords, fill = Gender)) +
+  geom_col() +
+  geom_text(aes(Film,
+                allwords - (allwords / 2),
+                label = my_pct(pctwords),
+                family = "serif"),
+            color = "#FAA6F5",
+            size = 4) +
+  facet_wrap(~ Gender) +
+  scale_x_discrete(labels = str_wrap(c("Fellowship of the Ring", 
+                                       "Two Towers", 
+                                       "Return of the King"), 
+                                     width = 9)) +
+  scale_y_continuous(labels = label_comma(), 
+                     expand = expansion(mult = 0.01, add = 0.1)) +
+  scale_fill_manual(values = colors, guide = "none") +
+  labs(x = NULL,
+       y = "Total Words",
+       title = "Total Words by Gender and Film") +
+  theme_light() +
+  theme(text = element_text(family = "serif"),
+        title = element_text(size = 18, 
+                             family = "sans", 
+                             face = "bold"),
+        axis.title.y = element_text(size = 14, 
+                                    family = "sans", 
+                                    color = "#310873"),
+        axis.text.x = element_text(size = 10,
+                                   family = "sans",
+                                   face = "bold",
+                                   color = "#310873"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#FAA6F5", linetype = "dashed"),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        strip.text = element_text(color = "#310873", 
+                                  face = "bold", 
+                                  family = "serif",
+                                  size = 14),
+        strip.background = element_blank())
+
+```
+
+\newpage
+
+## Race and film
+
+Does the dominant race differ across the three movies? (Hint: group by both `Race` and `Film`.) Experiment with filling by `Race` or `Film` and faceting by `Race` or `Film`.
+
+```{r film}
+#| fig-width: 7
+#| fig-height: 5
+
+rfilm <- lotr %>% 
+  group_by(Film, Race) %>% 
+  summarise(allwords = sum(Words)) 
+
+rfilm1 <- rfilm %>% 
+  group_by(Film) %>% 
+  summarise(filmwords = sum(allwords)) 
+
+rfilm <- rfilm1 %>% 
+  merge(rfilm) %>% 
+  mutate(pctwords = allwords / filmwords)
+
+rfilm %>% 
+  ggplot(aes(Film, allwords, fill = Race)) +
+  geom_col() +
+  geom_text(aes(Film,
+                allwords - (allwords / 2),
+                label = my_pct(pctwords),
+                family = "serif"),
+            color = "#FAA6F5",
+            size = 4) +
+  facet_wrap(~ Race) +
+  scale_y_continuous(labels = label_comma(), 
+                     expand = expansion(mult = 0.01, add = 0.1)) +
+  scale_fill_manual(values = colors, guide = "none") +
+  scale_x_discrete(labels = str_wrap(c("Fellowship of the Ring", 
+                                       "Two Towers", 
+                                       "Return of the King"), 
+                                     width = 9)) +
+  labs(x = NULL,
+       y = "Total Words",
+       title = "Total Words by Race and Film") +
+  theme_light() +
+  theme(text = element_text(family = "serif"),
+        title = element_text(size = 18, 
+                             family = "sans", 
+                             face = "bold"),
+        axis.title.y = element_text(size = 14, 
+                                    family = "sans", 
+                                    color = "#310873"),
+        axis.text.x = element_text(size = 10,
+                                   family = "sans",
+                                   face = "bold",
+                                   color = "#310873"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#FAA6F5", linetype = "dashed"),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        strip.text = element_text(color = "#310873", 
+                                  face = "bold", 
+                                  family = "serif",
+                                  size = 14),
+        strip.background = element_blank())
+
+```
+
+\newpage
+
+## Race and gender and film
+
+Create a plot that visualizes the number of words spoken by race, gender, and film simultaneously. Use the complete tidy `lotr` data frame. You don't need to create a new summarized dataset (with `group_by(Race, Gender, Film)`) because the original data already has a row for each of those (you could make a summarized dataset, but it would be identical to the full version).
+
+You need to show `Race`, `Gender`, and `Film` at the same time, but you only have two possible aesthetics (`x` and `fill`), so you'll also need to facet by the third. Play around with different combinations (e.g. try `x = Race`, then `x = Film`) until you find one that tells the clearest story. For fun, add a `labs()` layer to add a title and subtitle and caption.
+
+```{r alltogethernow}
+#| fig-height: 9
+
+lotr %>% 
+  ggplot(aes(Words, Gender, fill = Race)) +
+  geom_col(position = position_dodge()) +
+  facet_wrap(~ Film, ncol = 1) +
+  scale_x_continuous(labels = label_comma(),
+                     expand = expansion(mult = 0.01, add = 0.1)) +
+  scale_fill_manual(values = colors) +
+  labs(x = "Total Words",
+       y = NULL,
+       fill = NULL,
+       title = "Gender, Race and Film",
+       subtitle = "Words Spoken by Each Race and Gender",
+       caption = "Key takeaway: Hobbits are very much in need of feminine representation.") +
+  theme_light() +
+  theme(text = element_text(family = "serif"),
+        title = element_text(size = 18, 
+                             family = "sans", 
+                             face = "bold"),
+        axis.title.x = element_text(size = 12, 
+                                    family = "sans", 
+                                    color = "#310873"),
+        axis.text.x = element_text(size = 10,
+                                   family = "sans",
+                                   face = "bold",
+                                   color = "#310873"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_line(color = "#FAA6F5", linetype = "dashed"),
+        panel.grid.minor.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        strip.text = element_text(color = "#310873", 
+                                  face = "bold", 
+                                  family = "serif",
+                                  size = 14),
+        strip.background = element_blank(),
+        legend.position = "top",
+        plot.caption = element_text(size = 9, 
+                                    family = "serif", 
+                                    color = "#310873"))
+
+```

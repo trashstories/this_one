@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Hybrid sidebar example",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "subsection/index.html",
+    "href": "subsection/index.html",
+    "title": "Some subsection",
+    "section": "",
+    "text": "Blah"
+  },
+  {
+    "objectID": "subsection/thing1.html",
+    "href": "subsection/thing1.html",
+    "title": "Thing 1",
+    "section": "",
+    "text": "Blah"
+  }
+]

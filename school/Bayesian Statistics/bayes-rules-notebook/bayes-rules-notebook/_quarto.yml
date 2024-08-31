@@ -1,0 +1,67 @@
+project:
+  type: website
+
+website:
+  title: "*Bayes Rules!* Notebook"
+  navbar:
+    background: primary
+    right:
+      - href: index.qmd
+        text: Home
+      - text: "Notes"
+        file: notes/index.qmd
+      - text: "Exercises"
+        file: exercises/index.qmd
+
+  sidebar:
+    - title: "Notes"
+      style: "docked"
+      search: false
+      background: dark
+      contents:
+        - notes/index.qmd
+        - notes/02_notes.qmd
+        - notes/03_notes.qmd
+        - notes/04_notes.qmd
+        - notes/05_notes.qmd
+        - notes/06_notes.qmd
+        - notes/07_notes.qmd
+        - notes/08_notes.qmd
+        - notes/09_notes.qmd
+        - notes/10_notes.qmd
+        - notes/11_notes.qmd
+        - notes/12_notes.qmd
+        - notes/13_notes.qmd
+        - notes/15_notes.qmd
+        - notes/16_notes.qmd
+        - notes/17_notes.qmd
+        - notes/18_notes.qmd
+        - notes/19_notes.qmd
+
+    - title: "Exercises"
+      contents:
+        - exercises/index.qmd
+        - exercises/02_exercises.qmd
+        - exercises/03_exercises.qmd
+        - exercises/04_exercises.qmd
+        - exercises/05_exercises.qmd
+        - exercises/06_exercises.qmd
+        - exercises/07_exercises.qmd
+        - exercises/08_exercises.qmd
+        - exercises/09_exercises.qmd
+        - exercises/10_exercises.qmd
+        - exercises/11_exercises.qmd
+        - exercises/12_exercises.qmd
+        - exercises/13_exercises.qmd
+        - exercises/15_exercises.qmd
+        - exercises/16_exercises.qmd
+        - exercises/17_exercises.qmd
+        - exercises/18_exercises.qmd
+        - exercises/19_exercises.qmd
+
+
+format:
+  html:
+    # See other themes at https://bootswatch.com/
+    theme: custom.scss
+    toc: true

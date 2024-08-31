@@ -1,0 +1,82 @@
+---
+title: "Models"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+editor: visual
+---
+
+## Established indicators (demographics and socioeconomic factors)
+
+```{=tex}
+\begin{equation}
+\begin{array}{lcrl} 
+\text{data:} & \hspace{.025in} & \text{Imprisonment Rate}|\beta_0,\beta_1 & \stackrel{ind}{\sim} Pois\left(\lambda_i \right) \;\; \text{ with } \;\;
+\\ 
+&&& \log\left( \lambda_i \right) = \beta_0 + \\
+&&& \beta_1\text{Percent Black} + \\
+&&& \beta_2\text{Median Income} + \\
+&& \hspace{.025in} & \beta_3\text{Unemployment Rate} + \\
+&&& \beta_4\text{Percent with Bachelor's Degree} + \\
+&&& \beta_5\text{Urban} \\
+\\
+\text{priors:} & & \beta_{0} & \sim N\left(200, 100 \right) \\
+&& \beta_1 & \sim N(100, 60) \\
+&& \beta_2 & \sim N(-50, 15) \\
+&& \beta_3 & \sim N(100, 25) \\
+&& \beta_4 & \sim N(-100, 35) \\
+&& \beta_5 & \sim N(100, 25) \\
+&& \sigma & \sim \text{Exp}(l)
+\end{array}
+\end{equation}
+```
+Should I include more factors here? Percent disabled? Percent under poverty with medicaid? Or would that sort of just be the same as median income? Other factors? Maybe geographic mobility or population density or anything else?
+
+## Proximity to inpatient/crisis mental health facilities
+
+```{=tex}
+\begin{equation}
+\begin{array}{lcrl} 
+\text{data:} & \hspace{.025in} & \text{Imprisonment Rate}|\beta_0,\beta_1 & \stackrel{ind}{\sim} Pois\left(\lambda_i \right) \;\; \text{ with } \;\;
+\\ 
+&&& \log\left( \lambda_i \right) = \beta_0 + \beta_1\text{Driving Miles to Inpatient Facility}\\ 
+\\
+\text{priors:} & & \beta_0 & \sim N(200, 100)  \\
+&& \beta_1 & \sim N(100, 30) \\
+\\
+\text{data:} & \hspace{.025in} & \text{Imprisonment Rate}|\beta_0,\beta_1 & \stackrel{ind}{\sim} Pois\left(\lambda_i \right) \;\; \text{ with } \;\;
+\\ 
+&&& \log\left( \lambda_i \right) = \beta_0 + \beta_1\text{Driving Miles to Inpatient Facility w/ Crisis Intervention}\\ 
+\\
+\text{priors:} & & \beta_0 & \sim N(200, 100)  \\
+&& \beta_1 & \sim N(100, 30)
+\end{array}
+\end{equation}
+```
+## Capacity of nearest facilities
+
+```{=tex}
+\begin{equation}
+\begin{array}{lcrl} 
+\text{data:} & \hspace{.025in} & \text{Imprisonment Rate}|\beta_0,\beta_1 & \stackrel{ind}{\sim} Pois\left(\lambda_i \right) \;\; \text{ with } \;\;
+\\ 
+&&& \log\left( \lambda_i \right) = \beta_0 + \beta_1\text{Capacity of Nearest Inpatient Facility}\\ 
+\\
+\text{priors:} & & \beta_0 & \sim N(200, 100)  \\
+&& \beta_1 & \sim N(100, 30) \\
+\\
+\text{data:} & \hspace{.025in} & \text{Imprisonment Rate}|\beta_0,\beta_1 & \stackrel{ind}{\sim} Pois\left(\lambda_i \right) \;\; \text{ with } \;\;
+\\ 
+&&& \log\left( \lambda_i \right) = \beta_0 + \beta_1\text{Capacity of Nearest Inpatient Facility w/ Crisis Intervention}\\ 
+\\
+\text{priors:} & & \beta_0 & \sim N(200, 100)  \\
+&& \beta_1 & \sim N(100, 30)
+\end{array}
+\end{equation}
+```

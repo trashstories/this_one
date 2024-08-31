@@ -1,0 +1,173 @@
+---
+title: "Mini Project 1"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Mini Project 1
+
+## Memo
+
+Rat sightings in New York City are no new phenomenon; in a city as old and dense as the Big Apple, rodents and other pests are sure to be lurking, hoping to seize on an opportunity for warmth or free food. But where are they mostly likely to be spotted? Between 2010 and 2016, rats were spotted more often in family buildings than in buildings not used as family residences. This was true across all five boroughs, and the trends among family buildings and other buildings remained parallel (increasing overtime, especially in the more densely populated boroughs). Among family buildings, buildings with more than two family residences in Manhattan, Brooklyn, and the Bronx had a higher and more rapidly increasing number of sightings. Queens and Staten Island had lower numbers in multifamily buildings, but that is likely because there are more single family buildings in those boroughs.
+
+Using a line graph to show the change in rat sightings overtime in each borough allows for easy comparison over time and between boroughs. The graphs have each been split into two categories; the first graph is split between rat sightings in buildings with family residences and in buildings without family residences, and the second graph is split between one or two family homes and three or more family homes. High contrast colors are used to distinguish each borough against a plain black text for titles and other indicators. The same colors are used consistently between each plot and group. Both plots use the same contrasting font styles, using sans serif for the axis and facet titles and serif font for the title and axis labels. All four line plots are aligned in a grid for easy comparison.
+
+The plot is meant to be read from left to right, top to bottom, as one would read from a book. This allows the viewer to clearly see that the lines for family buildings are higher than other buildings in the top graphs, and then see the difference between different types of family buildings.
+
+There are many different ways to tell the truth about rats in the city, this visualization is based on a record of reported rat sightings, and while it may have its flaws (i.e., misreported sightings, missing unreported sightings), it is understood to be an accurate representation of rats in the real world coming in contact with humans. By looking at the changes in the data over time, between boroughs, and in different types of buildings, the viewer can use the graphic in conjunction with what they already know about the city and its boroughs to draw conclusions about the occurrences of rat sightings. High contrast colors and meaningful but simple indicators help convey the information in an aesthetically pleasing manor. The layout and progression of the line graphs tell the story about where rats are seen in NYC and which building types get the most reported sightings.
+
+\newpage
+
+## Code
+
+```{r load, warning=FALSE, message=FALSE}
+
+library(tidyverse)
+library(sf)
+library(scales)
+library(gghalves) 
+library(patchwork)
+
+colors <- c("#7400CC", "#3ACC14", "#CC0AA4", "#CCAC14", "#0E0ACC")
+
+rats <- read_csv("data/Rat_Sightings.csv") %>% 
+  filter(Borough != "Unspecified") %>% 
+  mutate(Borough = str_to_title(Borough)) %>% 
+  mutate(fam = ifelse(str_detect(`Location Type`, "Family"), 
+                      "Family Buildings", 
+                      "Other Buildings")) %>% 
+  mutate(type = case_when(str_detect(`Location Type`, "3") ~ "3+ Family Buildings", 
+                          str_detect(`Location Type`, "1-2") ~ "1-2 Family Buildings",
+                          TRUE ~ "Other")) %>% 
+  mutate(created_date = mdy_hms(`Created Date`)) %>%
+  mutate(year = year(created_date),
+         month = month(created_date),
+         day = day(created_date),
+         weekday = wday(as.Date(`Created Date`), label = TRUE, abbr = FALSE)) %>% 
+  filter(year != 2017)
+
+```
+
+```{r rats}
+
+r1 <- rats %>% 
+  group_by(Borough, year, fam) %>% 
+  summarise(famCount = n())
+
+rats <- r1 %>% 
+  left_join(rats, by = c("Borough", "year", "fam"))
+
+r2 <- rats %>% 
+  group_by(Borough, year, type) %>% 
+  summarise(typeCount = n())
+
+rats <- r2 %>% 
+  left_join(rats, by = c("Borough", "year", "type"))
+
+```
+
+```{r plot}
+#| fig-cap: "Rats in NYC"
+#| fig-width: 7
+#| fig-height: 4.326329
+
+famplot <- rats %>% 
+  drop_na(`Location Type`) %>% 
+  group_by(Borough, year, fam, famCount) %>% 
+  summarise(count = n()) %>% 
+  ggplot(aes(year, famCount, 
+             fill = Borough, color = Borough)) +
+  geom_line(linewidth = 1.25) + 
+  facet_wrap(~ fam, ncol = 2) +
+  scale_color_manual(values = colors,
+                     limits = c("Manhattan",
+                                "Bronx",
+                                "Brooklyn",
+                                "Queens",
+                                "Staten Island"),
+                     guide = "none") +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  labs(x = NULL,
+       y = "Rat Sightings",
+       color = NULL,
+       title = "Rats in NYC",
+       subtitle = "They are in our homes!") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "black", face = "bold", vjust = -1.5),
+        axis.text = element_text(family = "serif"),
+        axis.title = element_text(size = 7, face = "bold"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#FDDEED"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        plot.title = element_text(family = "serif", size = 14, face = "bold"),
+        plot.subtitle = element_text(family = "serif", size = 12))
+
+typeplot <- rats %>% 
+  drop_na(`Location Type`) %>% 
+  filter(type != "Other") %>% 
+  group_by(Borough, year, type, typeCount) %>% 
+  summarise(count = n()) %>% 
+  ggplot(aes(year, typeCount, 
+             fill = Borough, color = Borough)) +
+  geom_line(linewidth = 1.25) + 
+  facet_wrap(~ type, ncol = 2) +
+  scale_color_manual(values = colors,
+                     limits = c("Manhattan",
+                                "Bronx",
+                                "Brooklyn",
+                                "Queens",
+                                "Staten Island")) +
+  scale_fill_manual(values = colors, guide = "none") +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  labs(x = NULL,
+       y = "Rat Sightings",
+       color = NULL,
+       subtitle = "And multi-home buildings are worse!") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(color = "black", face = "bold", vjust = -1.5),
+        axis.text = element_text(family = "serif"),
+        axis.title = element_text(size = 7, face = "bold"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#FDDEED"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        plot.subtitle = element_text(family = "serif", size = 12))
+
+plot <- famplot / typeplot 
+
+ggsave(plot, filename = "output/rats.png", width = 7, height = 7 / 1.618)
+ggsave(plot, filename = "output/rats.pdf", width = 7, height = 7 / 1.618)
+
+plot
+
+```

@@ -1,0 +1,16 @@
+{
+  "hash": "d65bc141a00c8af08f355581f765360b",
+  "result": {
+    "markdown": "---\ntitle: \"3: Beta-Binomial Bayesian Model\"\neditor_options: \n  chunk_output_type: console\n---\n\n::: {.cell}\n\n```{.r .cell-code}\n# Load packages\nlibrary(bayesrules)\nlibrary(tidyverse)\n```\n:::\n\n\n# 3.1 The Beta prior model\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Plot the Beta(45, 55) prior\nplot_beta(45, 55)\n```\n\n::: {.cell-output-display}\n![](03_notes_files/figure-html/unnamed-chunk-1-1.png){width=672}\n:::\n\n```{.r .cell-code}\nplot_beta_binomial(alpha = 45, beta = 55, y = 30, n = 50)\n```\n\n::: {.cell-output-display}\n![](03_notes_files/figure-html/unnamed-chunk-1-2.png){width=672}\n:::\n\n```{.r .cell-code}\nsummarize_beta_binomial(alpha = 45, beta = 55, y = 30, n = 50)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n      model alpha beta mean      mode         var         sd\n1     prior    45   55 0.45 0.4489796 0.002450495 0.04950248\n2 posterior    75   75 0.50 0.5000000 0.001655629 0.04068942\n```\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nset.seed(84735)\nmichelle_sim <- data.frame(pi = rbeta(10000, 45, 55)) %>% \n  mutate(y = rbinom(10000, size = 50, prob = pi))\n\nggplot(michelle_sim, aes(x = pi, y = y)) + \n  geom_point(aes(color = (y == 30)), size = 0.1)\n```\n\n::: {.cell-output-display}\n![](03_notes_files/figure-html/unnamed-chunk-2-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\n# Keep only the simulated pairs that match our data\nmichelle_posterior <- michelle_sim %>% \n  filter(y == 30)\n\n# Plot the remaining pi values\nggplot(michelle_posterior, aes(x = pi)) + \n  geom_density()\n```\n\n::: {.cell-output-display}\n![](03_notes_files/figure-html/unnamed-chunk-3-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nmichelle_posterior %>% \n  summarize(mean(pi), sd(pi))\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n   mean(pi)     sd(pi)\n1 0.5054909 0.03732097\n```\n:::\n\n```{.r .cell-code}\nnrow(michelle_posterior)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n[1] 211\n```\n:::\n:::\n\n\n# 3.6.1 A Bayesian analysis\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# Beta(1,10) prior\nplot_beta(alpha = 1, beta = 10)\n```\n\n::: {.cell-output-display}\n![](03_notes_files/figure-html/unnamed-chunk-5-1.png){width=672}\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nsummarize_beta_binomial(alpha = 1, beta = 10, y = 26, n = 40)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n      model alpha beta       mean      mode         var         sd\n1     prior     1   10 0.09090909 0.0000000 0.006887052 0.08298827\n2 posterior    27   24 0.52941176 0.5306122 0.004791057 0.06921746\n```\n:::\n\n```{.r .cell-code}\nplot_beta_binomial(alpha = 1, beta = 10, y = 26, n = 40)\n```\n\n::: {.cell-output-display}\n![](03_notes_files/figure-html/unnamed-chunk-6-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "03_notes_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

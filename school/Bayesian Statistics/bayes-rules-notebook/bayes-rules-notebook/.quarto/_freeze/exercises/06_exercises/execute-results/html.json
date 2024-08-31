@@ -1,0 +1,14 @@
+{
+  "hash": "e07de181debb21e5d8a6967dc767dd0e",
+  "result": {
+    "markdown": "---\ntitle: \"6: Approximating the Posterior\"\neditor_options: \n  chunk_output_type: console\n---\n\n::: {.cell}\n\n```{.r .cell-code}\n# Load packages\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rstan)\nlibrary(bayesplot)\nlibrary(bayesrules)\n```\n:::\n\n\n# 6.5.1 Conceptual exercises\n\n## Exercise 6.1 (Steps for grid approximation)\n\na. Identify the steps for the grid approximation of a posterior model.\nb. Which step(s) would you change to make the approximation more accurate? How would you change them?\n\n#  Exercise 6.2 (Trace plot diagnostics) \n\nFor each MCMC simulation scenario described below, sketch by hand what a single chain trace plot might look like for each simulation.\n\na. The chain is mixing too slowly.\nb. The chain has high correlation.\nc. The chain has a tendency to get “stuck.”\nd. The chain has no problems!\n\n## Exercise 6.3 (MCMC woes) \n\nFor each MCMC simulation scenario described below, describe how the scenario could impact the posterior approximation.\n\na. The chain is mixing too slowly.\nb. The chain has high correlation.\nc. The chain has a tendency to get “stuck.”\n\n## Exercise 6.4 (MCMC simulation: thank you for being a friend) \n\nYour friend missed class this week and they are allergic to reading textbooks (a common affliction). Since you are a true friend, you decide to help them out and answer their following questions:\n\na. Why is it important to look at MCMC diagnostics?\nb. Why are MCMC simulations helpful?\nc. What are the benefits of using RStan?\nd. What don’t you understand about the chapter?\n\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

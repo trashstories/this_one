@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Jamie Pantazi Esmond">
+<meta name="dcterms.date" content="2023-04-19">
+
+<title>Test Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="test_files/libs/clipboard/clipboard.min.js"></script>
+<script src="test_files/libs/quarto-html/quarto.js"></script>
+<script src="test_files/libs/quarto-html/popper.min.js"></script>
+<script src="test_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="test_files/libs/quarto-html/anchor.min.js"></script>
+<link href="test_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="test_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="test_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="test_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="test_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<style>
+    .quarto-title-block .quarto-title-banner {
+      color: #744FC6;
+    }
+    </style>
+
+<script src="test_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="test_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Test Data</h1>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Jamie Pantazi Esmond </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 19, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  
+</div>
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">80</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n_ppl <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>esteem <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span>n_ppl) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Dates</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">sample</span>(<span class="dv">2017</span><span class="sc">:</span><span class="dv">2022</span>, n_ppl, <span class="at">replace =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, n_ppl, <span class="at">replace =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">day =</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">31</span>, n_ppl, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">day =</span> <span class="fu">case_when</span>(month <span class="sc">==</span> <span class="dv">2</span> <span class="sc">&amp;</span> day <span class="sc">&gt;</span> <span class="dv">28</span> <span class="sc">~</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>, n_ppl, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                         month <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">9</span>, <span class="dv">11</span>) <span class="sc">&amp;</span> day <span class="sc">&gt;</span> <span class="dv">30</span> <span class="sc">~</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">30</span>, n_ppl, <span class="at">replace =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                         <span class="cn">TRUE</span> <span class="sc">~</span> day)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date =</span> <span class="fu">make_date</span>(year, month, day)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Demographics </span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">age =</span> <span class="fu">round</span>(<span class="fu">rtruncnorm</span>(n_ppl, <span class="dv">16</span>, <span class="dv">65</span>, <span class="dv">18</span>, <span class="dv">5</span>), <span class="dv">0</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">race =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">"Black"</span>, <span class="st">"Latinx"</span>, <span class="st">"White"</span>, <span class="st">"Other"</span>), n_ppl,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                       <span class="at">replace =</span> <span class="cn">TRUE</span>, <span class="at">prob =</span> <span class="fu">c</span>(.<span class="dv">4</span>, .<span class="dv">2</span>, .<span class="dv">3</span>, .<span class="dv">1</span>)),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">race_num =</span> <span class="fu">case_when</span>(race <span class="sc">==</span> <span class="st">"Black"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                              race <span class="sc">==</span> <span class="st">"Latinx"</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>                              race <span class="sc">==</span> <span class="st">"White"</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>                              race <span class="sc">==</span> <span class="st">"Other"</span> <span class="sc">~</span> <span class="dv">4</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gender =</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">"Man"</span>, <span class="st">"Woman"</span>), n_ppl, <span class="at">replace =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>                         <span class="at">prob =</span> <span class="fu">c</span>(.<span class="dv">45</span>, .<span class="dv">55</span>)),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>         <span class="at">woman =</span> <span class="fu">case_when</span>(gender <span class="sc">==</span> <span class="st">"Man"</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>                           gender <span class="sc">==</span> <span class="st">"Woman"</span> <span class="sc">~</span> <span class="dv">1</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Social Media</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">social_base =</span> <span class="fu">rtruncnorm</span>(n_ppl, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="fl">2.5</span>),</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">age_social =</span> age <span class="sc">*</span> <span class="fu">rtruncnorm</span>(n_ppl, <span class="sc">-</span>.<span class="dv">05</span>, <span class="dv">0</span>, <span class="sc">-</span>.<span class="dv">025</span>, .<span class="dv">0025</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">gender_social =</span> <span class="fu">case_when</span>(gender <span class="sc">==</span> <span class="st">"Man"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>                                   gender <span class="sc">==</span> <span class="st">"Woman"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="dv">4</span>, <span class="dv">1</span>)),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>         <span class="at">race_social =</span> <span class="fu">case_when</span>(race <span class="sc">==</span> <span class="st">"Black"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="dv">3</span>, <span class="dv">2</span>),</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>                                 race <span class="sc">==</span> <span class="st">"Latinx"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="dv">1</span>, <span class="fl">1.5</span>),</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>                                 race <span class="sc">==</span> <span class="st">"White"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="dv">0</span>, <span class="fl">2.5</span>),</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>                                 race <span class="sc">==</span> <span class="st">"Other"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="dv">2</span>, <span class="dv">2</span>)),</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">social =</span> social_base <span class="sc">+</span> age_social <span class="sc">+</span> gender_social <span class="sc">+</span> race_social,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">social =</span> <span class="fu">case_when</span>(social <span class="sc">&lt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">1</span>, </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>                            social <span class="sc">&gt;</span> <span class="dv">10</span> <span class="sc">~</span> <span class="dv">10</span>,</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>                            <span class="cn">TRUE</span> <span class="sc">~</span> <span class="fu">round</span>(social))) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Self-esteem</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">esteem_base =</span> <span class="fu">rtruncnorm</span>(n_ppl, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">5</span>, <span class="fl">1.25</span>),</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>         <span class="at">age_esteem =</span> age <span class="sc">*</span> <span class="fu">rtruncnorm</span>(n_ppl, <span class="sc">-</span>.<span class="dv">25</span>, <span class="dv">0</span>, <span class="sc">-</span>.<span class="dv">15</span>, .<span class="dv">05</span>),</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>         <span class="at">age_gender =</span> <span class="fu">ifelse</span>(gender <span class="sc">==</span> <span class="st">"Woman"</span>, age <span class="sc">*</span> <span class="fu">rtruncnorm</span>(n_ppl, <span class="sc">-</span>.<span class="dv">4</span>, <span class="dv">0</span>, <span class="sc">-</span>.<span class="dv">2</span>, .<span class="dv">05</span>), age_esteem),</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>         <span class="at">gender_esteem =</span> <span class="fu">case_when</span>(gender <span class="sc">==</span> <span class="st">"Man"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="fl">2.5</span>, <span class="dv">1</span>),</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>                                   gender <span class="sc">==</span> <span class="st">"Woman"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="sc">-</span><span class="dv">2</span>, .<span class="dv">75</span>)),</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>         <span class="at">race_esteem =</span> <span class="fu">case_when</span>(race <span class="sc">==</span> <span class="st">"Black"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="sc">-</span><span class="fl">1.5</span>, .<span class="dv">75</span>),</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>                                 race <span class="sc">==</span> <span class="st">"Latinx"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="sc">-</span><span class="dv">1</span>, .<span class="dv">5</span>),</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>                                 race <span class="sc">==</span> <span class="st">"White"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="dv">2</span>, .<span class="dv">75</span>),</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>                                 race <span class="sc">==</span> <span class="st">"Other"</span> <span class="sc">~</span> <span class="fu">rnorm</span>(n_ppl, <span class="sc">-</span><span class="dv">1</span>, .<span class="dv">5</span>)),</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>         <span class="at">social_esteem =</span> social <span class="sc">*</span> <span class="fu">rtruncnorm</span>(n_ppl, <span class="sc">-</span>.<span class="dv">5</span>, <span class="dv">0</span>, <span class="sc">-</span>.<span class="dv">175</span>, .<span class="dv">05</span>),</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>         <span class="at">esteem =</span> esteem_base <span class="sc">+</span> age_social <span class="sc">+</span> gender_esteem <span class="sc">+</span> race_esteem <span class="sc">+</span> social_esteem,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>         <span class="at">esteem =</span> <span class="fu">case_when</span>(esteem <span class="sc">&lt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">1</span>, </span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>                            esteem <span class="sc">&gt;</span> <span class="dv">10</span> <span class="sc">~</span> <span class="dv">10</span>,</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>                            <span class="cn">TRUE</span> <span class="sc">~</span> <span class="fu">round</span>(esteem))) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, date, age, gender, woman, race, race_num, social, esteem)</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(esteem, <span class="st">"esteem.csv"</span>, <span class="at">row.names=</span><span class="cn">FALSE</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(esteem <span class="sc">~</span> social, <span class="at">data =</span> esteem)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic       p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+1 (Intercept)    6.35      0.865      7.35 0.00000000217
+2 social        -0.389     0.107     -3.64 0.000676     </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(esteem <span class="sc">~</span> social <span class="sc">+</span> age, <span class="at">data =</span> esteem)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)  6.17        2.29     2.69   0.00976 
+2 social      -0.390       0.109   -3.59   0.000784
+3 age          0.00882     0.104    0.0849 0.933   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(esteem <span class="sc">~</span> social <span class="sc">+</span> gender, <span class="at">data =</span> esteem)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)    6.90     0.699       9.87 4.85e-13
+2 social        -0.273    0.0883     -3.09 3.31e- 3
+3 genderWoman   -2.73     0.514      -5.31 2.95e- 6</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>m4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(esteem <span class="sc">~</span> social <span class="sc">+</span> age <span class="sc">+</span> gender, <span class="at">data =</span> esteem)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 5
+  term        estimate std.error statistic    p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+1 (Intercept)   5.19      1.82        2.85 0.00650   
+2 social       -0.277     0.0883     -3.14 0.00298   
+3 age           0.0844    0.0833      1.01 0.316     
+4 genderWoman  -2.81      0.521      -5.40 0.00000224</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>m5 <span class="ot">&lt;-</span> <span class="fu">lm</span>(esteem <span class="sc">~</span> social <span class="sc">+</span> age <span class="sc">+</span> gender <span class="sc">+</span> race, <span class="at">data =</span> esteem)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(m5)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 5
+  term        estimate std.error statistic       p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+1 (Intercept)   4.24      1.59       2.67  0.0106       
+2 social       -0.188     0.0878    -2.14  0.0381       
+3 age           0.0774    0.0681     1.14  0.262        
+4 genderWoman  -3.39      0.437     -7.75  0.00000000108
+5 raceLatinx   -0.195     0.610     -0.321 0.750        
+6 raceOther    -1.12      1.23      -0.912 0.367        
+7 raceWhite     2.11      0.513      4.12  0.000171     </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>notes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"t statistics in parentheses"</span>,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>           <span class="st">"confidence intervals in brackets"</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>           <span class="st">"(+ p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001)"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>together <span class="ot">&lt;-</span> <span class="fu">modelsummary</span>(<span class="fu">list</span>(<span class="st">"Social Media"</span> <span class="ot">=</span> m1,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"+ Age"</span> <span class="ot">=</span> m2,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"+ Gender"</span> <span class="ot">=</span> m3,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"+ Age &amp; Gender"</span> <span class="ot">=</span> m4,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                              <span class="st">"+ Age, Gender, &amp; Race"</span> <span class="ot">=</span> m5),</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">coef_rename =</span> <span class="fu">c</span>(<span class="at">social =</span> <span class="st">"Social Media"</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">age =</span> <span class="st">"Age"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">genderWoman =</span> <span class="st">"Woman"</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">raceWhite =</span> <span class="st">"White"</span>),</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>             <span class="at">coef_omit =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>),</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">output =</span> <span class="st">"kableExtra"</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>             <span class="at">estimate =</span> <span class="st">"{estimate}{stars}"</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">statistic =</span> <span class="st">"({statistic}) &lt;br&gt; p = {p.value} &lt;br&gt; [{conf.low}, {conf.high}]"</span>,</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>             <span class="at">fmt =</span>  <span class="dv">3</span>,</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>             <span class="at">gof_omit =</span> <span class="st">"IC|Log|Adj|p</span><span class="sc">\\</span><span class="st">.value|statistic|se_type|F|RMSE|R2"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>), <span class="at">background =</span> <span class="st">"#0A297D"</span>, <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_spec</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">width =</span> <span class="st">"9em"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">footnote</span>(<span class="at">general =</span> notes, <span class="at">general_title =</span> <span class="st">""</span>, <span class="at">footnote_as_chunk =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>together <span class="sc">%&gt;%</span> </span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">font_size =</span> <span class="dv">14</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table" style="width: auto !important; margin-left: auto; margin-right: auto;border-bottom: 0; font-size: 14px; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;"> Social Media </th>
+   <th style="text-align:center;"> + Age </th>
+   <th style="text-align:center;"> + Gender </th>
+   <th style="text-align:center;"> + Age &amp; Gender </th>
+   <th style="text-align:center;"> + Age, Gender, &amp; Race </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> (Intercept) </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> 6.353*** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> 6.173** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> 6.897*** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> 5.192** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;"> 4.243* </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 9em; ">  </td>
+   <td style="text-align:center;width: 9em; "> (7.346) <br> p = &lt;0.001 <br> [4.615, 8.092] </td>
+   <td style="text-align:center;width: 9em; "> (2.694) <br> p = 0.010 <br> [1.563, 10.784] </td>
+   <td style="text-align:center;width: 9em; "> (9.872) <br> p = &lt;0.001 <br> [5.491, 8.302] </td>
+   <td style="text-align:center;width: 9em; "> (2.851) <br> p = 0.006 <br> [1.527, 8.857] </td>
+   <td style="text-align:center;"> (2.671) <br> p = 0.011 <br> [1.039, 7.446] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> Social Media </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> −0.389*** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> −0.390*** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> −0.273** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> −0.277** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;"> −0.188* </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 9em; ">  </td>
+   <td style="text-align:center;width: 9em; "> (−3.635) <br> p = &lt;0.001 <br> [−0.604, −0.174] </td>
+   <td style="text-align:center;width: 9em; "> (−3.591) <br> p = &lt;0.001 <br> [−0.608, −0.171] </td>
+   <td style="text-align:center;width: 9em; "> (−3.095) <br> p = 0.003 <br> [−0.451, −0.096] </td>
+   <td style="text-align:center;width: 9em; "> (−3.136) <br> p = 0.003 <br> [−0.455, −0.099] </td>
+   <td style="text-align:center;"> (−2.140) <br> p = 0.038 <br> [−0.365, −0.011] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> Age </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; ">  </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> 0.009 </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; ">  </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> 0.084 </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;"> 0.077 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 9em; ">  </td>
+   <td style="text-align:center;width: 9em; ">  </td>
+   <td style="text-align:center;width: 9em; "> (0.085) <br> p = 0.933 <br> [−0.200, 0.218] </td>
+   <td style="text-align:center;width: 9em; ">  </td>
+   <td style="text-align:center;width: 9em; "> (1.014) <br> p = 0.316 <br> [−0.083, 0.252] </td>
+   <td style="text-align:center;"> (1.136) <br> p = 0.262 <br> [−0.060, 0.215] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> Woman </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; ">  </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; ">  </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> −2.725*** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> −2.814*** </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;"> −3.389*** </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 9em; ">  </td>
+   <td style="text-align:center;width: 9em; ">  </td>
+   <td style="text-align:center;width: 9em; ">  </td>
+   <td style="text-align:center;width: 9em; "> (−5.307) <br> p = &lt;0.001 <br> [−3.759, −1.692] </td>
+   <td style="text-align:center;width: 9em; "> (−5.404) <br> p = &lt;0.001 <br> [−3.862, −1.766] </td>
+   <td style="text-align:center;"> (−7.750) <br> p = &lt;0.001 <br> [−4.271, −2.507] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; "> White </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; ">  </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; ">  </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; ">  </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;width: 9em; ">  </td>
+   <td style="text-align:center;font-weight: bold;color: white !important;background-color: #0A297D !important;"> 2.111*** </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;box-shadow: 0px 1pxwidth: 9em; ">  </td>
+   <td style="text-align:center;box-shadow: 0px 1pxwidth: 9em; ">  </td>
+   <td style="text-align:center;box-shadow: 0px 1pxwidth: 9em; ">  </td>
+   <td style="text-align:center;box-shadow: 0px 1pxwidth: 9em; ">  </td>
+   <td style="text-align:center;box-shadow: 0px 1pxwidth: 9em; ">  </td>
+   <td style="text-align:center;box-shadow: 0px 1px"> (4.116) <br> p = &lt;0.001 <br> [1.077, 3.145] </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;width: 9em; "> Num.Obs. </td>
+   <td style="text-align:center;width: 9em; "> 50 </td>
+   <td style="text-align:center;width: 9em; "> 50 </td>
+   <td style="text-align:center;width: 9em; "> 50 </td>
+   <td style="text-align:center;width: 9em; "> 50 </td>
+   <td style="text-align:center;"> 50 </td>
+  </tr>
+</tbody>
+<tfoot>
+<tr><td style="padding: 0; " colspan="100%">
+<sup></sup> t statistics in parentheses</td></tr>
+<tr><td style="padding: 0; " colspan="100%">
+<sup></sup> confidence intervals in brackets</td></tr>
+<tr><td style="padding: 0; " colspan="100%">
+<sup></sup> (+ p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001)</td></tr>
+</tfoot>
+</table>
+
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

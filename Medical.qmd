@@ -1,0 +1,2260 @@
+---
+title: "Daily Symptom Tracking and Medical History"
+author: "Jamie Pantazi"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE)
+
+library(tidyverse)
+library(modelsummary)  
+library(lubridate)
+library(ggrepel)
+library(scales)
+library(kableExtra)
+library(readr)
+library(tufte)
+library(broom)
+library(tinytex)
+library(summarytools)
+library(patchwork)
+library(stringr)
+library(ggpmisc)
+library(cowplot)
+library(grid)
+library(googlesheets4)
+library(plotly)
+library(ggrepel) 
+library(ggridges)
+library(broom.mixed)
+library(forcats)
+library(extrafont)
+library(ggnewscale)
+library(gt)
+library(janitor)
+library(broom.mixed)
+library(zoo)
+library(colorspace)
+
+set.seed(80085)
+colors <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#CCAC14", "#0ACCC5", "#CC1F14", "#1471CC", 
+            "#805713", "#4F008C", "#B785DD", "#7400CC",
+            "#CC0AA4", "#0E0ACC", "#3ACC14")
+
+colors_ <- c("#0E0ACC", "#3ACC14", "#7400CC", "#CC0AA4", 
+             "#CCAC14", "#0ACCC5", "#CC1F14", "#1471CC", 
+             "#805713", "#4F008C", "#B785DD")
+
+colors2 <- c("#CCAC14", "#0ACCC5", "#CC1F14", "#3ACC14", 
+             "#B785DD", "#0E0ACC", "#CC0AA4", "#7400CC")
+
+colors3 <- c("#0ACCC5", "#0E0ACC", "#CCAC14", "#3ACC14", 
+             "#CC1F14", "#CC0AA4", "#4F008C", "#7400CC", 
+             "#1471CC", "#805713", "#B785DD")
+
+pink4 <- c("#F3D9F9", "#DE9BD0", "#D656BB", "#B04585")
+
+th_med <- theme_light() + 
+  theme(panel.grid.major = element_line(color = "#FFD1F9", 
+                                        linewidth = .5, 
+                                        linetype = "longdash"),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_text(color = "#310873", 
+                                 family = "Cambria"),
+        axis.title = element_text(color = "#310873", 
+                                  family = "Changa"),
+        plot.title = element_text(color = "#310873", 
+                                  size = 14, 
+                                  face = "bold", 
+                                  family = "Changa"),
+        plot.subtitle = element_text(color = "#310873", 
+                                     size = 12, 
+                                     family = "Changa"),
+        legend.text = element_text(color = "#310873", 
+                                   family = "Changa"),
+        plot.caption = element_text(color = "#310873", 
+                                    family = "Cambria"))
+```
+
+```{r load}
+
+gs4_deauth()
+
+sym_ <- read_sheet("https://docs.google.com/spreadsheets/d/1u5jGDmdz7ROWMQYDdtfwjMpeYMcsGGKz_XZoQpA6WFc/edit#gid=241327815", sheet = "symptoms") %>% 
+  rename(overall = `overall pain`,
+         forearm = `forearm pain`,
+         back = `back pain`,
+         focus = `focus / concentration issues`,
+         skin = `skin condition`,
+         leg = `leg function`) %>% 
+  mutate(date = ymd(date)) %>%
+  mutate(swim = ifelse(Swimming == "Yes", 1, 0),
+         stretch = ifelse(Stretching == "Yes", 1, 0),
+         si = ifelse(`suicidal ideation` == "yes", 1, 0),
+         night = ifelse(nightmares == "yes", 1, 0),
+         peri = ifelse(period == "Yes", 1, 0),
+         k = ifelse(str_detect(notes, "keta"), 1, 0),
+         rainbow = ifelse(str_detect(notes, "rainbow"), 1, 0)) %>% 
+  mutate(night3 = ifelse(nightmares == "not sure/don't remember", 
+                         "unsure", nightmares)) %>% 
+  mutate(cyst = ifelse(str_detect(skin, "cyst"), 1, 0),
+         activeCyst = case_when(str_detect(skin, "active cyst") ~ "Active",
+                                str_detect(skin, "healing cyst") ~ "Healing",
+                                TRUE ~ NA))
+
+pain <- sym_ %>% 
+  pivot_longer(c(overall, forearm, back, fatigue, mood, anxiety, 
+                 focus, leg, dizziness, headache, productivity)) %>% 
+  pivot_longer(c(si, night, swim, cyst), 
+               names_to = "points", 
+               values_to = "point_value") %>% 
+  mutate(sym_label = case_when(name == "overall" ~ "Overall pain",
+                               name == "forearm" ~ "Forearm pain",
+                               name == "back" ~ "Back pain",
+                               name == "fatigue" ~ "Fatigue",
+                               name == "mood" ~ "Depression",
+                               name == "anxiety" ~ "Anxiety",
+                               name == "focus" ~ "Focus Issues",
+                               name == "leg" ~ "Legs",
+                               name == "dizziness" ~ "Dizziness",
+                               name == "headache" ~ "Headache",
+                               name == "productivity" ~ "Productivity"),
+         dummies = case_when(points == "si" ~ "S.I.",
+                             points == "night" ~ "Nightmares",
+                             points == "swim" ~ "Swimming",
+                             points == "cyst" ~ "Skin Cyst")) %>% 
+  mutate(tip_line = paste0(format(date, "%b %e"), 
+                           "<br>", sym_label, 
+                           " - ", value),
+         tip_point = paste0(dummies, 
+                            "<br>", format(date, "%b %e"), 
+                            " (Overall pain - ", value, ")")) 
+
+place <- readRDS("data/place.RDS") %>% 
+  distinct()
+
+keep_last_observation <- function(place) {
+  place %>%
+    group_by(date) %>%
+    slice(n()) %>%
+    ungroup()
+}
+
+place_ <- keep_last_observation(place)
+
+sym <- sym_ %>% 
+  left_join(place_, by = "date") %>% 
+  rename(state = pm.state) 
+
+
+nearest <- function(index) {
+  i <- index - 1
+  
+  while (i >= 1 && is.na(sym$state[i])) {
+    i <- i - 1
+  }
+  
+  if (i >= 1) {
+    return(sym$state[i])
+  } else {
+    return(NA)
+  }
+}
+
+missing_indices <- which(is.na(sym$state))
+sym$state[missing_indices] <- sapply(missing_indices, nearest)
+
+si <- sym %>% 
+  filter(si == 1)
+night <- sym %>% 
+  filter(night == 1)
+swim <- sym %>% 
+  filter(swim == 1)
+k <- sym %>% 
+  filter(k == 1)
+rb <- sym %>% 
+  filter(rainbow == 1)
+stretch <- sym %>% 
+  filter(stretch == 1)
+peri <- sym %>% 
+  filter(peri == 1)
+
+k_start <- min(k$date)
+k_end <- max(k$date)
+
+sym <- sym %>% 
+  mutate(before_k = ifelse(date < k_start, TRUE, FALSE),
+         after_k = ifelse(date > k_end, TRUE, FALSE)) %>% 
+  mutate(state = case_when(date == "2024-03-12" ~ "AL",
+                           date == "2024-03-13" ~ "MS",
+                           date == "2024-03-14" | date == "2024-03-15" ~ "LA",
+                           date > "2024-03-15" & date < "2024-05-20" ~ "TX",
+                           date == "2024-05-20" ~ "OK",
+                           date > "2024-05-20" & date < "2024-06-03" ~ "MO",
+                           date > "2024-06-02" & date < "2024-06-18" ~ "IL",
+                           date > "2024-06-17" & date < "2024-06-21" ~ "WI",
+                           date > "2024-06-02" & date < "2024-06-28" ~ "IL",
+                           date > "2024-06-27" & date < "2024-07-30" ~ "MI",
+                           date == "2024-07-30" ~ "WI",
+                           date > "2024-07-30" ~ "MN",
+                           TRUE ~ state)) 
+
+saveRDS(sym, "sym.rds")
+
+```
+
+## Daily Symptoms
+
+::: column-page
+### Last 20 Weeks Stacked
+
+```{r stacked}
+#| fig-height: 6
+#| fig-width: 12
+
+pain %>% 
+  filter(date > (today() - 140),
+         name != "productivity") %>% 
+  mutate(sym_height = as.numeric(factor(sym_label)) * 10) %>% 
+  ggplot(aes(date, sym_label)) +
+  geom_vline(data = k %>% filter(date > (today() - 140)),
+             aes(xintercept = date),
+             color = "#FFFFBB", 
+             linewidth = 3) +
+  geom_vline(data = rb %>% filter(date > (today() - 140)),
+             aes(xintercept = date),
+             color = "#3ACC14", 
+             linewidth = 3,
+             alpha = .225) +
+  geom_vline(data = peri %>% filter(date > (today() - 140)),
+             aes(xintercept = date),
+             color = "#CC0AA4", 
+             linewidth = 2,
+             alpha = .2) +
+  geom_vline(data = si %>% filter(date > (today() - 140)),
+             aes(xintercept = date - .1),
+             color = "#CC1F14", 
+             linewidth = 1) +
+  geom_vline(data = night %>% filter(date > (today() - 140)),
+             aes(xintercept = date + .1),
+             color = "#456699", 
+             linewidth = 1) +
+  geom_vline(data = swim %>% filter(date > (today() - 140)),
+             aes(xintercept = date),
+             color = "#0CEBFF", 
+             linewidth = 1.5,
+             alpha = .25) +
+  geom_ridgeline(aes(fill = sym_label, 
+                     height = (value / 10),
+                     color = sym_label),
+                 alpha = .85) +
+  geom_point(data = stretch %>% filter(date > (today() - 140)),
+             aes(date, 1.5),
+             color = "#FFD1F9",
+             size = 6,
+             shape = "+") +
+  geom_text(data = k %>% filter(date > (today() - 140)),
+            aes(date, 11.75, 
+                label = "k"),
+            size = 3,
+            family = "Changa",
+            color = "#310873") +
+  scale_x_date(breaks = date_breaks(width = "10 days"),
+               labels = date_format("%b %e"),
+               expand = expansion(mult = c(.01,.01), add = c(.01,.01)),
+               position = "top") +
+  scale_y_discrete(limits = rev,
+                   expand = expansion(mult = c(0,.05), add = c(0,1.5))) +
+  scale_color_manual(values = colors,
+                     guide = "none",
+                     limits = c("Overall pain", "Forearm pain", 
+                                "Back pain", "Fatigue",
+                                "Depression", "Anxiety", "Focus Issues",
+                                "Legs", "Dizziness", "Headache")) +
+  scale_fill_manual(values = colors,
+                    guide = "none",
+                    limits = c("Overall pain", "Forearm pain", 
+                               "Back pain", "Fatigue",
+                               "Depression", "Anxiety", "Focus Issues",
+                               "Legs", "Dizziness", "Headache")) +
+  annotate(geom = "text",
+           x = (today() - 20), y = 1.15,
+           label = "Overall pain",
+           color = "#FFD1F9",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 10), y = 2.15,
+           label = "Legs",
+           color = "#FFD1F9",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 20), y = 3.15,
+           label = "Headache",
+           color = "#FFD1F9",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 10), y = 4.15,
+           label = "Forearm pain",
+           color = "#FFD1F9",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 20), y = 5.15,
+           label = "Focus Issues",
+           color = "#FFD1F9",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 10), y = 6.15,
+           label = "Fatigue",
+           color = "#310873",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 20), y = 7.15,
+           label = "Dizziness",
+           color = "#FFD1F9",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 10), y = 8.15,
+           label = "Depression",
+           color = "#310873",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 20), y = 9.15,
+           label = "Back pain",
+           color = "#FFD1F9",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (today() - 10), y = 10.15,
+           label = "Anxiety",
+           color = "#310873",
+           family = "Changa") +
+  annotate(geom = "text",
+           x = (as.Date("2024-04-24") + .5), y = 1.22,
+           label = "Stretched",
+           color = "#FFD1F9",
+           family = "Changa",
+           alpha = .8) +
+  annotate(geom = "segment",
+           x = (as.Date("2024-04-25")), 
+           xend = (as.Date("2024-04-28")),
+           y = 1.33, yend = 1.45,
+           color = "#FFD1F9",
+           linewidth = .6,
+           arrow = arrow(angle = 25,
+                         length = unit(0.5, "lines")),
+           alpha = .8) +
+  # annotate(geom = "text",
+  #          x = (as.Date("2023-11-20") - .5), y = 11.2,
+  #          label = "S.I.",
+  #          color = "#4D221F",
+  #          family = "Changa") +
+  # annotate(geom = "segment",
+  #          x = (as.Date("2023-11-20") - .5), 
+  #          xend = (as.Date("2023-11-21") - .5),
+  #          y = 11.35, yend = 11.6,
+  #          color = "#4D221F",
+  #          linewidth = .6,
+  #          arrow = arrow(angle = 25,
+  #                        length = unit(0.5, "lines"))) +
+  # annotate(geom = "text", 
+  #          x = (as.Date("2024-04-10")), 
+  #          y = 11.4, 
+  #          label = "Nightmares", 
+  #          color = "black",
+  #          family = "Changa") +
+  # annotate(geom = "segment", 
+  #          x = (as.Date("2024-04-12")), 
+  #          xend = (as.Date("2024-04-14") + .75), 
+  #          y = 11.525, yend = 11.8, 
+  #          color = "black", 
+  #          linewidth = .6,
+  #          arrow = arrow(angle = 25, 
+  #                        length = unit(0.5, "lines"))) +
+  # annotate(geom = "text",
+  #          x = as.Date("2024-03-09"), 
+  #          y = 11.25, 
+  #          label = "rainbow",
+  #          size = 3.5,
+  #          family = "Changa",
+  #          color = "#310873") +
+  # annotate(geom = "text",
+  #          x = as.Date("2024-02-27"), y = 11.25, 
+  #          label = "bleeding",
+  #          size = 3.5,
+  #          family = "Changa",
+  #          color = "#310873") +
+  labs(x = NULL,
+       y = NULL,
+       fill = NULL,
+       color = NULL) +
+  th_med +
+  theme(axis.text.y = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.border = element_rect(color = NA,
+                                    linewidth = 1,
+                                    fill = NA))
+
+ggsave("stacked.png",
+       device = png, type = "cairo", dpi = 300,
+       width = 12, height = 12 / 1.618)
+
+```
+:::
+
+### Physical Pain (Previous 30 Days)
+
+This highlights the trends of the last 30 days for physical symptoms.
+
+```{r pain, fig.width=7, fig.height=7 / 1.618}
+
+pain1 <- sym %>% 
+  pivot_longer(c(overall, forearm, back, fatigue, leg, dizziness, headache)) 
+
+pain1 %>% 
+  filter(date > (today() - 30)) %>% 
+  ggplot(aes(color = name)) +
+  geom_line(aes(date, value, 
+                linetype = name), 
+            linewidth = 2) +
+  geom_point(data = sym %>% filter(Swimming == "Yes", date > (today() - 30)), 
+             aes(date, overall,
+                 shape = Swimming),
+             color = "#0E0ACC", 
+             fill = "#0CEBFF", 
+             size = 5.5) +
+  scale_x_date(breaks = date_breaks(width = "3 days"),
+               labels = date_format("%b %d"),
+               expand = c(.01,.01)) +
+  scale_y_continuous(breaks = seq(0,10,2),
+                     limits = c(1,10)) +
+  scale_color_manual(values = c("#7400CC", "#CC0AA4", "#0E0ACC", 
+                                "#1471CC", "#805713", "#4F008C"),
+                     limits = c("overall", "forearm", 
+                                "back", "leg", 
+                                "dizziness", "headache"),
+                     labels = c("Overall pain", "Forearm pain", 
+                                "Back pain", "Legs", 
+                                "Dizziness", "Headache")) +
+  scale_linetype_manual(values = c("solid", "twodash", 
+                                   "twodash", "twodash", 
+                                   "twodash", "twodash"), 
+                        limits = c("overall", "forearm", 
+                                   "back", "leg", 
+                                   "dizziness", "headache"),
+                        labels = c("Overall pain", "Forearm pain", 
+                                   "Back pain", "Legs", 
+                                   "Dizziness", "Headache")) +
+  scale_shape_manual(values = 21,
+                     labels = "Swimming") +
+  labs(x = NULL,
+       y = "Pain Level",
+       color = NULL,
+       linetype = NULL,
+       shape = NULL,
+       title = "Daily Physical Pain") +
+  th_med +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#3ACC14", 
+                                          linetype = "dotted"),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_line(color = "#9DDD99", 
+                                          linetype = "dotted"),
+        legend.position = "bottom",
+        legend.text = element_text(color = "#310873", 
+                                   family = "Changa"))
+
+```
+
+### Mental Health (Previous 30 Days)
+
+This highlights the trends for the last 30 days for mental health symptoms.
+
+```{r mental, fig.width=7, fig.height=7 / 1.618}
+
+mental <- sym %>% 
+  pivot_longer(c(mood, anxiety, focus, fatigue)) 
+
+dum <- pain %>% 
+  filter(dummies == "S.I." | dummies == "Nightmares", 
+         name == "mood",
+         point_value == 1,
+         date > (today() - 30))
+
+mental %>% 
+  filter(date > (today() - 30)) %>% 
+  ggplot(aes(color = name)) +
+  geom_line(aes(date, value), 
+            linewidth = 2, 
+            linetype = "twodash") +
+  scale_x_date(breaks = date_breaks(width = "3 days"),
+               labels = date_format("%b %d"),
+               expand = c(.01,.01)) +
+  scale_y_continuous(breaks = seq(0,10,2),
+                     limits = c(1,10)) +
+  scale_color_manual(values = colors2,
+                     limits = c("mood", "anxiety", 
+                                "focus", "fatigue"),
+                     labels = c("Depression", "Anxiety", 
+                                "Focus Issues", "Fatigue")) +
+  geom_point(data = dum, 
+             aes(date, value,
+                 # color = dummies,
+                 # fill = dummies,
+                 # size = dummies,
+                 shape = "Nightmares"),
+             color = "#456699",
+             size = 6
+             ) +
+  labs(color = NULL) +
+  # new_scale_color() +
+  # scale_color_manual(values = c("#700000", "black"),
+  #                    labels = c("S.I.", "Nightmares"),
+  #                    limits = rev) +
+  # scale_fill_manual(values = c("#CC1F14", "#456699"),
+  #                    labels = c("S.I.", "Nightmares"),
+  #                    limits = rev) +
+  # scale_size_manual(values = c(4,6),
+  #                   guide = "none") +
+  labs(x = NULL,
+       y = "Severity Level",
+       color = NULL,
+       fill = NULL,
+       shape = NULL,
+       alpha = NULL,
+       title = "Daily Mental Health") +
+  # guides(fill = guide_legend(override.aes = list(size = 5)),
+  #        color = guide_legend(override.aes = list(size = 5))) +
+  th_med +
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#3ACC14", 
+                                          linetype = "dotted"),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_line(color = "#9DDD99", 
+                                          linetype = "dotted"),
+        legend.position = "bottom",
+        legend.text = element_text(color = "#310873", 
+                                   family = "Changa"))
+
+
+```
+
+::: column-page
+### Skin
+
+```{r skin}
+#| fig-height: 4
+#| fig-width: 12
+
+sym %>% 
+  filter(cyst == 1) %>% 
+  ggplot(aes(date, cyst, 
+             color = activeCyst,
+             fill = activeCyst)) +
+  geom_vline(xintercept = c(as.Date("2023-07-22"), # end doxy
+                            as.Date("2023-10-14"), # mycin/rifampin start
+                            as.Date("2023-10-29"), # mycin end
+                            as.Date("2023-11-12"), # rifampin end
+                            as.Date("2023-11-19"), # doxy start
+                            as.Date("2023-12-28"), # cyst removal
+                            as.Date("2024-02-01"), # doxy end
+                            as.Date("2024-07-17"), # doxy start
+                            as.Date("2024-08-04")), # doxy end
+             linewidth = .75,
+             linetype = "longdash",
+             color = "#310873") +
+  geom_vline(xintercept = c(as.Date("2023-08-25"), # infection
+                            as.Date("2023-09-24"), # start 
+                            as.Date("2023-09-24") + 10), # end
+             linewidth = .75,
+             linetype = "longdash",
+             color = "#B785DD") +
+  annotate("rect",
+           xmin = as.Date("2023-12-04"),
+           xmax = as.Date("2023-12-07"),
+           ymin = min(sym$cyst), 
+           ymax = 3.75,
+           fill = "#B785DD",
+           alpha = .5) +
+  annotate("text", 
+           x = as.Date("2023-07-29") + .5,
+           y = 2.3,
+           label = "Doxy\nEnded",
+           family = "Changa",
+           color = "#310873") +
+  geom_curve(x = as.Date("2023-07-29"), 
+             xend = as.Date("2023-07-23"), 
+             y = 2, yend = 1.75,
+             curvature = -0.25,
+             arrow = arrow(angle = 25,
+                           length = unit(0.75, "lines")),
+             color = "#310873") +
+  annotate("text", 
+           x = as.Date("2023-08-23") - .5,
+           y = 2.25,
+           label = "Wound Infection Noticed",
+           family = "Changa",
+           size = 3.25,
+           color = "#310873",
+           angle = 90) +
+  annotate("text", 
+           x = as.Date("2023-09-16") - .5,
+           y = 2.8,
+           label = "Bactrim\nStarted\n& Ended",
+           family = "Changa",
+           color = "#310873") +
+  geom_curve(x = as.Date("2023-09-17"), 
+             xend = as.Date("2023-09-23"), 
+             y = 3.2, yend = 3.3,
+             curvature = -0.25,
+             arrow = arrow(angle = 25,
+                           length = unit(0.5, "lines")),
+             color = "#310873") +
+  geom_curve(x = as.Date("2023-09-19"), 
+             xend = as.Date("2023-09-24") + 9, 
+             y = 2.35, yend = 2.25,
+             curvature = 0.25,
+             arrow = arrow(angle = 25,
+                           length = unit(0.65, "lines")),
+             color = "#310873") +
+  annotate("text", 
+           x = as.Date("2023-10-12") - .5,
+           y = 2.4,
+           label = "Clindamycin & Rifampin Started",
+           family = "Changa",
+           size = 3.25,
+           color = "#310873",
+           angle = 90) +
+  annotate("text", 
+           x = as.Date("2023-10-27") - .5,
+           y = 2.25,
+           label = "Clindamycin Stopped",
+           family = "Changa",
+           size = 3.25,
+           color = "#310873",
+           angle = 90) +
+  annotate("text", 
+           x = as.Date("2023-11-10") - .5,
+           y = 2.25,
+           label = "Rifampin Stopped",
+           family = "Changa",
+           size = 3.25,
+           color = "#310873",
+           angle = 90) +
+  annotate("text", 
+           x = as.Date("2023-11-17") - .5,
+           y = 2.25,
+           label = "Doxy Started",
+           family = "Changa",
+           size = 3.25,
+           color = "#310873",
+           angle = 90) +
+  annotate("text", 
+           x = as.Date("2023-12-05") + .25,
+           y = 2.25,
+           label = "Missed Doxy",
+           family = "Changa",
+           size = 3.25,
+           color = "#310873",
+           angle = 90) +
+  annotate("text", 
+           x = as.Date("2023-12-19") - .5,
+           y = 2.2,
+           label = "Surgical\nCyst\nRemoval",
+           family = "Changa",
+           color = "#310873") +
+  geom_curve(x = as.Date("2023-12-20") - .5, 
+             xend = as.Date("2023-12-27"), 
+             y = 2.6, yend = 2.85,
+             curvature = -0.25,
+             arrow = arrow(angle = 25,
+                           length = unit(0.75, "lines")),
+             color = "#310873") +
+  annotate("text", 
+           x = as.Date("2024-01-25") - .5,
+           y = 2.3,
+           label = "Doxy\nEnded",
+           family = "Changa",
+           color = "#310873") +
+  geom_curve(x = as.Date("2024-01-25"), 
+             xend = as.Date("2024-01-31"), 
+             y = 2.5, yend = 2.75,
+             curvature = -0.25,
+             arrow = arrow(angle = 25,
+                           length = unit(0.75, "lines")),
+             color = "#310873") +
+  annotate("text", 
+           x = as.Date("2024-07-08") - .5,
+           y = 2,
+           label = "Doxy\nStarted",
+           family = "Changa",
+           color = "#310873") +
+  geom_curve(x = as.Date("2024-07-08"), 
+             xend = as.Date("2024-07-16"), 
+             y = 2.2, yend = 2.55,
+             curvature = -0.25,
+             arrow = arrow(angle = 25,
+                           length = unit(0.75, "lines")),
+             color = "#310873") +
+  annotate("text", 
+           x = as.Date("2024-07-28") - .5,
+           y = 2.5,
+           label = "Doxy\nEnded",
+           family = "Changa",
+           color = "#310873") +
+  geom_curve(x = as.Date("2024-07-28"), 
+             xend = as.Date("2024-08-03"), 
+             y = 2.7, yend = 2.95,
+             curvature = -0.25,
+             arrow = arrow(angle = 25,
+                           length = unit(0.75, "lines")),
+             color = "#310873") +
+  geom_point(size = 6, 
+             shape = 22) +
+  scale_x_date(breaks = date_breaks(width = "17 days"),
+               limits = c(as.Date("2023-05-08"), today()),
+               labels = date_format("%b %e"),
+               expand = expansion(mult = c(0.02,0.02), 
+                                  add = c(0.02,0.02))) +
+  scale_y_continuous(expand = expansion(mult = c(0,0), 
+                                  add = c(0,0))) +
+  scale_fill_manual(values = colors) +
+  scale_color_manual(values = c("#CC0AA4", "#7400CC")) +
+  coord_cartesian(xlim = c(as.Date("2023-05-08"), today())) +
+  labs(color = NULL,
+       fill = NULL,
+       title = "Skin Cysts") +
+  th_med +
+  theme(panel.grid.major = element_blank(),
+        axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        legend.position = "top")
+  
+# sym %>% 
+#   filter(cyst == 1,
+#          date > (today() - 90)) %>% 
+#   ggplot(aes(date, cyst, 
+#              color = activeCyst,
+#              fill = activeCyst)) +
+#   geom_vline(xintercept = c(as.Date("2023-10-29"), # mycin end
+#                             as.Date("2023-11-12"), # rifampin end
+#                             as.Date("2023-11-19"), # doxy start
+#                             as.Date("2023-12-28")), # cyst removal
+#              linewidth = .75,
+#              linetype = "longdash",
+#              color = "#310873") +
+#   annotate("rect",
+#            xmin = as.Date("2023-12-04"),
+#            xmax = as.Date("2023-12-07"),
+#            ymin = min(sym$cyst), 
+#            ymax = 3.75,
+#            fill = "#B785DD",
+#            alpha = .5) +
+#   annotate("text", 
+#            x = as.Date("2023-10-28"),
+#            y = 2.25,
+#            label = "Clindamycin Stopped",
+#            family = "Changa",
+#            size = 3.25,
+#            color = "#310873",
+#            angle = 90) +
+#   annotate("text", 
+#            x = as.Date("2023-11-11"),
+#            y = 2.25,
+#            label = "Rifampin Stopped",
+#            family = "Changa",
+#            size = 3.25,
+#            color = "#310873",
+#            angle = 90) +
+#   annotate("text", 
+#            x = as.Date("2023-11-23"),
+#            y = 2.5,
+#            label = "Doxy\nStarted",
+#            family = "Changa",
+#            color = "#310873") +
+#   geom_curve(x = as.Date("2023-11-23"), 
+#              xend = as.Date("2023-11-19") + .5, 
+#              y = 2.2, yend = 1.95,
+#              curvature = -0.25,
+#              arrow = arrow(angle = 25,
+#                            length = unit(0.75, "lines")),
+#              color = "#310873") +
+#   annotate("text", 
+#            x = as.Date("2023-12-05") + .4,
+#            y = 2.25,
+#            label = "Missed Doxy",
+#            family = "Changa",
+#            size = 3.25,
+#            color = "#310873",
+#            angle = 90) +
+#   annotate("text", 
+#            x = as.Date("2023-12-24"),
+#            y = 1.6,
+#            label = "Surgical\nCyst\nRemoval",
+#            family = "Changa",
+#            color = "#310873") +
+#   geom_curve(x = as.Date("2023-12-24"), 
+#              xend = as.Date("2023-12-27") + .5, 
+#              y = 2, yend = 2.25,
+#              curvature = -0.25,
+#              arrow = arrow(angle = 25,
+#                            length = unit(0.75, "lines")),
+#              color = "#310873") +
+#   geom_point(size = 6, 
+#              shape = 22) +
+#   scale_x_date(breaks = date_breaks(width = "1 week"),
+#                limits = c((today() - 90), today()),
+#                labels = date_format("%b %e"),
+#                expand = expansion(mult = c(0.02,0.02), 
+#                                   add = c(0.02,0.02))) +
+#   scale_y_continuous(expand = expansion(mult = c(0,0), 
+#                                   add = c(0,0))) +
+#   scale_fill_manual(values = colors) +
+#   scale_color_manual(values = c("#CC0AA4", "#7400CC")) +
+#   labs(color = NULL,
+#        fill = NULL,
+#        title = NULL,
+#        subtitle = "Last 90 days") +
+#   th_med +
+#   theme(panel.grid.major = element_blank(),
+#         axis.title = element_blank(),
+#         axis.text.y = element_blank(),
+#         legend.position = "top")
+  
+
+```
+
+### Digestion
+
+```{r poops}
+#| fig-height: 4
+#| fig-width: 12
+
+poop <- sym %>% 
+  drop_na(`Bowel Movements`) %>% 
+  mutate(healthy = ifelse(str_detect(`Bowel Movements`, "Healthy"), 
+                          "Healthy", "Not Healthy"),
+         gassy = ifelse(str_detect(`Bowel Movements`, "Gassy"), 
+                        "Gassy", "Not Gassy"),
+         frequent = ifelse(str_detect(`Bowel Movements`, "Frequent"),
+                           "Frequent", "Not Frequent"),
+         diarrhea = ifelse(str_detect(`Bowel Movements`, "Diarrhea"),
+                           "Diarrhea", "No Diarrhea"),
+         difficult = ifelse(str_detect(`Bowel Movements`, "Difficult"),
+                           "Difficult", "Not Difficult"),
+         number = factor(`Number of Bowel Movements`))
+
+poop %>% 
+  ggplot() +
+  geom_point(aes(date, healthy, 
+                 color = gassy, 
+                 fill = gassy, 
+                 size = number, 
+                 shape = diarrhea)) + 
+  geom_vline(xintercept = c(as.Date("2023-10-14"), 
+                            as.Date("2023-10-29"),
+                            as.Date("2023-11-12")),
+             linewidth = .75,
+             linetype = "longdash",
+             color = "#310873") +
+  geom_vline(data = peri,
+             aes(xintercept = date),
+             color = "#CC0AA4", 
+             linewidth = 1.5,
+             alpha = .2) +
+  annotate(geom = "text",
+           x = as.Date("2024-02-27"), y = 2.3, 
+           label = "period",
+           size = 3,
+           family = "Changa",
+           color = "#310873") +
+  annotate("text", 
+           x = as.Date("2023-10-05") - .25,
+           y = 1.45,
+           label = "Clindamycin\n& Rifampin\nStarted",
+           family = "Changa",
+           color = "#310873",
+           size = 3.5) +
+  geom_curve(x = as.Date("2023-10-06"), 
+             xend = as.Date("2023-10-14") - .75, 
+             y = 1.7, yend = 1.8,
+             curvature = -0.25,
+             arrow = arrow(angle = 25,
+                           length = unit(0.75, "lines")),
+             color = "#310873",
+             size = .85) +
+  annotate("text", 
+           x = as.Date("2023-10-27") + .25,
+           y = 1.85,
+           label = "Clindamycin Stopped",
+           family = "Changa",
+           size = 3.25,
+           color = "#310873",
+           angle = 90) +
+  annotate("text", 
+           x = as.Date("2023-11-10") + .25,
+           y = 1.85,
+           label = "Rifampin Stopped",
+           family = "Changa",
+           size = 3.25,
+           color = "#310873",
+           angle = 90) +
+  scale_x_date(breaks = date_breaks(width = "2 weeks"),
+               limits = c(as.Date("2023-08-06"), today()),
+               labels = date_format("%b %e"),
+               expand = expansion(mult = c(0.02,0.02), 
+                                  add = c(0.02,0.02))) +
+  scale_shape_manual(values = c(21,24), limits = rev) +
+  scale_size_manual(values = seq(0,20,1.5), guide = "none") +
+  labs(shape = NULL,
+       size = NULL) +
+  new_scale("shape") +
+  new_scale("size") +
+  geom_point(data = poop %>% 
+               filter(difficult == "Difficult"), 
+             aes(date, healthy, 
+                 color = gassy, 
+                 fill = gassy, 
+                 shape = difficult,
+                 size = number)) + 
+  scale_y_discrete(limits = rev) +
+  scale_fill_manual(values = colors_, limits = rev) +
+  scale_color_manual(values = colors_, limits = rev) +
+  scale_size_manual(values = seq(4,24,1.5), guide = "none") +
+  scale_shape_manual(values = c(13,1)) +
+  labs(x = NULL,
+       y = NULL,
+       color = NULL,
+       fill = NULL,
+       size = NULL,
+       shape = NULL,
+       title = "Bowel Movements",
+       subtitle = "Sized by Frequency") +
+  guides(shape = guide_legend(override.aes = list(size = 6)),
+         fill = guide_legend(override.aes = list(size = 6)),
+         color = guide_legend(override.aes = list(size = 6))) +
+  th_med +
+  theme(panel.grid.major = element_blank(),
+        axis.title = element_blank(),
+        axis.text.y = element_text(size = 10,
+                                   family = "Changa"),
+        legend.position = "top")
+
+```
+
+### Reproductive
+
+```{r periods}
+#| fig-height: 4
+#| fig-width: 12
+
+periods <- sym %>% 
+  select(date, starts_with("period")) %>% 
+  filter(period == "Yes") 
+
+start_days <- periods %>% 
+  filter(period_day == 1) %>% 
+  mutate(days_since = as.numeric(date - lag(date))) 
+
+# start_days %>% 
+#   mean(days_since)
+
+s <- as.numeric(today() - as.numeric(max(start_days$date)))
+
+sym %>% 
+  filter(date > min(periods$date)) %>% 
+  ggplot(aes(date, period_pain)) +
+  geom_point(aes(fill = period_flow, color = period_flow),
+             size = 5,
+             shape = 23) +
+  geom_line(linewidth = 1, 
+            lineend = "round",
+            color = "#310873",
+            linetype = "longdash") +
+  scale_x_date(breaks = date_breaks(width = "1 week"),
+               labels = date_format("%b %e"),
+               expand = expansion(mult = c(0.02,0.02), 
+                                  add = c(0.02,0.02))) +
+  scale_y_continuous(limits = c(1,10), 
+                     breaks = seq(2,10,2)) +
+  scale_color_steps2(low = "#FFF4FB",
+                     mid = "#CC0AA4",
+                     high = "black",
+                     midpoint = 7.5,
+                     breaks = seq(2,10,2)) +
+  scale_fill_steps2(low = "#FFF4FB",
+                     mid = "#CC0AA4",
+                     high = "black",
+                     midpoint = 7.5,
+                     breaks = seq(2,10,2)) +
+  coord_cartesian(xlim = c(min(periods$date), today())) +
+  labs(x = NULL,
+       y = "Pain Level",
+       color = str_wrap("Flow Level", 5),
+       fill = str_wrap("Flow Level", 5),
+       title = "Period Pain and Flow Tracker") +
+  th_med +
+  theme(panel.grid.major.x = element_blank(),
+        legend.text = element_text(color = "#310873", 
+                                   size = 10, 
+                                   family = "Cambria"),
+        legend.title = element_text(color = "#310873", 
+                                   size = 12, 
+                                   family = "Changa"))
+
+```
+:::
+
+**`r s`** days since the start of my last period on `r format(max(start_days$date), format = "%b %e")`.
+
+### Interactive
+
+::: column-page
+This graph is interactive.
+
+-   Click each symptom in the legend to toggle visibility.
+-   Double click to toggle only the selected symptom, or double click in the panel to revert to the original.
+-   Click and drag areas of the panel to zoom in; double click to zoom out.
+
+```{r interactive}
+#| fig-height: 6
+
+symplot <- pain %>% 
+  ggplot() +
+  geom_vline(data = k,
+             aes(xintercept = date,
+                 text = "Ketamine Treatment"),
+             color = "#FFFFBB", 
+             linewidth = 1.5) +
+  geom_vline(data = rb,
+             aes(xintercept = date,
+                 text = "Rainbow Gathering"),
+             color = "#3ACC14", 
+             linewidth = 2,
+             alpha = .3) +
+  geom_vline(data = peri,
+             aes(xintercept = date,
+                 text = "Bleeding"),
+             color = "#CC0AA4", 
+             linewidth = 2,
+             alpha = .2) +
+  # geom_text(data = k,
+  #           aes(date, .15, 
+  #               label = "k",
+  #               text = "Ketamine Treatment"),
+  #           size = 3,
+  #          family = "Changa",
+  #          color = "#310873") +
+  geom_line(aes(date, value, 
+                color = sym_label,
+                linetype = sym_label), 
+            linewidth = 1) +
+  geom_point(aes(date, value, 
+                 color = sym_label,
+                 text = tip_line), 
+             size = .1) +
+  geom_point(data = pain %>% filter(point_value == 1, 
+                                    name == "overall"), 
+             aes(date, case_when(dummies == "Nightmares" ~ 1.85,
+                                 dummies == "S.I." ~ 1.4,
+                                 dummies == "Skin Cyst" ~ .95,
+                                 dummies == "Swimming" ~ .5),
+                 fill = dummies,
+                 text = tip_point),
+             size = 3, alpha = .75) +
+  scale_x_date(#breaks = date_breaks(width = "7 days"),
+               labels = date_format("%b %e"),
+               expand = expansion(mult = c(0,0), add = c(0,0))) +
+  scale_y_continuous(breaks = seq(0,10,2)) +
+  scale_color_manual(values = colors,
+                     limits = c("Overall pain", "Forearm pain", 
+                                "Back pain", "Fatigue",
+                                "Depression", "Anxiety", 
+                                "Focus Issues", "Legs", 
+                                "Dizziness", "Headache",
+                                "Productivity")) +
+  scale_linetype_manual(values = c("solid", "twodash", 
+                                   "twodash", "twodash", 
+                                   "twodash", "twodash", 
+                                   "twodash", "twodash", 
+                                   "twodash", "twodash",
+                                   "dotted"), 
+                        limits = c("Overall pain", "Forearm pain", 
+                                   "Back pain", "Fatigue",
+                                   "Depression", "Anxiety", 
+                                   "Focus Issues", "Legs", 
+                                   "Dizziness", "Headache",
+                                   "Productivity")) +
+  scale_fill_manual(values = c("#456699", "#CC1F14", "#CC1483", "#0CEBFF")) +
+  scale_shape_manual(values = c(21,22,23)) +
+  labs(x = NULL,
+       y = "Severity Level",
+       color = NULL,
+       fill = NULL,
+       linetype = NULL,
+       title = "Daily Symptoms") +
+  theme_light() + 
+  theme(panel.border = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#9DDD99"),
+        axis.text = element_text(color = "#310873",
+                                 family = "Cambria"),
+        axis.title = element_text(color = "#310873"),
+        axis.ticks = element_blank(),
+        plot.title = element_text(color = "#310873",
+                                  size = 14,
+                                  face = "bold"))
+
+p <- ggplotly(symplot, tooltip = "text", dynamicTicks = TRUE) 
+
+p$x$data[[1]]$legendgroup <- p$x$data[[1]]$name
+p$x$data[[1]]$name <- "Ketamine"
+
+p$x$data[[2]]$legendgroup <- p$x$data[[2]]$name
+p$x$data[[2]]$name <- "Rainbow"
+
+p$x$data[[3]]$legendgroup <- p$x$data[[3]]$name
+p$x$data[[3]]$name <- "Bleeding"
+
+p$x$data[[4]]$legendgroup <- p$x$data[[4]]$name
+p$x$data[[4]]$name <- "Anxiety"
+
+p$x$data[[5]]$legendgroup <- p$x$data[[5]]$name
+p$x$data[[5]]$name <- "Back Pain"
+
+p$x$data[[6]]$legendgroup <- p$x$data[[6]]$name
+p$x$data[[6]]$name <- "Depression"
+
+p$x$data[[7]]$legendgroup <- p$x$data[[7]]$name
+p$x$data[[7]]$name <- "Dizziness"
+
+p$x$data[[8]]$legendgroup <- p$x$data[[8]]$name
+p$x$data[[8]]$name <- "Fatigue"
+
+p$x$data[[9]]$legendgroup <- p$x$data[[9]]$name
+p$x$data[[9]]$name <- "Focus Issues"
+
+p$x$data[[10]]$legendgroup <- p$x$data[[10]]$name
+p$x$data[[10]]$name <- "Forearm pain"
+
+p$x$data[[11]]$legendgroup <- p$x$data[[11]]$name
+p$x$data[[11]]$name <- "Headache"
+
+p$x$data[[12]]$legendgroup <- p$x$data[[12]]$name
+p$x$data[[12]]$name <- "Legs"
+
+p$x$data[[13]]$legendgroup <- p$x$data[[13]]$name
+p$x$data[[13]]$name <- "Overall Pain"
+
+p$x$data[[14]]$legendgroup <- p$x$data[[14]]$name
+p$x$data[[14]]$name <- "Productivity"
+
+p$x$data[[26]]$legendgroup <- p$x$data[[26]]$name
+p$x$data[[26]]$name <- "Nightmares"
+
+p$x$data[[27]]$legendgroup <- p$x$data[[27]]$name
+p$x$data[[27]]$name <- "S.I."
+
+p$x$data[[28]]$legendgroup <- p$x$data[[28]]$name
+p$x$data[[28]]$name <- "Skin Cyst"
+
+p$x$data[[29]]$legendgroup <- p$x$data[[29]]$name
+p$x$data[[29]]$name <- "Swimming"
+
+p
+
+```
+:::
+
+# Storytime
+
+```{r story}
+#| fig-height: 18
+
+p2 <- pain %>% 
+  filter(name != "dizziness",
+         name != "leg",
+         name != "productivity") %>% 
+  mutate(sym_label = str_wrap(sym_label, 8),
+         value = factor(value)) 
+
+p2 %>% 
+  ggplot() +
+  geom_tile(aes(sym_label, date, 
+                fill = sym_label)) +
+  geom_tile(aes(sym_label, date,
+                alpha = value),
+            fill = "white") +
+  scale_alpha_manual(values = c("1" = .95,
+                                "2" = .85,
+                                "3" = .5,
+                                "4" = .25,
+                                "5" = .01,
+                                "6" = 0,
+                                "7" = 0,
+                                "8" = 0,
+                                "9" = 0,
+                                "10" = 0),
+                     guide = "none") +
+  new_scale("alpha") +
+  geom_tile(aes(sym_label, date,
+                alpha = value),
+            fill = "black") +
+  scale_alpha_manual(values = c("1" = 0,
+                                "2" = 0,
+                                "3" = 0,
+                                "4" = 0,
+                                "5" = 0,
+                                "6" = 0,
+                                "7" = .05,
+                                "8" = .1,
+                                "9" = .5,
+                                "10" = .5),
+                     guide = "none") +
+  geom_tile(data = p2 %>% filter(value != "10",
+                                 value != "1"),
+            aes(sym_label, date,
+                fill = sym_label),
+            alpha = .075) +
+  scale_x_discrete(position = "top") +
+  scale_y_date(breaks = date_breaks(width = "2 weeks"),
+               labels = date_format("%b %d"),
+               expand = c(0,0)) +
+  scale_fill_manual(values = colors3, 
+                    guide = "none") +
+  labs(x = NULL,
+       y = NULL,
+       alpha = NULL,
+       title = "Symptoms Tell the Story") +
+  th_med +
+  theme(panel.grid.major.y = element_blank(),
+        axis.text.x = element_text(family = "Changa", 
+                                   size = 11))
+
+ggsave("story.jpg", height = 18, width = 6.5,
+       device = png, type = "cairo", dpi = 300)
+
+```
+
+## Location Based Mood
+
+```{r states}
+
+sts <- sym %>% 
+  group_by(state) %>% 
+  summarise(mean_mood = mean(mood),
+            mean_angst = mean(anxiety),
+            mean_head = mean(headache),
+            mean_focus = mean(focus),
+            mean_prod = mean(productivity),
+            mean_pain = mean(overall),
+            mean_back = mean(back),
+            mean_arm = mean(forearm),
+            mean_fati = mean(fatigue),
+            n = n()) %>% 
+  filter(n > 2)
+
+saveRDS(sts, "sts.rds")
+
+sts_k <- sym %>% 
+  group_by(state, after_k) %>% 
+  summarise(mean_mood = mean(mood),
+            mean_angst = mean(anxiety),
+            mean_head = mean(headache),
+            mean_focus = mean(focus),
+            mean_prod = mean(productivity),
+            mean_pain = mean(overall),
+            mean_back = mean(back),
+            mean_arm = mean(forearm),
+            mean_fati = mean(fatigue),
+            n = n()) %>% 
+  filter(n > 2)
+
+sts_k %>% 
+  ggplot(aes(reorder(state, mean_mood), mean_mood, 
+             fill = state, color = after_k)) +
+  geom_col(position = position_dodge(width = .5)) +
+  scale_y_continuous(breaks = seq(0,10,2), 
+                     limits = c(0,10)) +
+  scale_fill_manual(values = colors) +
+  scale_color_manual(values = c("white", "white"), guide = "none") +
+  annotate("text",
+           x = 6.86,
+           y = 4.45,
+           label = "Before K Treatment",
+           angle = 90,
+           family = "Cambria",
+           color = "white",
+           size = 4.5) +
+  annotate("text",
+           x = 7.11,
+           y = 1.11,
+           label = "After",
+           angle = 90,
+           family = "Cambria",
+           color = "white",
+           size = 4.5) +
+  labs(x = NULL,
+       y = "Average Depression Severity",
+       fill = NULL,
+       color = NULL,
+       title = "Depression by State",
+       subtitle = "for states where I spent more than 2 days") +
+  th_med +
+  theme(panel.grid.major.x = element_blank())
+
+ggsave("states_mood.jpg", height = 8 / 1.618, width = 8,
+       device = png, type = "cairo", dpi = 300)
+
+sts_k %>% 
+  ggplot(aes(reorder(state, mean_angst), mean_angst, 
+             fill = state, color = after_k)) +
+  geom_col(position = position_dodge(width = .5)) +
+  scale_y_continuous(breaks = seq(0,10,2), 
+                     limits = c(0,10)) +
+  scale_fill_manual(values = colors) +
+  scale_color_manual(values = c("white", "white"), guide = "none") +
+  annotate("text",
+           x = 7.875,
+           y = 4.9,
+           label = "Before K Treatment",
+           angle = 90,
+           family = "Cambria",
+           color = "white",
+           size = 4) +
+  annotate("text",
+           x = 8.125,
+           y = 1.55,
+           label = "After",
+           angle = 90,
+           family = "Cambria",
+           color = "white",
+           size = 4) +
+  labs(x = NULL,
+       y = "Average Anxiety Severity",
+       fill = NULL,
+       title = "Anxiety by State",
+       subtitle = "for states where I spent more than 2 days") +
+  th_med +
+  theme(panel.grid.major.x = element_blank())
+
+ggsave("states_angst.jpg", height = 8 / 1.618, width = 8,
+       device = png, type = "cairo", dpi = 300)
+
+```
+
+# Correlations and other stats
+
+## Ketamine
+
+```{r k}
+
+since <- as.numeric(today() - k_end - 1)
+
+before <- sym %>% 
+  filter(date < k_start,
+         date > (k_start - since)) %>% 
+  summarise(n = n()) %>% 
+  pluck(1,1)
+
+after <- sym %>% 
+  filter(date > k_end,
+         date < as.Date("2024-06-22")) %>% 
+  summarise(n = n()) %>% 
+  pluck(1,1)
+
+night_before <- sym %>% 
+  filter(date < k_start,
+         date > (k_start - since)) %>% 
+  group_by(night) %>% 
+  summarise(n = n()) %>% 
+  pluck(2,2)
+
+night_after <- sym %>% 
+  filter(date > k_end) %>% 
+  group_by(night) %>% 
+  summarise(n = n()) %>% 
+  pluck(2,2)
+
+si_before <- sym %>% 
+  filter(date < k_start,
+         date > (k_start - since)) %>% 
+  group_by(si) %>% 
+  summarise(n = n()) %>% 
+  pluck(2,2)
+
+si_after <- sym %>% 
+  filter(date > k_end) %>% 
+  group_by(si) %>% 
+  summarise(n = n()) %>% 
+  pluck(2,2) 
+
+si_after <- ifelse(is.null(si_after), 0, si_after)
+
+k_si_night_ <- data.frame(name = c("Nightmares", "Nightmares",
+                                   "Suicidal Ideation", "Suicidal Ideation"),
+                          time = c("Before", "After",
+                                   "Before", "After"),
+                          value = c(night_before, night_after,
+                                    si_before, si_after))
+
+k_si_night <- k_si_night_ %>% 
+  mutate(rate = (value / (since)) * 100)
+
+k_si_night %>% 
+  ggplot(aes(name, rate, fill = reorder(time, desc(time)))) +
+  geom_col(position = position_dodge()) +
+  geom_text(data = k_si_night %>% filter(time == "Before"),
+            aes(name,
+                rate + 2, 
+                label = paste0(round(rate, 1), "%")),
+            family = "Changa",
+            size = 8,
+            color = "#CC0AA4",
+            nudge_x = -.2) +
+  geom_text(data = k_si_night %>% filter(time == "After"),
+            aes(name,
+                rate + 2, 
+                label = paste0(round(rate, 1), "%")),
+            family = "Changa",
+            size = 7.5,
+            color = "#CC0AA4",
+            nudge_x = .24) +
+  scale_y_continuous(labels = label_percent(scale = 1),
+                     breaks = seq(0, 100, 5)) +
+  scale_fill_manual(values = colors_) +
+  labs(x = NULL,
+       y = "Rate",
+       fill = NULL,
+       title = "Nightmares and S.I. Before and After Ketamine Treatment",
+       caption = paste0("Before includes 190 days before treatment began; After includes 190 days since treatment ended.")) +
+  th_med +
+  theme(panel.grid.major.x = element_blank(),
+        legend.position = "bottom",
+        axis.text.x = element_text(family = "Changa",
+                                   size = 12))
+
+ggsave("ksinight.png",
+       device = png, type = "cairo", dpi = 300,
+       width = 8, height = (8 / 1.618))
+
+```
+
+```{r k2}
+
+k_ <- sym %>% 
+  mutate(before_k = date < k_start,
+         after_k = date > k_end) %>% 
+  filter(date < k_start | date > k_end,
+         date > (k_start - (since))) %>% 
+  group_by(after_k) %>% 
+  summarise(mood = mean(mood),
+            anxiety = mean(anxiety),
+            focus = mean(focus),
+            fatigue = mean(fatigue),
+            dizziness = mean(dizziness, na.rm = TRUE),
+            headache = mean(headache)) %>% 
+  pivot_longer(c(mood:headache)) 
+
+k_2 <- k_ %>% 
+  mutate(date = ifelse(after_k == TRUE, 
+                       "After", 
+                       "Before")) %>% 
+  select(!after_k) %>% 
+  pivot_wider(names_from = date, 
+              values_from = value) %>% 
+  mutate(change = Before - After,
+         pctChange = ((After - Before) / Before) * 100)
+
+# k_ %>% 
+#   ggplot() +
+#   geom_col(aes(name, value, fill = after_k),
+#            position = position_dodge()) +
+#   geom_text(data = k_2,
+#             aes(name,
+#                 1.15, 
+#                 label = paste0("-", round(change, 1))),
+#             family = "Changa",
+#             size = 8.5,
+#             color = "#0ACCC5") +
+#   geom_text(data = k_2,
+#             aes(name,
+#                 .4, 
+#                 label = paste0(round(pctChange, 0), "%")),
+#             family = "Changa",
+#             size = 6,
+#             color = "#0ACCC5") +
+#   geom_text(data = k_ %>% filter(after_k == FALSE),
+#             aes(name, 
+#                 value - .75,
+#                 label = round(value, 1)),
+#             family = "Changa",
+#             size = 4.5,
+#             color = "#D2B3FF",
+#             nudge_x = -.22) +
+#   geom_text(data = k_ %>% filter(after_k == TRUE),
+#             aes(name, 
+#                 value - .75,
+#                 label = round(value, 1)),
+#             family = "Changa",
+#             size = 4.5,
+#             color = "#FFD1F9",
+#             nudge_x = .22) +
+#   scale_x_discrete(labels = c("Anxiety", "Dizziness", 
+#                               "Fatigue", "Focus Issues", 
+#                               "Headache", "Depression")) + 
+#   scale_y_continuous(limits = c(0,10),
+#                      breaks = seq(2,10,2)) +
+#   scale_fill_manual(values = colors,
+#                     labels = c("Before Treatment",
+#                                "After Treatment")) +
+#   labs(x = NULL,
+#        y = "Average Value",
+#        fill = NULL,
+#        title = "Other Symptoms Before and After Ketamine Treatment",
+#        caption = paste0("Before includes 190 days before treatment began; After includes 190 days since treatment ended.")) +
+#   th_med +
+#   theme(legend.position = "bottom",
+#         panel.grid.major.x = element_blank(),
+#         axis.text.x = element_text(family = "Changa",
+#                                    size = 10))
+# 
+# ggsave("ksince.png",
+#        device = png, type = "cairo", dpi = 300,
+#        width = 8, height = (8 / 1.618))
+
+k_mh <- sym %>%
+  mutate(before_k = date < k_start,
+         after_k = date > k_end) %>%
+  filter(date < k_start | date > k_end,
+         date > (k_start - since)
+         ) %>%
+  group_by(after_k) %>%
+  summarise(mood = mean(mood),
+            anxiety = mean(anxiety),
+            focus = mean(focus)) %>%
+  pivot_longer(c(mood:focus))
+
+k_mh2 <- k_mh %>%
+  mutate(date = ifelse(after_k == TRUE,
+                       "After",
+                       "Before")) %>%
+  select(!after_k) %>%
+  pivot_wider(names_from = date,
+              values_from = value) %>%
+  mutate(change = Before - After) %>%
+  mutate(change = Before - After,
+         pctChange = ((After - Before) / Before) * 100)
+
+k_mh %>%
+  ggplot() +
+  geom_col(aes(name, value, fill = after_k),
+           position = position_dodge()) +
+  geom_text(data = k_mh2,
+            aes(name,
+                1,
+                label = paste0("-", round(change, 1))),
+            family = "Changa",
+            size = 9,
+            color = "#0ACCC5") +
+  geom_text(data = k_mh %>% filter(after_k == FALSE),
+            aes(name,
+                value - .75,
+                label = round(value, 1)),
+            family = "Changa",
+            size = 5,
+            color = "#D2B3FF",
+            nudge_x = -.22) +
+  geom_text(data = k_mh %>% filter(after_k == TRUE),
+            aes(name,
+                value - .75,
+                label = round(value, 1)),
+            family = "Changa",
+            size = 5,
+            color = "#FFD1F9",
+            nudge_x = .22) +
+  geom_text(data = k_mh2,
+            aes(name,
+                .3,
+                label = paste0(round(pctChange, 0), "%")),
+            family = "Changa",
+            size = 6,
+            color = "#0ACCC5") +
+  scale_x_discrete(labels = c("Anxiety",
+                              "Focus Issues",
+                              "Depression")) +
+  scale_y_continuous(limits = c(0,10),
+                     breaks = seq(2,10,2)) +
+  scale_fill_manual(values = colors,
+                    labels = c("Before Treatment",
+                               "After Treatment")) +
+  labs(x = NULL,
+       y = "Average Value",
+       fill = NULL,
+       title = "Before and After Ketamine Treatment",
+       caption = paste0("Before includes 190 days before treatment began; After includes 190 days since treatment ended.")) +
+  th_med +
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_blank(),
+        axis.text.x = element_text(family = "Changa",
+                                   size = 10),
+        plot.caption = element_text(size = 8))
+
+ggsave("ksince_mh.png",
+       device = png, type = "cairo", dpi = 300,
+       width = 8, height = (8 / 1.618))
+
+```
+
+## Nightmares and S.I.
+
+```{r pain-night}
+
+sin <- sym %>% 
+  select(night, si, overall) %>% 
+  mutate(both = ifelse(night == 1 & si == 1, 1, 0),
+         nightonly = ifelse(night == 1 & si == 0, 1, 0),
+         sionly = ifelse(night == 0 & si == 1, 1, 0),
+         none = ifelse(night == 0 & si == 0, 1, 0),
+         status = case_when(night == 1 & si == 1 ~ str_wrap("Nightmares and S.I.", 10),
+                            night == 1 & si == 0 ~ str_wrap("Nightmares Only", 10),
+                            night == 0 & si == 1 ~ "S.I. Only",
+                            night == 0 & si == 0 ~ str_wrap("Neither Nightmares nor S.I.", 18)))
+
+sin %>% 
+  filter(none != 1) %>% 
+  ggplot(aes(status, fill = overall, group = overall)) +
+  geom_bar() +
+  scale_y_continuous(breaks = seq(0,200,10)) +
+  scale_x_discrete(limits = rev) +
+  scale_fill_steps2(low = "#E9E4FC",
+                    mid = "#6610F2",
+                    high = "black",
+                    midpoint = 7.5,
+                    breaks = seq(1,10,1)) +
+  labs(x = NULL,
+       y = "Days",
+       fill = "Overall Pain") +
+  th_med +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(family = "Changa"),
+        panel.grid.major.x = element_blank(),
+        legend.position = "top")
+
+
+```
+
+## Density
+
+```{r ridge}
+
+pain %>% 
+  filter(name != "productivity") %>% 
+  ggplot(aes(value, sym_label)) +
+  geom_density_ridges(aes(fill = sym_label), 
+                      color = "white",
+                      alpha = .75) +
+  scale_fill_manual(values = colors,
+                    guide = "none",
+                    limits = c("Overall pain", "Forearm pain", 
+                               "Back pain", "Fatigue",
+                               "Depression", "Anxiety", "Focus Issues",
+                               "Legs", "Dizziness", "Headache")) +
+  scale_x_continuous(breaks = seq(1,10,1),
+                     limits = c(1,11.25),
+                     expand = expansion(mult = 0, add = 0)) +
+  scale_y_discrete(limits = rev) +
+  labs(x = "Severity",
+       y = NULL,
+       title = "Density of Severity Levels by Symptoms") +
+  th_med +
+  theme(panel.grid.major.x = element_line(linetype = "dotted", 
+                                          color = "#FFD1F9"))
+
+```
+
+## Pain and Mood
+
+```{r pain-mood2}
+
+fmt1 <- "~ {p == %.3f}"
+
+mod <- lm(mood ~ overall, data = sym)
+sum <- summary(mod)
+lab <- sprintf(fmt1, coef(sum)[8])
+
+sym %>% 
+  ggplot(aes(overall, mood)) +
+  geom_smooth(method = "lm", 
+              color = "#7400CC", 
+              fill = "#CCB1FA") +
+  geom_jitter(aes(color = anxiety), 
+              size = 3, 
+              alpha = .75,
+              position = position_jitter(width = 0.35, 
+                                         height = 0.35, 
+                                         seed = 80085)) +
+  annotate("text", x = 9.5, y = 1.5, 
+           label = lab, 
+           parse = TRUE, 
+           hjust = 0, 
+           color = "#7400CC", 
+           family = "Cambria", 
+           size = 5) +
+  scale_x_continuous(limits = c(4,10.5), 
+                     breaks = seq(1,10,1)) +
+  scale_y_continuous(limits = c(1,10.5), 
+                     breaks = seq(1,10,1)) +
+  scale_color_steps2(low = "#E9E4FC",
+                     mid = "#6610F2",
+                     high = "black",
+                     midpoint = 7.5) +
+  labs(x = "Overall Pain",
+       y = "Depression",
+       fill = "Anxiety",
+       title = "Overall pain and Depressed mood") +
+  th_med
+
+
+```
+
+```{r si}
+#| label: tbl-si
+#| tbl-cap: "Pain and S.I."
+
+model <- lm(si ~ overall,
+            data = sym)
+model2 <- lm(si ~ forearm,
+             data = sym)
+model3 <- lm(si ~ back,
+             data = sym)
+
+my_gof <- tribble(
+  ~raw, ~clean, ~fmt,
+  "nobs", "N", 0)
+
+modelsummary(list(model, model2, model3),
+             output = "kableExtra",
+             estimate = "{estimate}{stars}",
+             statistic = "statistic",
+             fmt =  2,
+             gof_map = my_gof) %>% 
+  row_spec(c(3,5,7), background = "#CCB1FA")
+
+```
+
+```{r pain-si}
+#| fig-height: 6
+
+# sym %>% 
+#   ggplot(aes(si)) +
+#   geom_density(fill = "#7400CC") +
+#   th_med
+# 
+# m1 <- stan_glm(si ~ mood, 
+#                data = sym, 
+#                family = binomial,
+#                chains = 4, iter = 5000*2, seed = 84735)
+# 
+# tidy(m1)
+# 
+# color_scheme_set("purple")
+# ppc_dens_overlay(y = sym$si,
+#                  yrep = posterior_predict(m1, 
+#                                           draws = 50)) +
+#   th_med
+# 
+# mood_b <- k_2 %>% 
+#   pluck(2,1)
+# mood_a <- k_2 %>% 
+#   pluck(3,1)
+# 
+# mini <- expand_grid(mood = c(mood_b, mood_a))
+# 
+# m1 %>%
+#   gather_draws(mood) %>%
+#   ggplot(aes(.value, .variable)) +
+#   stat_dotsinterval(.width = c(.8,.95),
+#                     color = "#7400CC",
+#                     size = 5) +
+#   # scale_y_continuous(limits = c(0,1),
+#   #                    breaks = seq(0,1,.2),
+#   #                    labels = label_percent()) +
+#   th_med
+
+set.seed(05062023)
+
+fmt <- "%s: ~ {p == %.3f}"
+
+mod1o <- lm(si ~ overall, data = sym)
+sum1o <- summary(mod1o)
+lab1o <- sprintf(fmt, "S.I. (pink)", coef(sum1o)[8])
+
+mod2o <- lm(night ~ overall, data = sym)
+sum2o <- summary(mod2o)
+lab2o <- sprintf(fmt, "Nightmares (purple)", coef(sum2o)[8])
+
+mod1f <- lm(si ~ forearm, data = sym)
+sum1f <- summary(mod1f)
+lab1f <- sprintf(fmt, "S.I. (pink)", coef(sum1f)[8])
+
+mod2f <- lm(night ~ forearm, data = sym)
+sum2f <- summary(mod2f)
+lab2f <- sprintf(fmt, "Nightmares (purple)", coef(sum2f)[8])
+
+lab1 <- "S.I."
+lab2 <- "Nightmares"
+
+min_both <- min(c(min(sym$overall), min(sym$forearm)))
+
+o <- sym %>% 
+  ggplot(aes(overall, si)) +
+  geom_smooth(aes(overall, night), 
+              method = "lm", 
+              color = "#7400CC", 
+              fill = "#CCB1FA") +
+  geom_smooth(method = "lm", 
+              color = "#CC0AA4", 
+              fill = "#FFD1F9") +
+  geom_jitter(aes(color = productivity), 
+              size = 3, 
+              position = position_jitter(width = .35, 
+                                         height = .35)) +
+  annotate("text", 
+           x = min_both + .5,
+           y = c(1.2, 1),
+           label = c(lab1, lab2),
+           parse = TRUE, 
+           hjust = 0, 
+           color = c("#CC0AA4", "#7400CC"), 
+           family = "Cambria", 
+           face = "bold",
+           size = 4) +
+  scale_x_continuous(breaks = seq(1,10,1),
+                     expand = expansion(mult = c(0.01,0.01), 
+                                        add = c(0.01,0.01))) +
+  scale_y_continuous(breaks = seq(0,1,1), 
+                     labels = c("No", "Yes")) +
+  coord_cartesian(xlim = c(min_both, 10.5), 
+                  ylim = c(-.25,1.5)) +
+  scale_color_stepsn(colors = c("#C3DEC8", "#A8DD9B", "#6FD555", 
+                                "#3ACC14", "#4CB045", "#2F660F"),
+                     n.breaks = 6) +
+  labs(x = "Overall Pain",
+       y = "S.I.",
+       color = "Pro-\nduct-\nivity") +
+  th_med +
+  theme(panel.grid.major.y = element_blank())
+
+f <- sym %>% 
+  ggplot(aes(forearm, si)) +
+  geom_smooth(aes(forearm, night), 
+              method = "lm", 
+              color = "#7400CC", 
+              fill = "#CCB1FA") +
+  geom_smooth(method = "lm", 
+              color = "#CC0AA4", 
+              fill = "#FFD1F9") +
+  geom_jitter(aes(color = productivity), 
+              size = 3,
+              position = position_jitter(width = 0.35, 
+                                         height = .35)) +
+  annotate("text", 
+           x = min_both + .5, 
+           y = c(1.2, 1),
+           label = c(lab1, lab2), 
+           parse = TRUE, 
+           hjust = 0, 
+           color = c("#CC0AA4", "#7400CC"), 
+           family = "Cambria", 
+           face = "bold",
+           size = 4) +
+  scale_x_continuous(breaks = seq(1,10,1),
+                     expand = expansion(mult = c(0.01,0.01), 
+                                        add = c(0.01,0.01))) +
+  scale_y_continuous(breaks = seq(0,1,1), 
+                     labels = c("No", "Yes")) +
+  coord_cartesian(xlim = c(min_both, 10.5), 
+                  ylim = c(-.25,1.5)) +
+  scale_color_stepsn(colors = c("#C3DEC8", "#A8DD9B", "#6FD555", 
+                                "#3ACC14", "#4CB045", "#2F660F"),
+                     n.breaks = 6) +
+  labs(x = "Forearm Pain",
+       y = "S.I.",
+       color = "Pro-\nduct-\nivity") +
+  th_med +
+  theme(panel.grid.major.y = element_blank())
+
+(o / f) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "left")
+
+
+```
+
+## Other Correlations
+
+```{r pain-fatigue}
+
+mod3 <- lm(fatigue ~ overall, data = sym)
+sum3 <- summary(mod3)
+lab3 <- sprintf(fmt1, coef(sum3)[8])
+
+sym %>% 
+  ggplot(aes(overall, fatigue)) +
+  geom_smooth(method = "lm", color = "#7400CC", fill = "#CCB1FA") +
+  geom_jitter(aes(color = focus), 
+              size = 3, 
+              alpha = .75,
+              position = position_jitter(width = 0.35, 
+                                         height = 0.35, 
+                                         seed = 80085)) +
+  annotate("text", 
+           x = 9.5, y = 4.5, 
+           label = lab3, 
+           parse = TRUE, 
+           hjust = 0, 
+           color = "#7400CC", 
+           family = "Cambria", 
+           size = 5) +
+  scale_x_continuous(limits = c(4,10.5), 
+                     breaks = seq(1,10,1)) +
+  scale_y_continuous(limits = c(4,10.5), 
+                     breaks = seq(1,10,1)) +
+  scale_color_steps2(low = "#E9E4FC",
+                     mid = "#6610F2",
+                     high = "black",
+                     midpoint = 7.5) +
+  labs(x = "Overall Pain",
+       y = "Fatigue",
+       fill = "Focus Issues",
+       title = "Overall Pain and Fatigue") +
+  th_med
+
+
+```
+
+```{r pain-focus}
+
+mod4 <- lm(focus ~ overall, data = sym)
+sum4 <- summary(mod4)
+lab4 <- sprintf(fmt1, coef(sum4)[8])
+
+sym %>% 
+  ggplot(aes(overall, focus)) +
+  geom_smooth(method = "lm", color = "#7400CC", fill = "#CCB1FA") +
+  geom_jitter(aes(color = fatigue), 
+              size = 3, 
+              alpha = .75,
+              position = position_jitter(width = 0.35, 
+                                         height = 0.35, 
+                                         seed = 80085)) +
+  annotate("text", 
+           x = 9.5, y = 1.5, 
+           label = lab4, 
+           parse = TRUE, 
+           hjust = 0, 
+           color = "#7400CC", 
+           family = "Cambria", 
+           size = 5) +
+  scale_x_continuous(limits = c(4,10.5), 
+                     breaks = seq(1,10,1)) +
+  scale_y_continuous(limits = c(1,10.5), 
+                     breaks = seq(1,10,1)) +
+  scale_color_steps2(low = "#E9E4FC",
+                     mid = "#6610F2",
+                     high = "black",
+                     midpoint = 8) +
+  labs(x = "Overall Pain",
+       y = "Focus Issues",
+       fill = "Fatigue",
+       title = "Overall pain and Focus issues") +
+ th_med
+
+
+```
+
+```{r fatigue-focus}
+
+mod5 <- lm(focus ~ fatigue, data = sym)
+sum5 <- summary(mod5)
+lab5 <- sprintf(fmt1, coef(sum5)[8])
+
+sym %>% 
+  ggplot(aes(fatigue, focus)) +
+  geom_smooth(method = "lm", 
+              color = "#7400CC", 
+              fill = "#CCB1FA") +
+  geom_jitter(aes(color = overall), 
+              size = 3, 
+              alpha = .75,
+              position = position_jitter(width = 0.35, 
+                                         height = 0.35, 
+                                         seed = 80085)) +
+  annotate("text", 
+           x = 9.5, y = 1.5, 
+           label = lab5, 
+           parse = TRUE, 
+           hjust = 0, 
+           color = "#7400CC", 
+           family = "Cambria", 
+           size = 5) +
+  scale_x_continuous(limits = c(4,10.5), 
+                     breaks = seq(1,10,1)) +
+  scale_y_continuous(limits = c(1,10,1), 
+                     breaks = seq(1,10,1)) +
+  scale_color_steps2(low = "#E9E4FC",
+                     mid = "#6610F2",
+                     high = "black",
+                     midpoint = 8) +
+  labs(x = "Fatigue",
+       y = "Focus Issues",
+       fill = "Overall Pain",
+       title = "Fatigue and Focus issues") +
+  th_med
+
+
+```
+
+```{r si}
+#| label: tbl-focus
+#| tbl-cap: "Focus Issues"
+
+model <- lm(focus ~ overall,
+            data = sym)
+model2 <- lm(focus ~ mood,
+             data = sym)
+model3 <- lm(focus ~ fatigue,
+             data = sym)
+
+my_gof <- tribble(
+  ~raw, ~clean, ~fmt,
+  "nobs", "N", 0)
+
+modelsummary(list(model, model2, model3),
+             output = "kableExtra",
+             estimate = "{estimate}{stars}",
+             statistic = "statistic",
+             fmt =  2,
+             gof_map = my_gof) %>% 
+  row_spec(c(3,5), background = "#CCB1FA") %>% 
+  row_spec(7, background = "#7400CC", color = "white")
+
+```
+
+# History Highlights
+
+## General info
+
+-   38 y/o
+-   Female
+-   White/Jewish
+-   Married
+-   5'5"
+-   \~297 lbs
+-   Pansexual
+-   Moderate caffeine use
+-   Every day smoker since age 14
+-   No alcohol
+-   Daily cannabis use for pain since 2016
+-   Not pregnant and no desire for children
+-   1 pregnancy, stillborn at 42 weeks 08/2006 (age 21)
+
+## Family history
+
+-   brother (32): type 1 diabetes (diagnosed at age 11), ADHD, additional mental health issues
+-   brother (36): type 1 diabetes and celiac (diagnosed in 30s)
+-   sister (27): mental health issues, obesity, chronic back pain (disk issues), hidradenitis suppuritiva
+-   father (64): obesity, gastric bypass, alcoholism, substance abuse, opiate dependency, narcissism, likely additional unknown and undiagnosed mental health issues
+-   mother (62): obesity, type 2 diabetes, arthritis
+-   paternal grandmother (deceased): lupus, bipolar
+-   paternal grandfather (deceased): unknown
+-   paternal aunt (deceased): breast cancer (diagnosed age \~40, died at age \~43)
+-   paternal aunt (deceased): unknown
+-   maternal grandmother (deceased): unknown psychiatric issues, chronic back pain, carpal tunnel syndrome, opiate dependency
+-   maternal grandfather (deceased): relatively healthy to my knowledge, died of intestinal disease (unsure of specifics)
+-   maternal uncle: unknown
+-   maternal uncle (deceased): COVID-19
+
+## Symptoms/Diagnoses
+
+-   Constant electric, shooting pain from my abdomen to my right thigh, numbness of the top and outer area of my right thigh, disrupting sleep, painful to empty bladder, reducing mobility
+    -   since 10/12/2023
+-   Chronic and increasing pain in both forearms (spreading to wrists and hands)
+    -   since 12/2021
+-   Chronic back pain varying from moderate to severe, but always present
+    -   since 2015
+-   Chronic and debilitating fatigue
+    -   since 2019
+-   Limited mobility and inability to complete many regular daily activities without assistance
+    -   since 2020
+-   Obesity and increased weight gain due to mobility issues and pain
+    -   since 2022
+-   Various other intermittent issues
+    -   Recurring subcutaneous cyst (neck)
+        -   since 02/2022
+    -   Hidradenitis suppuritiva
+        -   since 2018 (diagnosed 2022)
+    -   Cutaneous lupus
+        -   diagnosed 06/2020
+-   Mental health
+    -   GAD
+        -   since 2018
+    -   SAD/Agoraphobia
+        -   since 07/2019
+    -   Depression
+        -   since age 11
+    -   ADHD
+        -   diagnosed age 7
+    -   PTSD
+        -   since 11/2006
+    -   Nightmares
+        -   since 2005
+    -   SI
+        -   since age 11
+-   Hepatitis C
+    -   diagnosed 2011
+    -   treated with Harvoni in 2015
+    -   no viral load detected since 2015
+
+## Recent Imaging
+
+-   MRI - 11/07/2023
+    -   Brain
+        -   All clear
+    -   Lumbar
+        -   Herniated disks L3/L4/L5
+-   Back X-ray - 10/24/2023
+    -   All clear
+-   MRI - 06/08/2023
+    -   Lumbar, Thoracic, Cervical
+        -   No evidence of cord compression
+-   Chest X-ray - 06/08/2023
+    -   All clear
+-   CT - 06/07/2023
+    -   No evidence of muscle inflammation or breakdown
+-   Upper limbs X-ray - 05/31/2023
+    -   All clear
+
+# Medications and Providers
+
+```{r meds}
+
+gs4_deauth()
+
+meds <- read_sheet("https://docs.google.com/spreadsheets/d/10jHvDuHzhdgbULzjpjv14cypUSejCKa4GL92owiFsDQ/edit#gid=932747361", sheet = "meds") %>% 
+  mutate(amount = ifelse(amount > 1, as.character(round(amount, 1)), as.character(amount)))
+
+meds %>% 
+  mutate(`per day` = ifelse(is.na(`per day`), "", `per day`)) %>% 
+  gt() %>% 
+  tab_header("Current Medications") %>%
+  cols_align(align = c("center"),
+             columns = everything()) %>% 
+  cols_label(medication = html("<b>Medication</b>"),
+             amount = html("<b>Amount</b>"),
+             unit = html("<b>Unit</b>"),
+             `per day` = html("<b>Per day</b>"),
+             time = html("<b>Time of day</b>"),
+             specialty = html("<b>Prescriber</b>"),
+             reason = html("<b>Reason</b>")) 
+
+```
+
+```{r providers}
+
+gs4_deauth()
+
+drs <- read_sheet("https://docs.google.com/spreadsheets/d/10jHvDuHzhdgbULzjpjv14cypUSejCKa4GL92owiFsDQ/edit#gid=932747361", sheet = "drs") %>% 
+  select(-meds)
+
+drs %>% 
+  gt() %>% 
+  tab_header("Providers and Diagnoses") %>%
+  cols_align(align = c("center"),
+             columns = everything()) %>% 
+  cols_label(doc = html("<b>Provider</b>"),
+             specialty = html("<b>Specialty</b>"),
+             issue = html("<b>Issue(s)</b>"),
+             diagnosis = html("<b>Diagnoses</b>"),
+             last = html("<b>Last Visit</b>"),
+             `next` = html("<b>Next Visit</b>")) %>% 
+  cols_width(doc ~ pct(12.5),
+             issue ~ pct(24.5),
+             diagnosis ~ pct(37.5),
+             last ~ pct(12.5),
+             `next` ~ pct(13)) %>% 
+  fmt_date(columns = c(last, `next`),
+           date_style = "m_day_year")
+
+```
+
+# Full History
+
+I have been experiencing pain in various parts of my body for about 10 years. I have been to a variety of specialists over the past 8 years with no diagnosis other than cutaneous lupus but the rheumatologists have confirmed that it's only in my skin, and there is no indication of a flare-up causing pain.
+
+The following is an edited report from the doctor who took a full history while admitted at Emory University Hospital in June 2023:
+
+-2009 completed rehab for IV substance use (heroin, cocaine) with few relapses after 1.5 years of substance use
+
+-2010-2012 pt active, living "clean" with high attention to her diet, able to bike 50+ miles per day
+
+-2010-2013 had regular periods
+
+-2011 diagnosed with hepatitis C
+
+-2013-2014 began to have bouts of diffuse pain "flares" lasting days at a time, which would significantly limit her ability - these lasted for several days and would abate on their own
+
+-02/2013 Mirena IUD placed for contraception
+
+-06/2014 moved to Atlanta and secured housing
+
+-2014-2020 ongoing intermittent back pain and flares that incompletely self-resolved after several days
+
+-01/2015 secured medical insurance
+
+-09/2015 treated for hepatitis C infection for 3 months as part of Harvoni trial, hep C quant negative at 6 months
+
+-11/2018 first appearance of hidradenitis suppuritiva (lower abdomen)
+
+-03/2019 increased frequency of hidradenitis suppuritiva (usually under breasts, occasionally in the groin)
+
+-06/2019 SAD symptoms began, including agoraphobia
+
+-10/2019 involuntary psychiatric hospitalization for SI
+
+-04/2020 IUD removed, replaced
+
+-06/2020 noted by dermatology to have rash on the face/arms with sun sensitivity, diagnosed with cutaneous lupus
+
+-2020 started on Plaquenil
+
+-09/2020 lumbar MRI showed 3 protruding disks, decompression treatment with PT, massage, ultrasound, and electrotherapy \~8 weeks, minor temporary results
+
+-09/2020-07/2021 regular PT and worked up to 10-20 min walks almost daily
+
+-12/2021 began having BL forearm pain (first in right forearm, left began several months after)
+
+-01-08/2022 regular aquatic exercise (2-3x/week), reduced back pain
+
+-03/2022 first noticed and attempted to drain subcutaneous cyst seen on imaging, became inflamed several times with increasing size, pain, and duration
+
+-01/2023 began being much more limited by her forearm and back pain and more sedentary, requiring significant help with ADLs from partner, increased SAD symptoms including agoraphobia (and fear of driving)
+
+-02/2023 I&D in ER for subcutaneous cyst (neck)
+
+-06/2023 progressive worsening of muscle weakness, most profound and on a daily basis in last 3 months, able to walk short distances but quickly becomes fatigued and achy all over before she has to stop

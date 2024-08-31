@@ -1,0 +1,88 @@
+---
+title: "Threats to validity"
+author: "Jamie Esmond"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+bibliography: Validity.bib
+csl: "https://raw.githubusercontent.com/citation-style-language/styles/master/apa.csl"
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+    toc: yes
+  html_document: 
+    toc: yes
+    theme: journal
+  word_document: 
+    toc: yes
+---
+
+\newpage
+
+# Conditional cash transfers and education in Mexico
+
+## Internal validity
+
+1. **Selection**: The researchers address the potential for selection bias in certain situations, such as the limited wage earners in rural areas and the wages of children. For the issue with limited wage earners, additional data were needed and some assumptions about children migrating to urban areas to continue their education were made. For the wages of children, they are clear that their estimates may not be unbiased.
+2. **Attrition**: The study addresses the concern about attrition by recognizing that it is due to outmigration and age limitations. They are transparent about the fact that this may impact the representativeness of the sample for certain age groups. 
+3. **Maturation**: This research is only influenced by maturation in a negative direction (children leaving school to work). The goal of this program is to subsidize those lost earning to allow children to stay in school with the hopes of better economic outcomes as adults. If anything, maturation would minimize the impact of the program rather than inflate it.
+4. **Secular trends**: The researchers recognize the national trend in increased education over the course of the study. However, they attempt to isolate the impact of the program by controlling for poverty levels and parental education. Since the ultimate goal is to increase education in an effort to reduce poverty, putting focus on the most disadvantaged in comparison with the least disadvantage indicates the impact of the program.
+5. **Seasonality**: The benchmark surveys were conducted before the program was announced, in October 1997 and March 1998. The final survey was conducted in November 1999. Since all of these months fall within the school year, seasonality should not impact the validity of the responses.
+6. **Testing**: Testing is not used in this study, instead the enrollment rates for each grade level are reported both before and after the program.
+7. **Regression to the mean**: Because this program targets chronically poor families, it is unlikely that a change in education engagement would be a regression to the mean since these families had largely been experiencing generational poverty.
+8. **Measurement error**: To ensure that the possibility of measurement error was accounted for, the article published the effect of the program for both exogenous and endogenous assumptions.
+9. **Time frame of study**: This study is assessing the impact of the program more than one whole school year after it was implemented. Considering the intended impact of the program was to maintain school enrollment, the validity of this factor is not addressed. The impact of a program designed to help children continue their education instead of joining the workforce may not be evident after only one year of implementation. Since school retention diminishes as children get older, it may take more time to detect the true impact. 
+10. **Hawthorne effects**: The article does not address this issue.
+11. **John Henry effects**: The article does not address this issue, but the localities were randomly chosen before the program was announced, so there may have not been widespread awareness in the control localities about the program and their role in it.
+12. **Spillovers**: Because this program targets children from poor families, the researchers have accounted for the possible spillovers to families who were not eligible for the program.
+13. **Intervening events**: There were no intervening events mentioned in the article.
+
+Final score: 9
+
+**General summary**: This study is relatively internally valid. Though there are some validity issues with the time frame of the study, possible Hawthorne or John Henry effects which are not addressed, and perhaps intervening events that were not accounted for, the researchers took great efforts to manage the validity issues within their control. They were meticulous about selection, transparent about attrition, and accounted for secular trends and measurement error. 
+
+## External validity
+
+The most obvious threat to external validity is the fact that the program specifically targets poor families in rural Mexico. While it may be somewhat generalizable to that population during this timeframe, it is not likely that it would be representative of other communities in need of educational intervention. The impacts on the program for rural families would not likely translate to the same impacts for urban families in similar economic situations. Moreover, the conditions and culture of rural Mexico may influence the effectiveness of the program in ways that other conditions and cultures may not.
+
+## Construct validity
+
+This study evaluates the impact of the program on school enrollment. Though the greater goal on the program is to alleviate poverty by advancing education for children, the measurable impact of enrollment for various grades, does capture the number of children who remain in school. Whether the additional years of education will influence their long-term outcomes and poverty status is not covered in this study, but because there is an overwhelming amount of research to support the fact that education influences earning in the future, the measurement of enrollment is a good place to start when assessing the efficacy of the program.
+
+[@paulschultzSchoolSubsidiesPoor2004]
+
+\newpage
+
+# Police deployment and crime in Argentina
+
+## Internal validity
+
+1. **Selection**: The selection in this program is not random. However, it targets Jewish institutions in the wake of terrorist attack. The study is assessing this if increased police presence had an impact on car thefts in the area. The areas of study were selected based on the number of protected institutions and equivalent area without protection as a control group since the areas neighboring the protected areas are likely similar in many characteristics to the protected areas. There is no option for the subjects to opt in or out of the study, so selection bias from the target population is not an issue.
+2. **Attrition**: There is no issue with attrition in this study because the unit of analysis is a geographic location. A geographic location cannot stop participating in a study, and the data collected is observational data from the police reports.
+3. **Maturation**: Again, because this is an analysis of observational data about a geographic area, maturation is not a concern.
+4. **Secular trends**: Secular trends are an important consideration in this study because crime rates change often and the overall trends can distort the small scale trends under study. However, the researchers are transparent about this, and they clearly state that these results may not be generalizable. 
+5. **Seasonality**: The study assesses the change from several months before the attack to several months after the attack, for a total of nine months over the entire study. However, the article never mentions the seasonality of crime rates on average. Though their study shows changes after the attack, there is no reference provide about whether that aligns with the seasonal trends of car theft in a year without a terrorist attack and a new program.
+6. **Testing**: Testing is not relevant to this research.
+7. **Regression to the mean**: The article does not address the issue of regression to the mean. There is no discussion about whether car thefts were naturally increasing before the attack and it may have just been a return to normal afterwards. The time frame of the study is too short to have accounted for this.
+8. **Measurement error**: Since the measurement used is crime reports from the police, it is accurate in describing reported crime. The authors do note that not all crime is reported, but specifically chose car theft because a police report is necessary for the insurance claim, so they are likely to reported more often than other crimes.
+9. **Time frame of study**: As discussed earlier, the time frame of the study is not sufficient to capture the impact of the program. The change in the rate of car thefts could be temporary, or seasonal, or a return to the norm. Though the study captures data from before and after the change, there is not a sufficient amount of time on either side to determine if this change was a result of the program.
+10. **Hawthorne effects**: The Hawthorne effect is a threat in this case because if those who would steal a car know that this program will increase police presence around certain institutions, they will know to avoid those areas. This may look like a decrease in crime in the protected area, but in reality, the crime is simply moved to another area. This can skew the findings even further if the crime is displaced to the control areas, giving the appearance of an even greater effect.
+11. **John Henry effects**: John Henry effects do not apply in this case because there is no reason for car thieves to avoid areas without the added protection.
+12. **Spillovers**: Because the treatment and control areas border each other and that provides the potential for spillovers, this study actually concludes that the opposite is true. The hope was to find that increased police presence would reduce crime, not only in the protected areas, but overall as well. However, this is not the case, probably because of the aforementioned reason of criminals relocating their criminal activities to none protected areas.
+13. **Intervening events**: There are no other intervening events mentioned in the article other than the attack that initiated the program.
+
+Final score: 7
+
+**General summary**: This study is only somewhat internally valid. The biggest issues is with the time frame of the study, and the abbreviated length of time under study leads to other validity issues. There is no average seasonal trends to compare with the study data to ensure that the change was in fact linked to the implementation of the program.
+
+## External validity
+
+This study and its findings are not generalizable for the reasons stated in the article, such as the class make up of the study areas compared to the class of higher crime areas in Buenos Aires. It is also not generalizable because the focus is on areas with a large Jewish population, and may not accurately represent other communities.
+
+## Construct validity
+
+The researchers are attempting assess the impact of police presence on crime rates. Since crime rates do not accurately represent all crime, they chose to focus on car theft, since that is a crime that is more often reported. While that is not a bad strategy to gain some insight on actual crime, it only covers a piece of the picture. As stated earlier, if car thieves know which areas are protected, they will simply chose other locations to steal cars, so this really only captures part of the property crime aspect of actual crime. Additionally, violent crime is not well represented by this measure.
+
+[@tellaPoliceReduceCrime2004]
+
+\newpage
+
+# References

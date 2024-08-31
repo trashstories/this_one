@@ -1,0 +1,298 @@
+---
+title: "12: Poisson & Negative Binomial Regression"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(rstanarm)
+library(bayesplot)
+library(tidyverse)
+library(tidybayes)
+library(broom.mixed)
+
+colors <- c("#7400CC", "#CC0AA4", "#3ACC14", "#0E0ACC", "#CCAC14", "#0ACCC5", "#CC5514")
+
+```
+
+# 12.9.1 Conceptual exercises
+
+## Exercise 12.1 (Warming up)
+
+a. Give a new example (i.e., not the same as from the chapter) in which we would want to use a Poisson, instead of Normal, regression model. 
+   - **Number of children because the distribution is right skewed since most people have 3 or fewer children, few have more than 3, and the mean is probably 1 or 2.**
+b. The Poisson regression model uses a log link function, while the Normal regression model uses an identity link function. Explain in one or two sentences what a link function is. 
+   - **Normal -> $Y_i | \beta_0, \beta_1, \cdots, \beta_p, \sigma \sim N(\mu_i, \sigma^2)$** 
+   - **Poisson -> $Y_i | \beta_0, \beta_1, \cdots, \beta_p \sim Pois(\lambda_i)$.**
+   - **If $g(\mu_i) = \mu_i$ -> *identity link function***
+   - **If $g(\lambda_i) := \log(\lambda_i)$ -> *log link function***
+c. Explain why the log link function is used in Poisson regression.
+   - **When we assume that $\lambda_i$ can be expressed by a linear combination of the $X$ predictors, the model of $\lambda_i$ spans both positive and negative values, and thus suggests that some states have a negative number of anti-discrimination laws. That doesn’t make sense. Like the number of laws, a Poisson rate $\lambda_i$, must be positive. To avoid this violation, it is common to use a log link function. That is, we’ll assume that $log(\lambda_i)$, which does span both positive and negative values, is a linear combination of the $X$ predictors:** $Y_i | \beta_0,\beta_1, \beta_2, \beta_3 \stackrel{ind}{\sim} Pois\left(\lambda_i \right) \;\;\; \text{ with } \;\;\; \log\left( \lambda_i \right) = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \beta_3 X_{i3}$
+d. List the four assumptions for a Poisson regression model.
+   i. **Structure of the data** - Conditioned on predictors $X$, the observed data $Y_i$ on case $i$ is independent of the observed data on any other case $j$.
+   ii. **Structure of variable $Y$** - Response variable $Y$ has a Poisson structure, i.e., is a discrete count of events that happen in a fixed interval of space or time.
+   iii. **Structure of the relationship** - The logged average $Y$ value can be written as a linear combination of the predictors, $\log\left( \lambda_i \right) = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2}+ \beta_3 X_{i3}$.
+   iv. **Structure of the variability in $Y$** - A Poisson random variable $Y$ with rate $\lambda$ has equal mean and variance, $E(Y) = \text{Var}(Y) = \lambda$ (5.3). Thus, conditioned on predictors $X$, the typical value of $Y$ should be roughly equivalent to the variability in $Y$. As such, the variability in $Y$ increases as its mean increases. See Figure 12.6 for examples of when this assumption does and does not hold.
+   
+## Exercise 12.2 (Poisson versus Negative Binomial) 
+
+Specify whether Poisson regression, Negative Binomial regression, both, or neither fit with each situation described below.
+
+a. The response variable is a count. **both**
+b. The link is a log. **both**
+c. The link is the identity. **neither**
+d. We need to account for overdispersion. **Negative Binomial**
+e. The response is a count variable, and as the expected response increases, the variability also increases. **Poisson**
+
+## Exercise 12.3 (Why use a Negative Binomial) 
+
+You and your friend Nico are in a two-person Bayes Rules! book club. How lovely! Nico has read only part of this chapter, and now they know about Poisson regression, but not Negative Binomial regression. Be a good friend and answer their questions.
+
+a. What’s the shortcoming of Poisson regression? **Poisson regression assumes that, at any set of predictor values, the typical value of $Y$ and variability in $Y$ are equivalent. Thus, when $Y$ is overdispersed, i.e., its variability exceeds assumptions, we might instead utilize the more flexible Negative Binomial regression model.**
+b. How does Negative Binomial regression address the shortcoming of Poisson regression? **Poisson regression preserves the Poisson property of equal mean and variance. Negative Binomial regression is more appropriate for high variability relative to a low average.**
+c. Are there any situations in which Poisson regression would be a better choice than Negative Binomial? **When variability is low relative to the average.**
+
+## Exercise 12.4 (Interpreting Poisson regression coefficients) 
+
+As modelers, the ability to interpret regression coefficients is of utmost importance. Let $Y$ be the number of “Likes” a tweet gets in an hour, $X_1$ be the number of followers the person who wrote the tweet has, and $X_2$ indicate whether the tweet includes an emoji ($X_2 = 1$ if there is an emoji, $X_2 = 0$ if there is no emoji). Further, suppose $Y|\beta_0, \beta_1, \beta_2 \sim \text{Pois}(\lambda)$ with
+
+$\text{log}(\lambda) = \beta_0 + \beta_1X_{1} + \beta_2X_{2}  .$
+ 
+a. Interpret $e^{\beta_0}$ in context. **y-intercept**
+b. Interpret $e^{\beta_1}$ in context. **slope of followers**
+c. Interpret $e^{\beta_2}$in context. **slope of emoji**
+d. Provide the model equation for the expected number of “Likes” for a tweet in one hour, when the person who wrote the tweet has 300 followers, and the tweet does not use an emoji. $\text{log}(\lambda) = \beta_0 + ( \beta_1 * 300 ) + ( \beta_2 * 0)$.
+
+# 12.9.2 Applied exercises
+
+## Exercise 12.5 (Eagles: get to know the data) 
+
+In the next exercises, you will explore how the number of eagle sightings in Ontario, Canada has changed over time. Since this context is unfamiliar to us, we’ll utilize weakly informative priors throughout. We’ll balance this prior uncertainty by the `bald_eagles` data in the **bayesrules** package, which includes data on bald eagle sightings during 37 different one-week observation periods. First, get to know this data.
+
+a. Construct and discuss a univariate plot of `count`, the number of eagle sightings across the observation periods.
+
+```{r}
+
+bald_eagles <- bald_eagles
+
+bald_eagles %>% 
+  ggplot(aes(count_per_week)) +
+  geom_histogram(binwidth = 1, fill = "#0E0ACC", color = "white", boundary = 0)
+
+```
+
+b. Construct and discuss a plot of `count` versus `year.`
+
+```{r, warning=FALSE, message=FALSE}
+
+bald_eagles %>% 
+  ggplot(aes(year, count)) +
+  geom_smooth(method = "lm", color = "#cc0aa4", se = FALSE) +
+  geom_smooth(color = "#7400CC", se = FALSE) +
+  geom_point(size = 4, color = "#0E0ACC") +
+  scale_x_continuous(breaks = seq(1980,2020,5)) +
+  theme_light()
+
+```
+
+c. In exploring the number of eagle sightings over time, it’s important to consider the fact that the length of the observation periods vary from year to year, ranging from 134 to 248.75 hours. Update your plot from part b to also include information about the observation length in `hours` and comment on your findings.
+
+```{r, warning=FALSE, message=FALSE}
+
+bald_eagles %>% 
+  ggplot(aes(year, count)) +
+  geom_smooth(method = "lm", color = "#cc0aa4", se = FALSE) +
+  geom_smooth(color = "#7400CC", se = FALSE) +
+  geom_point(aes(fill = hours), size = 4, shape = 21, color = "#7400CC") +
+  scale_x_continuous(breaks = seq(1980,2020,5)) +
+  scale_fill_steps(low = "white", high = "#0E0ACC") +
+  theme_light()
+
+```
+
+## Exercise 12.6 (Eagles: first model attempt) 
+
+Our next goal is to model the relationship between bald eagle counts $Y$ by year $X_1$ when controlling for the number of observation hours $X_2$. To begin, consider a Normal regression model of $Y$ versus $X_1$ and $X_2$.
+
+a. Simulate the model posterior and check the `prior_summary()`.
+
+```{r}
+
+eagle_model_prior <- stan_glm(count ~ year + hours, 
+                              data = bald_eagles, 
+                              family = gaussian,
+                              prior_intercept = normal(2, 0.5),
+                              prior = normal(0, 2.5, autoscale = TRUE), 
+                              chains = 4, iter = 5000*2, seed = 84735, 
+                              prior_PD = TRUE)
+
+prior_summary(eagle_model_prior)
+
+# hi <- bald_eagles %>% 
+#   add_epred_draws(eagle_model_prior, ndraws = 50)# %>%
+#   
+# ggplot(hi, aes(year, .epred)) +
+#   geom_line(aes(color = paste(hours, .draw)))
+# 
+# ggplot(aes(x = year, y = count, color = hours)) +
+#     geom_line(aes(y = .value, group = paste(hours, .draw))) + 
+#   scale_color_steps(low = "white", high = "#0E0ACC")
+
+```
+
+b. Use careful notation to write out the complete Bayesian structure of the Normal regression model of $Y$ by $X_1$ and $X_2$.
+
+$$
+
+\begin{aligned}
+Y_i | \beta_0, \beta_1, \beta_2, \sigma & \stackrel{ind}{\sim} N\left(\mu_i, \sigma^2\right) \;\; \text{ with } \;\; \mu_i = \beta_0 + \beta_1X_i + \beta_2X_i \\
+\beta_{0c}  & \sim N\left(2, .5 \right)  \\
+\beta_1  & \sim N\left(0, 2.5 \right) \\
+\beta_2  & \sim N\left(0, 2.5 \right) \\
+\sigma   & \sim \text{Exp}(1) \\
+\end{aligned}
+
+$$
+c. Complete a `pp_check()` for the Normal model. Use this to explain whether the model is “good” and, if not, what assumptions it makes that are inappropriate for the bald eagle analysis.
+
+```{r}
+
+eagle_model <- update(eagle_model_prior, prior_PD = FALSE)
+
+mcmc_trace(eagle_model)
+mcmc_dens_overlay(eagle_model)
+mcmc_acf(eagle_model)
+
+set.seed(1)
+pp_check(eagle_model) + 
+  xlab("count")
+
+```
+
+## Exercise 12.7 (Eagles: second model attempt) 
+
+Let’s try to do better. Consider a Poisson regression model of $Y$ versus $X_1$ and $X_2$.
+
+a. In the bald eagle analysis, why might a Poisson regression approach be more appropriate than a Normal regression approach?
+
+b. Simulate the posterior of the Poisson regression model of $Y$ versus $X_1$ and $X_2$. Check the `prior_summary()`.
+
+```{r, cache=TRUE}
+
+eagle_pois_prior <- stan_glm(count ~ year + hours, 
+                             data = bald_eagles, 
+                             family = poisson,
+                             prior_intercept = normal(2, 0.5),
+                             prior = normal(0, 2.5, autoscale = TRUE), 
+                             chains = 4, iter = 5000*2, seed = 84735, 
+                             prior_PD = TRUE)
+
+prior_summary(eagle_pois_prior)
+
+bald_eagles %>% 
+  add_fitted_draws(eagle_pois_prior, n = 50) %>%
+  ggplot(aes(x = year, y = count, color = hours)) +
+    geom_line(aes(y = .value, group = paste(hours, .draw))) + 
+    ylim(0, 100) +
+  scale_color_steps(low = "white", high = "#0E0ACC")
+
+```
+
+c. Use careful notation to write out the complete Bayesian structure of the Poisson regression model of $Y$ by $X_1$ and $X_2$.
+
+$$
+
+$$
+
+d. Complete a `pp_check()` for the Poisson model. Use this to explain whether the model is “good” and, if not, what assumptions it makes that are inappropriate for the bald eagle analysis.
+
+```{r, cache=TRUE}
+
+eagle_pois <- update(eagle_pois_prior, prior_PD = FALSE)
+
+mcmc_trace(eagle_pois)
+mcmc_dens_overlay(eagle_pois)
+mcmc_acf(eagle_pois)
+
+set.seed(1)
+pp_check(eagle_pois, plotfun = "hist", nreps = 5) + 
+  xlab("count")
+pp_check(eagle_pois) + 
+  xlab("count")
+
+```
+
+## Exercise 12.8 (Eagles: an even better model) 
+
+The Poisson regression model of bald eagle counts ($Y$) by year ($X_1$) and observation hours ($X_2$), was pretty good. Let’s see if a Negative Binomial approach is even better.
+
+a. Simulate the model posterior and use a `pp_check()` to confirm whether the Negative Binomial model is reasonable.
+
+```{r, cache=TRUE}
+
+eagle_negbi_prior <- stan_glm(count ~ year + hours, 
+                              data = bald_eagles, 
+                              family = neg_binomial_2,
+                              prior_intercept = normal(2, 0.5),
+                              prior = normal(0, 2.5, autoscale = TRUE), 
+                              chains = 4, iter = 5000*2, seed = 84735, 
+                              prior_PD = TRUE)
+
+prior_summary(eagle_negbi_prior)
+
+bald_eagles %>% 
+  add_fitted_draws(eagle_negbi_prior, n = 50) %>%
+  ggplot(aes(x = year, y = count, color = hours)) +
+    geom_line(aes(y = .value, group = paste(hours, .draw))) + 
+    ylim(0, 100) +
+  scale_color_steps(low = "white", high = "#0E0ACC")
+
+eagle_negbi <- update(eagle_negbi_prior, prior_PD = FALSE)
+
+mcmc_trace(eagle_negbi)
+mcmc_dens_overlay(eagle_negbi)
+mcmc_acf(eagle_negbi)
+
+set.seed(1)
+pp_check(eagle_negbi, plotfun = "hist", nreps = 5) + 
+  xlab("count")
+pp_check(eagle_negbi) + 
+  xlab("count")
+
+# Numerical summaries
+tidy(eagle_negbi, conf.int = TRUE, conf.level = 0.80)
+
+```
+
+b. Use careful notation to write out the complete Bayesian structure of the Negative Binomial regression model of $Y$ by $X_1$ and $X_2$.
+
+$$
+
+$$
+
+c. Interpret the posterior median estimates of the regression coefficients on `year` and `hours`, $\beta_1$ and $\beta_2$. Do so on the unlogged scale.
+   - `year` - $+.0715, .0492-.0945$
+   - `hours` - $+.00457, -.00271/.012$
+   
+d. Construct and interpret a 95% posterior credible interval for the `year` coefficient.
+
+e. When controlling for the number of observation hours, do we have ample evidence that the rate of eagle sightings has increased over time?
+
+## Exercise 12.9 (Eagles: model evaluation) 
+
+Finally, let’s evaluate the quality of our Negative Binomial bald eagle model.
+
+a. How fair is the model?
+b. How wrong is the model?
+c. How accurate are the model predictions?
+
+## Exercise 12.10 (Open exercise: AirBnB) 
+
+The `airbnb_small` data in the **bayesrules** package contains information on AirBnB rentals in Chicago. This data was originally collated by Trinh and Ameri (2016) and distributed by Legler and Roback (2021). In this open-ended exercise, build, interpret, and evaluate a model of the number of `reviews` an AirBnB property has by its `rating`, `district`, `room_type`, and the number of guests it `accommodates`.
+
+
+
+

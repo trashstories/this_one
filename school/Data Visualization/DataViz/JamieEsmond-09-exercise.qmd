@@ -1,0 +1,198 @@
+---
+title: "Exercise 9"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+Annotations are wonderful. I have been excited to get to this part for awhile because I am always trying to figure out how to add different stuff to my plots. This is so much fun to play with, and I now I just want to make crazy plots with lots of arrows and text and other annotations. All I need is more time!
+
+\newpage
+
+# Task 2: Annotations
+
+```{r load-libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggrepel) 
+library(scales)
+
+# Load data here
+set.seed(80085)
+colors <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", "#CCAC14")
+
+sym <- read_csv("data/symptoms.csv") %>% 
+  rename(overall = `overall pain`,
+         forearm = `forearm pain`,
+         back = `back pain`) %>% 
+  mutate(date = mdy(date)) %>%
+  mutate(swim = ifelse(Swimming == "Yes", 1, 0)) 
+
+```
+
+Do the following:
+
+1.  Make a plot. Any kind of plot will do (though it might be easiest to work with `geom_point()`).
+
+2.  Label (some or all of) the points using one of `geom_text()`, `geom_label()`, `geom_text_repel()`, or `geom_label_repel()`. You might need to make a new indicator variable so that you only highlight a few of the points instead of all of them.
+
+3.  Add \*at least two each\*\* the following annotations somewhere on the plot using `annotate()`:
+
+    -   **Text**
+    -   **An arrow** (make a curved arrow for bonus fun)
+    -   **A rectangle**
+
+    You can add more if you want, but those three are the minimum. Try to incorporate the annotations into the design of the plot rather than just placing them wherever.
+
+Good luck and have fun!
+
+```{r pain-mood}
+#| label: fig-pain
+#| fig-cap: "Daily Physical Pain"
+#| fig-width: 8
+#| fig-height: 4
+
+pain <- sym %>% 
+  pivot_longer(c(overall, forearm, back, fatigue)) 
+
+pain %>% 
+  ggplot(aes(color = name)) +
+  annotate(geom = "rect", 
+           xmin = ymd("2023-07-01"), 
+           xmax = today(), 
+           ymin = 1, 
+           ymax = 10, 
+           fill = "#00FA7A", alpha = 0.25) +
+  annotate(geom = "rect", 
+           xmin = ymd("2023-06-06"), 
+           xmax = ymd("2023-06-10"),
+           ymin = 1, 
+           ymax = 10, 
+           fill = "#0E99CC", alpha = 0.25) +
+  geom_vline(xintercept = ymd("2023-06-15"), 
+             linewidth = 1, 
+             color = "#2ECC40") +
+  geom_line(aes(date, value, 
+                linetype = name, 
+                linewidth = name, 
+                alpha = name)) +
+  geom_point(data = sym %>% filter(Swimming == "Yes"), 
+             aes(date, overall,
+                 shape = Swimming),
+             color = "#0E0ACC", 
+             fill = "#0CEBFF", 
+             size = 5.5) +
+  geom_label_repel(data = sym %>% filter(Swimming == "Yes"), 
+                   aes(date, overall, label = label), 
+                   color = "#0E0ACC",
+                   label.padding = unit(.15, "lines"),
+                   size = 3.5) +
+  annotate(geom = "text",
+           x = ymd("2023-06-14"),
+           y = 2.85,
+           angle = 90,
+           label = "Purchashed Bus", 
+           color = "#2ECC40") +
+  annotate(geom = "text", 
+           x = ymd("2023-06-24"), 
+           y = 1.75, 
+           label = "On the Bus", 
+           color = "#2ECC40") +
+  annotate(geom = "segment", 
+           x = ymd("2023-06-25"), 
+           xend = ymd("2023-07-01"), 
+           y = 1.45, 
+           yend = 1.45, 
+           color = "#2ECC40", 
+           linewidth = 1,
+           arrow = arrow(angle = 45, length = unit(1, "lines"))) +
+  annotate(geom = "text", 
+           x = ymd("2023-05-30"), 
+           y = 2.75, 
+           label = "Hospital Stay", 
+           color = "#0061E3") +
+  annotate(geom = "segment", 
+           x = ymd("2023-06-01"), 
+           xend = ymd("2023-06-06"), 
+           y = 2.45, 
+           yend = 2.45, 
+           color = "#0061E3", linewidth = 1,
+           arrow = arrow(angle = 45, 
+                         length = unit(1, "lines"))) +
+  scale_x_date(breaks = date_breaks(width = "1 week"),
+               labels = date_format("%b %d"),
+               expand = c(.01,.01)) +
+  scale_y_continuous(breaks = seq(0,10,2),
+                     limits = c(1,10)) +
+  scale_color_manual(values = colors,
+                     limits = c("overall", "forearm", 
+                                "back", "fatigue"),
+                     labels = c("Overall pain", "Forearm pain", 
+                                "Back pain", "Fatigue")) +
+  scale_linetype_manual(values = c("solid", "twodash", 
+                                   "twodash", "twodash"), 
+                        limits = c("overall", "forearm", 
+                                   "back", "fatigue"),
+                        labels = c("Overall pain", "Forearm pain", 
+                                   "Back pain", "Fatigue")) +
+  scale_linewidth_manual(values = c(1.5,1,1,1),
+                         limits = c("overall", "forearm", 
+                                    "back", "fatigue"),
+                         labels = c("Overall pain", "Forearm pain", 
+                                    "Back pain", "Fatigue")) +
+  scale_alpha_manual(values = c(.5,.5,.5,1), 
+                     guide = "none") +
+  scale_shape_manual(values = 21,
+                     labels = "Swimming") +
+  labs(x = NULL,
+       y = "Pain Level",
+       color = NULL,
+       linetype = NULL,
+       linewidth = NULL,
+       alpha = NULL,
+       shape = NULL,
+       title = "Daily Physical Pain") +
+  theme_light() +
+  theme(panel.border = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#3ACC14", 
+                                          linetype = "dotted"),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_line(color = "#9DDD99", 
+                                          linetype = "dotted"),
+        axis.text = element_text(color = "#310873", 
+                                 family = "serif"),
+        axis.title = element_text(color = "#310873", 
+                                  family = "sans"),
+        axis.ticks = element_blank(),
+        plot.title = element_text(color = "#310873", 
+                                  size = 14, 
+                                  face = "bold"),
+        legend.position = "bottom",
+        legend.text = element_text(color = "#310873", 
+                                   family = "sans"))
+
+ggsave("pain.png", last_plot(), width = 10, height = 5)
+
+```

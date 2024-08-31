@@ -1,0 +1,167 @@
+---
+title: "15: Hierarchical Models are Exciting"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, warning=FALSE, message=FALSE}
+
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(rstanarm)
+library(broom.mixed)
+library(lme4)
+
+colors <- c( "#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", "#CCAC14")
+
+```
+
+
+# 15.6.1 Conceptual exercises
+
+## Exercise 15.1 (Three pooling types: explain to your friend) 
+
+In one to two sentences each, explain the following concepts to your friend Hakeem, who has taken an intro statistics course but otherwise is new to pooled data.
+
+a. Complete pooling
+   - **All observations are analyzed together in one group**
+b. No pooling
+   - **Each individually identified type of record (group) is analyzed on its own (i.e. one person, one lab, one tract, etc)**
+c. Partial pooling
+   - **Groups are analyzed separately but use information about the entire sample to inform predictions**
+
+## Exercise 15.2 (Three pooling types: redux) 
+
+Hakeem now understands the three pooling approaches thanks to your excellent explanations in the previous exercise. Now he has some follow-up questions! Answer these in your own words and using your own examples.
+
+a. Can you give me an example when we might want to use the partial pooling approach?
+   - **When there are multiple records tied to the same entity**
+b. Why wouldn’t we always just use the complete pooling approach? It seems easier!
+   - **Complete pooling might miss trends within groups that provide more basis for accurate predictions**
+c. Does the no pooled approach have any drawbacks? It seems that there are fewer assumptions.
+   - **No pooled ignores information about the other groups which could lead to misinterpreted finding that only apply to specific groups**
+d. Can you remind me what the difference is between within-group variability and between-group variability? And how does that relate to partial pooling?
+   - **within-group - degree of the variability among multiple observations within each group**
+   - **between-group - variability from group to group**
+
+# 15.6.2 Applied exercises
+
+Interested in the impact of sleep deprivation on reaction time, Belenky et al. (2003) enlisted 18 subjects in a study. The subjects got a regular night’s sleep on “day 0” of the study, and were then restricted to 3 hours of sleep per night for the next 9 days. Each day, researchers recorded the subjects’ reaction times (in ms) on a series of tests. The results are provided in the `sleepstudy` dataset in the *lme4* package.
+
+## Exercise 15.3 (Hierarchical data) 
+
+The `sleepstudy` data is hierarchical. Draw a diagram in the spirit of Figure 15.8 that captures the hierarchical framework. Think: What are the “groups?”
+
+```{r}
+
+sleep <- sleepstudy
+
+```
+
+   - Records -> **Subject** -> Days 
+
+## Exercise 15.4 (Complete pooling: Part I) 
+
+Suppose that we (incorrectly) took a complete pooling approach to modeling `Reaction` time ($Y$) by `Days` of sleep deprivation ($X$).
+
+a. To explore the complete pooled behavior of the data points, construct and discuss a plot of `Reaction` by `Days`. In doing so, ignore the subjects and include the observed trend in the relationship.
+
+```{r}
+
+sleep %>% 
+  ggplot(aes(Days, Reaction)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(aes(color = Subject)) + 
+  theme_light()
+
+```
+
+b. Draw a diagram in the spirit of Figure 15.8 that captures the complete pooling framework.
+   - Records -> Days
+   
+c. Using careful notation, write out the structure for the complete pooled model of $Y$ by $X$.
+
+\begin{equation}
+Y_i | \beta_0, \beta_1, \sigma \stackrel{ind}{\sim} N\left(\mu_i, \sigma^2\right) \;\; \text{ with } \;\; \mu_i = \beta_0 + \beta_1X_i
+\end{equation}
+
+```{r, cache=TRUE}
+
+complete_pooled_model <- stan_glm(
+  Reaction ~ Days, 
+  data = sleep, family = gaussian, 
+  prior_intercept = normal(0, 2.5, autoscale = TRUE),
+  prior = normal(0, 2.5, autoscale = TRUE), 
+  prior_aux = exponential(1, autoscale = TRUE),
+  chains = 4, iter = 5000*2, seed = 84735)
+
+# Posterior summary statistics
+tidy(complete_pooled_model, conf.int = TRUE, conf.level = 0.80)
+
+# Plot of the posterior median model
+sleep %>% 
+  ggplot(aes(Days, Reaction, group = Subject)) + 
+  geom_smooth(method = "lm", se = FALSE, color = "#FF99F9", size = 0.5) + 
+  geom_abline(aes(intercept = 251, slope = 10.4), color = "#7400CC", linewidth = 1) + 
+  theme_light()
+
+```
+
+## Exercise 15.5 (Complete pooling: Part II) 
+
+In the context of the sleep study, what two incorrect assumptions does the complete pooled model make and why are these inappropriate in the sleep study analysis?
+
+   - **That the reaction time will change consistently or similarly for all subjects.**
+
+## Exercise 15.6 (No pooling: Part I) 
+
+Suppose instead that we (incorrectly) took a no pooling approach in our sleep study analysis.
+
+a. To explore the no pooled behavior of the data points, construct and discuss separate scatterplots of `Reaction` by `Days` for each `Subject`, including subject-specific trend lines.
+
+```{r}
+
+sleep %>% 
+  ggplot(aes(Days, Reaction, color = Subject)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point() + 
+  theme_light()
+
+```
+
+b. Draw a diagram in the spirit of Figure 15.6 that captures the no pooling framework.
+   - Subject -> Days
+   
+c. Using careful notation, write out the structure for the no pooled model of $Y$ by $X$.
+
+\begin{equation}
+Y_{ij} | \beta_{0j}, \beta_{1j}, \sigma \sim N\left(\mu_{ij}, \sigma^2\right) \;\; \text{ with } \;\; \mu_{ij} = \beta_{0j} + \beta_{1j} X_{ij}
+\end{equation}
+
+## Exercise 15.7 (No pooling: Part II) 
+
+In the context of the sleep study, what are the two main drawbacks to analyzing the relationship between reaction time and sleep deprivation using a no pooling approach?
+
+   - **Complete pooling does not consider the variance among subjects, and no pooling ignores the context of the other subjects.**
+
+## Exercise 15.8 (Complete vs no vs partial pooling) 
+
+Suppose we only had data on the two subjects below. For both, provide a loose sketch of three separate trend lines corresponding to a complete pooled, no pooled, and partial pooled model of `Reaction` time by `Days`.
+
+```{r}
+
+sleep %>% 
+  filter(Subject %in% c("308", "335")) %>% 
+  ggplot(aes(Days, Reaction)) +
+  geom_smooth(aes(color = Subject), method = "lm", se = FALSE, linewidth = 1.2) +
+  geom_abline(aes(intercept = 251, slope = 10.4), color = "black", linewidth = 1) + 
+  geom_point(aes(color = Subject), size = 3) + 
+  facet_wrap(~ Subject) +
+  scale_color_manual(values = colors) +
+  theme_light()
+
+```
+
+
+

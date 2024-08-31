@@ -1,0 +1,226 @@
+---
+title: "Exercise 8"
+author: "Jamie Pantazi Esmond"
+date: "today"
+date-format: "long"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    title-block-banner: true
+    title-block-banner-color: "#744FC6"
+    fig-align: "center"
+  pdf: 
+    toc: true
+    lof: true
+    mainfont: "Cambria"
+    fig-cap-location: "top"
+    code-line-numbers: true
+    fig-align: "center"
+editor_options: 
+  chunk_output_type: console
+---
+
+\newpage
+
+# Task 1: Reflection
+
+Obviously I love the map stuff. I had a lot of fun playing with the unemployment map graph, but I do with I could manipulate it more specifically.
+
+I am not a huge fan of many tiny graphs in a graphs (even in the map form, it is not ideal), especially when it is printed and size is limited. I do find them more useful if they are digital and zooming or scrolling is an option.
+
+```{r load-libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(broom)
+library(geofacet)
+library(scales)
+library(Rmisc)
+
+colors <- c("#7400CC", "#3ACC14", "#CC0AA4", "#CCAC14", "#0E0ACC")
+
+unemployment <- read_csv("data/unemployment.csv") %>%
+  mutate(state1 = ifelse(state != "District of Columbia", 
+                         state.abb[match(state,state.name)],
+                         "DC"))
+
+```
+
+\newpage
+
+# Task 2: Small multiples
+
+Use data from the US Bureau of Labor Statistics (BLS) to show the trends in employment rate for all 50 states between 2006 and 2016.
+
+**What stories does this plot tell? Which states struggled to recover from the 2008--09 recession?**
+
+Some hints/tips:
+
+-   You won't need to filter out any missing rows because the data here is complete---there are no state-year combinations with missing unemployment data.
+
+-   You'll be plotting 51 facets. You can filter out DC if you want to have a better grid (like 5 × 10), or you can try using `facet_geo()` from the [{geofacet} package](https://hafen.github.io/geofacet/) to lay out the plots like a map of the US (try this!).
+
+-   Plot the `date` column along the x-axis, *not* the `year` column. If you plot by year, you'll get weird looking lines (try it for fun?), since these observations are monthly. If you really want to plot by year only, you'll need to create a different data frame where you group by year and state and calculate the average unemployment rate for each year/state combination (i.e. `group_by(year, state) %>% summarize(avg_unemployment = mean(unemployment))`)
+
+-   Try mapping other aesthetics onto the graph too. You'll notice there are columns for region and division---play with those as colors, for instance.
+
+-   This plot might be big, so make sure you adjust `fig.width` and `fig.height` in the chunk options so that it's visible when you knit it. You might also want to use `ggsave()` to save it with extra large dimensions.
+
+**I spent far too much time on this one. I was mostly hung up on labeling the vlines that I added for context about major events that might impact unemployment. Ideally I wanted the labels outside the panel with an arrow, or even a legend, but I couldn't figure it out, and I had already spent too much time tweaking this one. Any feedback or resources for how to do what I was trying to do is appreciated!**
+
+(Also, I wanted to keep the full state names, but DC wouldn't fit, so I made them all abbreviations because I could not figure out how to change only DC. Is that possible?)
+
+```{r small-multiples}
+#| fig-width: 8
+#| fig-height: 7
+#| fig-cap: "Recession Bumps"
+
+unemployment %>% 
+  ggplot(aes(date, unemployment, color = region)) +
+  geom_point() +
+  geom_vline(aes(xintercept = as.numeric(as.Date("2007-10-01"))), 
+             color="#FF19D0", linewidth = .8, linetype = "dotted") +  
+  geom_text(data = filter(unemployment, state == "Washington"),
+            aes(as.Date("2007-10-01") + 100, 12, 
+                label = str_wrap("Financial Crisis", 10)),
+            color="#FF19D0", hjust = 0, size = 2.5) +
+  geom_vline(data = filter(unemployment, state == "North Dakota"),
+             aes(xintercept = as.numeric(as.Date("2012-07-01"))),
+             color="#CC5514", linewidth = .8, linetype = "dashed") +
+  geom_text(data = filter(unemployment, state == "North Dakota"),
+            aes(as.Date("2012-07-01") + 100, 12,
+                label = str_wrap("Oil Boom", 4)),
+            color="#CC5514", hjust = 0, size = 2.5) +
+  geom_vline(data = filter(unemployment, state == "Michigan"),
+             aes(xintercept = as.numeric(as.Date("2014-04-01"))),
+             color="#0ACCC5", linewidth = .8, linetype = "dashed") +
+  geom_text(data = filter(unemployment, state == "Michigan"),
+            aes(as.Date("2014-04-01") + 100, 10,
+                label = str_wrap("Flint Water Crisis", 10)),
+            color="#0ACCC5", hjust = 0, size = 2.5) +
+  geom_vline(data = filter(unemployment, state == "New York" |
+                             state == "New Jersey"),
+             aes(xintercept = as.numeric(as.Date("2012-11-01"))),
+             color="#0E0ACC", linewidth = .8, linetype = "dashed") +
+  geom_text(data = filter(unemployment, state == "New York" |
+                             state == "New Jersey"),
+            aes(as.Date("2012-11-01") + 100, 12,
+                label = str_wrap("Hurricane Sandy", 10)),
+            color="#0E0ACC", hjust = 0, size = 2.5) +
+  facet_geo(~ state1, move_axes = FALSE) +
+  scale_color_manual(values = colors) +
+  scale_x_date(date_labels = "%Y", 
+               breaks = as.Date(c("2008", "2014"), "%Y")) +
+  scale_y_continuous(labels = label_percent(scale = 1), breaks = seq(5,15,5)) +
+  labs(x = NULL,
+       y = "Unemployment Rate",
+       color = NULL,
+       alpha = NULL,
+       title = "Recession Bumps",
+       subtitle = "Unemployment Rates in the US (2006 - 2016)\nBig Bumps and Small Bumps (but Everyone Bumped)") +
+  theme_light() +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(family = "serif", color = "black", size = 9),
+        strip.placement = "inside",
+        panel.spacing = unit(.15, "lines"),
+        legend.position = "top",
+        axis.text = element_text(family = "serif"),
+        axis.text.x = element_text(size = 8),
+        panel.grid.minor = element_blank())
+
+ggsave("map.png", last_plot())
+
+```
+
+\newpage
+
+# Task 3: Slopegraphs
+
+Use data from the BLS to create a slopegraph that compares the unemployment rate in January 2006 with the unemployment rate in January 2009, either for all 50 states at once (good luck with that!) or for a specific region or division. Make sure the plot doesn't look too busy or crowded in the end.
+
+**What story does this plot tell? Which states in the US (or in the specific region you selected) were the most/least affected the Great Recession?**
+
+Some hints/tips:
+
+-   You should use `filter()` to only select rows where the year is 2006 or 2009 (i.e. `filter(year %in% c(2006, 2009)`) and to select rows where the month is January (`filter(month == 1)` or `filter(month_name == "January")`)
+
+-   In order for the year to be plotted as separate categories on the x-axis, it needs to be a factor, so use `mutate(year = factor(year))` to convert it.
+
+-   To make ggplot draw lines between the 2006 and 2009 categories, you need to include `group = state` in the aesthetics.
+
+```{r slopegraph}
+#| fig-cap: "Unemployment Changes Overview"
+#| fig-height: 7
+
+slope <- unemployment %>% 
+  filter(year %in% c(2006, 2009),
+         month == 1) %>% 
+  mutate(year = factor(year))
+
+slope %>% 
+  ggplot(aes(year, unemployment, group = state, color = division)) + 
+  geom_line(linewidth = 1) + 
+  geom_point(size = 2) +
+  facet_wrap(~ region) +
+  scale_color_discrete() +
+  labs(x = NULL,
+       y = "Unemployment Rate",
+       color = NULL,
+       alpha = NULL,
+       title = "Unemployment Changes Overview") +
+  theme_light() +
+  theme(legend.position = "bottom",
+        strip.background = element_blank(),
+        strip.text = element_text(family = "serif", color = "black", size = 9),
+        strip.placement = "inside",
+        panel.spacing = unit(.15, "lines"),
+        axis.text = element_text(family = "serif"),
+        panel.grid.minor = element_blank())
+
+```
+
+```{r midwest}
+#| fig-cap: "Unemployment Changes in the Midwest"
+#| fig-height: 6
+
+slope %>% 
+  filter(region == "Midwest") %>% 
+  ggplot(aes(year, unemployment, group = state, color = division)) + 
+  geom_line(linewidth = 1) + 
+  geom_point(size = 2) +
+  geom_label(data = slope %>% filter(year == "2009", 
+                                     region == "Midwest", 
+                                     division == "East North Central"), 
+             aes(label = state1),
+             label.padding = unit(0.15, "lines"), 
+             family = "mono", nudge_x = .09, show.legend	= FALSE) +
+  geom_label(data = slope %>% filter(year == "2006", 
+                                     region == "Midwest", 
+                                     division == "West North Central"), 
+             aes(label = state1),
+             label.padding = unit(0.15, "lines"), 
+             family = "mono", nudge_x = -.09, show.legend	= FALSE) +
+  geom_label(data = slope %>% filter(year == "2006", 
+                                     state1 == "ND"), 
+             aes(label = state1),
+             label.padding = unit(0.15, "lines"), 
+             family = "mono", nudge_x = -.21, show.legend	= FALSE) +
+  scale_color_manual(values = colors, label = c("East", "West")) +
+  labs(x = NULL,
+       y = "Unemployment Rate",
+       color = NULL,
+       alpha = NULL,
+       title = "Unemployment Changes in the Midwest",
+       subtitle = "New Oil in the Western Midwest Softened the Blow") +
+  theme_light() +
+  theme(legend.position = "right",
+        strip.background = element_blank(),
+        strip.text = element_text(family = "serif", color = "black", size = 11),
+        strip.placement = "inside",
+        panel.spacing = unit(.15, "lines"),
+        axis.text = element_text(family = "serif"),
+        panel.grid.minor = element_blank())
+
+
+```

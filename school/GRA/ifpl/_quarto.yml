@@ -1,0 +1,33 @@
+project:
+  type: website
+
+website:
+  title: "iFPL"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: team.qmd
+        text: Team
+      - href: projects.qmd
+        text: Projects
+      - href: news.qmd
+        text: News
+        
+  sidebar:
+    - title: "Pages"
+      style: "docked"
+      background: light
+      contents:
+        - index.qmd
+        - team.qmd
+        - projects.qmd
+        - news.qmd
+        
+format:
+  html:
+    theme: custom1.scss
+    toc: true
+
+editor: visual
+

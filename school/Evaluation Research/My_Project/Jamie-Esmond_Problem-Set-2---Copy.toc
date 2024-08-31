@@ -1,0 +1,19 @@
+\contentsline {section}{Task 1: Penguins}{1}{section*.2}%
+\contentsline {subsection}{Exploratory analysis}{2}{section*.3}%
+\contentsline {subsection}{Models}{7}{section*.4}%
+\contentsline {subsubsection}{Predicting weight with bill depth}{7}{section*.5}%
+\contentsline {subsubsection}{Predicting weight with bill depth and flipper length}{8}{section*.6}%
+\contentsline {subsubsection}{Predicting weight with bill depth, flipper length, and species}{9}{section*.7}%
+\contentsline {subsection}{All models at the same time}{10}{section*.8}%
+\contentsline {section}{Task 2: Food access and mortality}{11}{section*.9}%
+\contentsline {subsection}{Exploratory analysis}{12}{section*.10}%
+\contentsline {subsubsection}{How related are mortality rate and access to food?}{12}{section*.11}%
+\contentsline {subsubsection}{How related are mortality rate and the prevalence of fast food restaurants?}{13}{section*.12}%
+\contentsline {subsubsection}{How related are mortality rate and the prevalence of SNAP stores per 1,000 residents?}{14}{section*.13}%
+\contentsline {subsubsection}{How related are mortality rate and the percent of the county that voted for Democrats in 2016?}{15}{section*.14}%
+\contentsline {subsection}{Models}{16}{section*.15}%
+\contentsline {subsubsection}{Does access to food predict mortality?}{16}{section*.16}%
+\contentsline {subsubsection}{Do more SNAP stores per person predict mortality?}{17}{section*.17}%
+\contentsline {subsubsection}{Do election results and access to food and SNAP stores predict mortality?}{18}{section*.18}%
+\contentsline {subsubsection}{Mortality, contolling for state differences}{19}{section*.19}%
+\contentsline {subsection}{All models at the same time}{20}{section*.20}%
