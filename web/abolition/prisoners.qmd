@@ -41,7 +41,7 @@ library(tinytex)
 library(summarytools)
 library(patchwork)
 library(stringr)
-library(ggpmisc)
+# library(ggpmisc)
 library(cowplot)
 library(grid)
 library(ggridges)
@@ -129,14 +129,6 @@ custom_labels <- function(x) {
   labels <- as.character(x)
   labels[1] <- paste0(labels[1], " min")
   return(labels)
-}
-
-gt_pct <- function(x, page_width = 5.5) {
-  if (knitr::pandoc_to("latex")) {
-    paste0(page_width * (x / 100), "in")
-  } else {
-    gt::pct(x)
-  }
 }
 
 
@@ -246,9 +238,9 @@ vars_tbl %>%
                              "**Established indicators (demographics and socioeconomic)** - *from US Census*", 
                              "**Primary explanatory variables** - \n*from SAMHSA*",
                              "**Reference Data** - *from American Community Survey*")) %>% 
-  cols_width(Variable ~ gt_pct(30),
-             Measure ~ gt_pct(40),
-             Source ~ gt_pct(30)) %>% 
+  cols_width(Variable ~ pct(30),
+             Measure ~ pct(40),
+             Source ~ pct(30)) %>% 
   cols_label(Variable = md("*Variable*"),
              Measure = md("*Measure*"),
              Source = md("*Source*")) 
@@ -276,10 +268,10 @@ vars2_tbl %>%
   cols_align(align = c("center"),
              columns = contains("acilities")) %>%
   cols_label(x = md("")) %>% 
-  cols_width(x ~ gt_pct(40),
-             contains("health fac") ~ gt_pct(19),
-             contains("inpatient care") ~ gt_pct(19),
-             contains("crisis") ~ gt_pct(22)) 
+  cols_width(x ~ pct(40),
+             contains("health fac") ~ pct(19),
+             contains("inpatient care") ~ pct(19),
+             contains("crisis") ~ pct(22)) 
 
 ```
 
@@ -1040,9 +1032,9 @@ MDsum %>%
              Std.Dev = md("*Std Dev*"),
              Min = md("*Min*"),
              Max = md("*Max*")) %>% 
-  cols_width(Variable ~ gt_pct(45),
-             starts_with("M") ~ gt_pct(10),
-             Std.Dev ~ gt_pct(10))
+  cols_width(Variable ~ pct(45),
+             starts_with("M") ~ pct(10),
+             Std.Dev ~ pct(10))
 
 ```
 
@@ -1088,9 +1080,9 @@ MD_Distance %>%
              Std.Dev = md("*Std Dev*"),
              Min = md("*Min*"),
              Max = md("*Max*")) %>% 
-  cols_width(Variable ~ gt_pct(45),
-             starts_with("M") ~ gt_pct(10),
-             Std.Dev ~ gt_pct(10))
+  cols_width(Variable ~ pct(45),
+             starts_with("M") ~ pct(10),
+             Std.Dev ~ pct(10))
   
 
 
@@ -1253,7 +1245,7 @@ MDw %>%
              NAME = md("*Tract*"),
              Imprisonment_Rate = md("*Imprisonment Rate*"),
              pctBlack = md("*% Black*")) %>% 
-  cols_width(Imprisonment_Rate ~ gt_pct(15)) %>% 
+  cols_width(Imprisonment_Rate ~ pct(15)) %>% 
   cols_align(align = "center")
 
 ```
@@ -1433,11 +1425,11 @@ cnts %>%
              pctB = md("*Percent\nBlack*"),
              income = md("*Median\nIncome*"),
              unemp = md("*Unemployment Rate*")) %>% 
-  cols_width(County ~ gt_pct(40),
-             impris ~ gt_pct(12),
-             pctB ~ gt_pct(12),
-             income ~ gt_pct(12),
-             unemp ~ gt_pct(12)) %>% 
+  cols_width(County ~ pct(40),
+             impris ~ pct(12),
+             pctB ~ pct(12),
+             income ~ pct(12),
+             unemp ~ pct(12)) %>% 
   cols_align(columns = !c(County),
              align = "center")
   
@@ -3076,7 +3068,7 @@ custom_labels <- function(x) {
   return(labels)
 }
 
-gt_pct <- function(x, page_width = 5.5) {
+pct <- function(x, page_width = 5.5) {
   if (knitr::pandoc_to("latex")) {
     paste0(page_width * (x / 100), "in")
   } else {

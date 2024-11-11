@@ -1,0 +1,133 @@
+---
+title: "interactive_maps"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE)
+
+library(tidyverse)     # ggplot, dplyr, and friends
+library(jsonlite)      # Read JSON files
+library(sf)            # Handle spatial data in a tidy way
+library(tigris)        # Access demographic data from the US Census
+library(ggrepel)       # Nicer non-overlapping labels
+library(glue)          # Easier string interpolation
+library(scales)        # Nicer labeling functions
+library(patchwork)     # Combine plots nicely
+library(ggspatial)     # Nicer map features like scale bars
+library(leaflet)       # Make interactive maps
+library(lutz)          # Look up time zones for lat/lon coordinates
+library(gt)            # Make fancy tables
+library(rcartocolor)   # Use CARTO colors (https://carto.com/carto-colors/)
+library(ggnewscale)    # Use multiple scales for the same aesthetic in ggplot
+library(extrafont)
+library(tibbletime)
+library(postmastr)
+library(colorspace)
+library(tidycensus)
+
+colors <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#0ACCC5", "#CCAC14", "#CC1F14", "#1471CC", 
+            "#805713", "#4F008C", "#B785DD", "black")
+
+my_number <- label_number(accuracy = 1, big.mark = ",")
+
+theme_roadtrip_map <- function() {
+  theme_void(base_family = "Changa") +
+    theme(
+      plot.title = element_text(color = "#310873", 
+                                size = 14, 
+                                face = "bold", 
+                                family = "Changa"),
+      strip.text = element_text(family = "Changa", 
+                                face = "plain",
+                                size = rel(1.1), 
+                                hjust = 0.5)
+    )
+}
+
+# Make labels use Changa by default
+update_geom_defaults("label_repel", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+update_geom_defaults("label", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+
+update_geom_defaults("text_repel", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+update_geom_defaults("text", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+
+```
+
+``` {r load}
+
+lower_48 <- states(resolution = "20m", year = 2022, cb = TRUE) 
+
+pops <- read_csv("data/ACS_Population_Variables_-_Boundaries/State_0.csv") |> 
+  rename(STUSPS = `State FIPS Postal Code`,
+         total_pop = `Total Population`)
+
+sts <- lower_48 |> 
+  left_join(pops, by = "STUSPS")
+
+```
+
+```{r}
+
+# states <- sf::read_sf("https://rstudio.github.io/leaflet/json/us-states.geojson")
+class(sts)
+names(sts)
+
+m <- leaflet(sts) %>%
+  setView(-96, 37.8, 4) %>%
+  addProviderTiles("MapBox", options = providerTileOptions(
+    id = "mapbox.light",
+    accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN'))) |> 
+  addPolygons()# |> 
+  # leafletOptions(crs = st_crs("ESRI:102003"))
+
+bins <- seq(0,40000000,5000000)
+pal <- colorBin("YlOrRd", domain = sts$total_pop, bins = bins)
+
+labels <- sprintf(
+  "<strong>%s</strong><br/>%s total population<br><a href='https://www.r-project.org/'>R Project</a>",
+  sts$NAME, my_number(sts$total_pop)
+) %>% lapply(htmltools::HTML)
+
+m <- m |> 
+  addPolygons(fillColor = ~pal(total_pop), 
+              weight = 2,
+              opacity = 1,
+              color = "white",
+              dashArray = "3",
+              fillOpacity = 0.7,
+              highlightOptions = highlightOptions(weight = 4,
+                                                  color = "#4F008C",
+                                                  dashArray = "",
+                                                  fillOpacity = 0.7,
+                                                  bringToFront = TRUE),
+              popup = labels,
+              labelOptions = labelOptions(style = list("font-weight" = "normal", 
+                                                       padding = "3px 8px"),
+                                          textsize = "15px",
+                                          direction = "auto")) |> 
+  addLegend(pal = pal, 
+            values = ~total_pop, 
+            opacity = 0.7, 
+            title = NULL,
+            position = "bottomright") |> 
+  addScaleBar(position = c("bottomleft"))
+
+m
+
+```
+
+
+
+
+

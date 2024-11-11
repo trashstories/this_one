@@ -2,6 +2,47 @@
 title: "hot & spikey"
 ---
 
+[![](pics\maps\tx.png){width="100%"}](pics\maps\tx.png)
+
 *link to bus storymap*
 
 ### Garner State Park
+
+:::: {.columns}
+
+::: {.column width="33.33%"}
+
+[![](pics\bus\garner\20240321_182227.jpg){width="100%"}](pics\bus\garner\20240321_182227.jpg)
+[![](pics\bus\garner\20240321_192202.jpg){width="100%"}](pics\bus\garner\20240321_192202.jpg)
+[![](pics\bus\garner\20240322_142621.jpg){width="100%"}](pics\bus\garner\20240322_142621.jpg)
+[![](pics\bus\garner\night.jpg){width="100%"}](pics\bus\garner\night.jpg)
+[![](pics\bus\garner\20240324_091919.jpg){width="100%"}](pics\bus\garner\20240324_091919.jpg)
+[![](pics\bus\garner\20240323_200136.jpg){width="100%"}](pics\bus\garner\20240323_200136.jpg)
+
+:::
+
+::: {.column width="33.33%"}
+
+[![](pics\bus\garner\20240321_185228.jpg){width="100%"}](pics\bus\garner\20240321_185228.jpg)
+[![](pics\bus\garner\20240323_211025.jpg){width="100%"}](pics\bus\garner\20240323_211025.jpg)
+[![](pics\bus\garner\PXL_20240322_225733479.jpg){width="100%"}](pics\bus\garner\PXL_20240322_225733479.jpg)
+[![](pics\bus\garner\20240321_185420.jpg){width="100%"}](pics\bus\garner\20240321_185420.jpg)
+[![](pics\bus\garner\20240323_200153.jpg){width="100%"}](pics\bus\garner\20240323_200153.jpg)
+
+:::
+
+::: {.column width="33.33%"}
+
+[![](pics\bus\garner\PXL_20240322_231200404.jpg){width="100%"}](pics\bus\garner\PXL_20240322_231200404.jpg)
+[![](pics\bus\garner\20240323_221846.jpg){width="100%"}](pics\bus\garner\20240323_221846.jpg)
+[![](pics\bus\garner\20240324_092152.jpg){width="100%"}](pics\bus\garner\20240324_092152.jpg)
+[![](pics\bus\garner\PXL_20240322_223723875.jpg){width="100%"}](pics\bus\garner\PXL_20240322_223723875.jpg)
+[![](pics\bus\garner\20240322_152546.jpg){width="100%"}](pics\bus\garner\20240322_152546.jpg)
+
+:::
+
+::::
+
+[![](pics\bus\garner\20240321_183556.jpg){width="100%"}](pics\bus\garner\20240321_183556.jpg)
+
+### River Relaxing

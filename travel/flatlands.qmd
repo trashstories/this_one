@@ -2,6 +2,23 @@
 title: "flatlands full of sand"
 ---
 
+:::: {.columns}
+
+::: {.column width="50%"}
+
+[![](pics\maps\winter2324.png){width="100%"}](pics\maps\winter2324.png)
+
+:::
+
+::: {.column width="50%"}
+
+[![](pics\maps\wintercont.png){width="100%"}](pics\maps\wintercont.png)
+
+:::
+
+::::
+
+
 *link to bus storymap*
 
 ### camping with the niblings
@@ -12,25 +29,25 @@ We saw some deer, swam in the lake, and watched *Inside Out* on the side of the 
 
 ::: {.column width="33.33%"}
 
-![](pics\niblings\20231021_084302.jpg){width="100%"}
-![](pics\niblings\20231021_085641.jpg){width="100%"}
+[![](pics\niblings\20231021_084302.jpg){width="100%"}](pics\niblings\20231021_084302.jpg)
+[![](pics\niblings\20231021_085641.jpg){width="100%"}](pics\niblings\20231021_085641.jpg)
 
 :::
 
 ::: {.column width="33.33%"}
 
-![](pics\niblings\20231021_090531.jpg){width="100%"}
-![](pics\niblings\20231021_113633.jpg){width="100%"}
-![](pics\niblings\20231021_123900.jpg){width="100%"}
-![](pics\bus\drawers.jpg){width="100%"}
+[![](pics\niblings\20231021_090531.jpg){width="100%"}](pics\niblings\20231021_090531.jpg)
+[![](pics\niblings\20231021_113633.jpg){width="100%"}](pics\niblings\20231021_113633.jpg)
+[![](pics\niblings\20231021_123900.jpg){width="100%"}](pics\niblings\20231021_123900.jpg)
+[![](pics\bus\drawers.jpg){width="100%"}](pics\bus\drawers.jpg)
 
 :::
 
 ::: {.column width="33.33%"}
 
-![](pics\niblings\20231021_123205.jpg){width="100%"}
-![](pics\niblings\20231020_203051.jpg){width="100%"}
-![](pics\niblings\20231021_083036.png){width="100%"}
+[![](pics\niblings\20231021_123205.jpg){width="100%"}](pics\niblings\20231021_123205.jpg)
+[![](pics\niblings\20231020_203051.jpg){width="100%"}](pics\niblings\20231020_203051.jpg)
+[![](pics\niblings\20231021_083036.jpg){width="100%"}](pics\niblings\20231021_083036.png)
 
 :::
 
@@ -42,26 +59,58 @@ We saw some deer, swam in the lake, and watched *Inside Out* on the side of the 
 
 ::: {.column width="33.33%"}
 
-![](pics\bus\20230902_200151.jpg){width="100%"}
-![](pics\bus\20230902_185400.jpg){width="100%"}
-![](pics\bus\20230907_215048.jpg){width="100%"}
+[![](pics\bus\20230902_200151.jpg){width="100%"}](pics\bus\20230902_200151.jpg)
+[![](pics\bus\20230902_185400.jpg){width="100%"}](pics\bus\20230902_185400.jpg)
+[![](pics\bus\20230907_215048.jpg){width="100%"}](pics\bus\20230907_215048.jpg)
 
 :::
 
 ::: {.column width="33.33%"}
 
-![](pics\bus\20230830_135110.jpg){width="100%"}
-![](pics\bus\PXL_20230903_001022458.jpg){width="100%"}
-![](pics\bus\PXL_20230909_224241946.jpg){width="100%"}
+[![](pics\bus\20230830_135110.jpg){width="100%"}](pics\bus\20230830_135110.jpg)
+[![](pics\bus\PXL_20230903_001022458.jpg){width="100%"}](pics\bus\PXL_20230903_001022458.jpg)
+[![](pics\bus\PXL_20230909_224241946.jpg){width="100%"}](pics\bus\PXL_20230909_224241946.jpg)
 
 :::
 
 ::: {.column width="33.33%"}
 
-![](pics\bus\bday.jpg){width="100%"}
-![](pics\bus\ari1.jpg){width="100%"}
-![](pics\bus\dogs1.jpg){width="100%"}
+[![](pics\bus\bday.jpg){width="100%"}](pics\bus\bday.jpg)
+[![](pics\bus\ari1.jpg){width="100%"}](pics\bus\ari1.jpg)
+[![](pics\bus\dogs1.jpg){width="100%"}](pics\bus\dogs1.jpg)
 
 :::
 
 ::::
+
+[![](pics\bus\20240302_145132.jpg){width="100%"}](pics\bus\20240302_145132.jpg)
+
+### westward
+
+:::: {.columns}
+
+::: {.column width="33.33%"}
+
+[![](pics\bus\20240302_145132.jpg){width="100%"}](pics\bus\20240302_145132.jpg)
+[![](pics\bus\20240304_184409.jpg){width="100%"}](pics\bus\20240304_184409.jpg)
+
+:::
+
+::: {.column width="33.33%"}
+
+[![](pics\bus\20240312_181644.jpg){width="100%"}](pics\bus\20240312_181644.jpg)
+[![](pics\bus\20240304_121547.jpg){width="100%"}](pics\bus\20240304_121547.jpg)
+
+:::
+
+::: {.column width="33.33%"}
+
+[![](pics\bus\20240302_145034.jpg){width="100%"}](pics\bus\20240302_145034.jpg)
+[![](pics\bus\20240303_084824.jpg){width="100%"}](pics\bus\20240303_084824.jpg)
+
+:::
+
+::::
+
+[![](pics\bus\20240304_121736.jpg){width="100%"}](pics\bus\20240304_121736.jpg)
+[![](pics\bus\20240304_121217.jpg){width="100%"}](pics\bus\20240304_121217.jpg)

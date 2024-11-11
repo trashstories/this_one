@@ -1,0 +1,22 @@
+---
+title: "sf notes"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = FALSE, include = FALSE, message = FALSE, warning = FALSE, cache = FALSE, eval=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)     # ggplot, dplyr, and friends
+library(sf)            # classes and functions for vector data
+library(terra)         # classes and functions for raster data
+library(spData)        # load geographic data
+library(spDataLarge)   # load larger geographic data'
+
+plot(world)
+
+
+
+
+```
+

@@ -1,0 +1,998 @@
+---
+title: "Load Map"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Import and Clean Location Data
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE, eval=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE, eval=FALSE)
+
+library(tidyverse)     # ggplot, dplyr, and friends
+library(jsonlite)      # Read JSON files
+library(sf)            # Handle spatial data in a tidy way
+library(tigris)        # Access deographic data from the US Census
+library(ggrepel)       # Nicer non-overlapping labels
+library(glue)          # Easier string interpolation
+library(scales)        # Nicer labeling functions
+library(patchwork)     # Combine plots nicely
+library(ggspatial)     # Nicer map features like scale bars
+library(leaflet)       # Make interactive maps
+library(lutz)          # Look up time zones for lat/lon coordinates
+library(gt)            # Make fancy tables
+library(rcartocolor)   # Use CARTO colors (https://carto.com/carto-colors/)
+library(ggnewscale)    # Use multiple scales for the same aesthetic in ggplot
+library(extrafont)
+library(tibbletime)
+library(postmastr)
+library(colorspace)
+
+source("deletes.R")
+
+colors <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#0ACCC5", "#CCAC14", "#CC1F14", "#1471CC", 
+            "#805713", "#4F008C", "#B785DD", "black",
+            "#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#0ACCC5", "#CCAC14", "#CC1F14", "#1471CC", 
+            "#805713", "#4F008C", "#B785DD", "black")
+lighten(colors, .5)
+
+colors17 <- c("#CC0AA4", "#B611AE", "#A119B8", "#8B20C2", "#7428CC", 
+              "#5A30CC", "#4038CC", "#263FCC", "#0E47CC", "#0C65C9", 
+              "#0A83C7", "#089FC4", "#06BFC2", "#16C881", "#23D24F", 
+              "#30DC1D", "#3AE700")
+
+# Custom ggplot themes to make pretty plots
+# Get the font at https://fonts.google.com/specimen/Overpass
+theme_roadtrip <- function() {
+  theme_light(base_family = "Changa") +
+    theme(panel.grid.major.y = element_line(color = "#FFD1F9", 
+                                            linewidth = .5, 
+                                            linetype = "longdash"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text.x = element_text(color = "#310873", 
+                                     family = "Changa"),
+          axis.text.y = element_text(color = "#310873", 
+                                     family = "Cambria"),
+          axis.title = element_text(color = "#310873", 
+                                    family = "Changa"),
+          plot.title = element_text(color = "#310873", 
+                                    size = 14, 
+                                    face = "bold", 
+                                    family = "Changa"),
+          plot.subtitle = element_text(color = "#310873", 
+                                       size = 12, 
+                                       family = "Changa"),
+          legend.text = element_text(color = "#310873", 
+                                     family = "Changa"),
+          plot.caption = element_text(color = "#310873", 
+                                      family = "Cambria"))
+}
+
+theme_roadtrip_map <- function() {
+  theme_void(base_family = "Changa") +
+    theme(
+      plot.title = element_text(color = "#310873", 
+                                size = 14, 
+                                face = "bold", 
+                                family = "Changa"),
+      strip.text = element_text(family = "Changa", 
+                                face = "plain",
+                                size = rel(1.1), 
+                                hjust = 0.5)
+    )
+}
+
+# Make labels use Changa by default
+update_geom_defaults("label_repel", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+update_geom_defaults("label", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+
+update_geom_defaults("text_repel", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+update_geom_defaults("text", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+
+lower_48 <- states(resolution = "20m", year = 2022, cb = TRUE) |> 
+  filter(!(NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "California",
+                       "Oregon", "Nevada", "Washington", "Idaho", 
+                       "Colorado", "Arkansas", "Kansas", "Delaware",
+                       "Montana", "Utah", "Arizona", "South Dakota", 
+                       "North Dakota", "Minnesota", "Maine", "Wyoming",
+                       "Wisconsin", "New Hampshire", "Vermont", "Iowa",
+                       "Massachusetts", "Rhode Island", "Connecticut",
+                       "New York", "New Jersey", "Michigan", "Nebraska",
+                       "Oklahoma", "Missouri", "Indiana", "Ohio")))
+
+```
+
+```{r help}
+
+#' Format difftime in minutes and hours
+#'
+#' This function takes a difftime input \code{x} and formats the result as a 
+#' string indicating the number of hours and minutes in the duration.
+#'
+#' @param x A difftime input.
+#' @return A character vector of formatted duration strings.
+#' @examples
+#' x <- as.difftime(c(93, 1007, 3056), units = "secs")
+#' fmt_duration(x)
+fmt_difftime <- function(x) {
+  n_seconds <- seconds(as.double(x, units = "secs"))
+  n_seconds <- seconds_to_period(n_seconds)
+  
+  out <- map_chr(n_seconds, \(n) {
+    if (as.numeric(n) < 3600) {
+      # If this is less than an hour, don't format anything with hours
+      glue::glue("{MM} minutes", MM = minute(n))
+    } else {
+      # I only want to format this as a number of hours. If the duration is
+      # longer than 24 hours, seconds_to_period() rolls over into days (i.e.
+      # seconds_to_period(60 * 60 * 24) returns "1d 0H 0M 0S"), and it shows
+      # zero hours. So we extract the day part of the period, multiply it by 24,
+      # and add it to the hour component that we want to display
+      extra_day_hours <- day(n) * 24
+      
+      glue::glue("{HH} hour{s} {MM} minutes",
+        HH = scales::label_comma()(hour(n) + extra_day_hours),
+        MM = minute(n),
+        s = ifelse(hour(n) == 1, "", "s")
+      )
+    }
+  })
+  
+  return(out)
+}
+
+fmt_miles <- scales::label_number(accuracy = 10, suffix = " miles", big.mark = ",")
+
+miles_to_meters <- function(x) {
+  x * 1609.344
+}
+
+meters_to_miles <- function(x) {
+  x / 1609.344
+}
+
+meters_to_feet <- function(x) {
+  x * 3.28084
+}
+
+km_to_miles <- function(x) {
+  meters_to_miles(x * 1000)
+}
+
+```
+
+```{r load, eval=FALSE}
+
+# all_locations_us_raw <- read_json("data/Records.json", simplifyVector = TRUE) |>
+#   # Pull out the "locations" slot (this is the same as doing full_data$locations)
+#   pluck("locations") |>
+#   # Convert the timestamp to an actual UTC-based timestamp
+#   mutate(timestamp = ymd_hms(timestamp, tz = "UTC")) |>
+#   # Filter since 2018-12-11
+#   filter(timestamp > as.Date("2018-12-11"))
+# 
+# saveRDS(all_locations_us_raw, "all_locations_us_raw.RDS")
+
+all_locations_us_raw <- readRDS("all_locations_us_raw.RDS")
+
+all_locations <- readRDS("all_locations.RDS")
+travel <- readRDS("travel.RDS")
+place_visits <- readRDS("place_visits.RDS")
+
+```
+
+```{r clean_r, eval=FALSE}
+
+all_locations_ <- all_locations_us_raw |>
+  drop_na(latitudeE7, longitudeE7) |>
+  filter(formFactor == "PHONE" | is.na(formFactor)) |>
+  # Scale down the location data (divide any column that ends in E7 by 10000000)
+  mutate(across(ends_with("E7"), ~ . / 1e7)) |>
+  # Add some helper columns for filtering, grouping, etc.
+  mutate(year = year(timestamp),
+         month = month(timestamp, label = TRUE),
+         day = day(timestamp)) |>
+  mutate(my = paste0(month, " ", year),
+         md = paste0(month, " ", day),
+         mdy = paste0(month, " ", day, ", ", year)) |> 
+  filter(longitudeE7 != -88.8430372) |>
+
+
+a_l <- all_locations_ |> 
+  filter(mdy == "Aug 17, 2023",
+         latitudeE7 < 31.99) |> 
+  mutate(year = year("2023-12-27"),
+         month = month("2023-12-27", label = TRUE),
+         day = day("2023-12-27")) |>
+  mutate(my = paste0(month, " ", year),
+         md = paste0(month, " ", day),
+         mdy = paste0(month, " ", day, ", ", year)) |> 
+  arrange(desc(timestamp)) |> 
+  mutate(timestamp = seq(as_datetime("2023-12-27 20:30:20"), 
+                         by = 10, 
+                         length.out = 398))
+
+all_locations <- all_locations_ |> 
+  rbind(a_l) |>
+  # Create a geometry column with the coordinates
+  st_as_sf(coords = c("longitudeE7", "latitudeE7"), crs = st_crs("EPSG:4326")) |>
+  # Make a column with the time zone for each point
+  mutate(tz = tz_lookup(., method = "accurate")) |>
+  # Create a version of the timestamp in local time, but in UTC
+  group_by(tz) |>
+  mutate(timestamp_local = force_tz(with_tz(timestamp, tz), "UTC")) |>
+  ungroup() |>
+  # Add some helper columns for filtering, grouping, etc.
+  mutate(year = year(timestamp_local),
+         month = month(timestamp_local),
+         day = day(timestamp_local)) #|>
+  # filter(timestamp != "2024-05-30T23:47:29Z",
+  #        timestamp != "2024-01-15T22:41:05Z")
+
+saveRDS(all_locations, "all_locations.RDS")
+
+```
+
+```{r groups_r, eval=FALSE}
+
+# Combine all the points in the year into a connected linestring
+year_routes <- all_locations |>
+  group_by(year) |>
+  nest() |>
+  mutate(path = map(data, ~st_cast(st_combine(.), "LINESTRING"))) |>
+  unnest(path) |>
+  st_set_geometry("path")
+
+saveRDS(year_routes, "year_routes.RDS")
+
+# Combine all the points in the month into a connected linestring
+month_routes <- all_locations |>
+  group_by(my) |>
+  nest() |>
+  mutate(path = map(data, ~st_cast(st_combine(.), "LINESTRING"))) |>
+  unnest(path) |>
+  st_set_geometry("path")
+
+saveRDS(month_routes, "month_routes.RDS")
+
+```
+
+```{r clean_gis, eval=FALSE}
+
+travel_ <- all_locations_us_raw |>
+  drop_na(latitudeE7, longitudeE7) |>
+  filter(formFactor == "PHONE" | is.na(formFactor)) |>
+  mutate(id = row_number()) |> 
+  # # Scale down the location data (divide any column that ends in E7 by 10000000)
+  mutate(across(ends_with("E7"), ~ . / 1e7)) |>
+  # Add some helper columns for filtering, grouping, etc.
+  mutate(year = year(timestamp),
+         month = month(timestamp, label = TRUE),
+         day = day(timestamp)) |>
+  mutate(my = paste0(month, " ", year),
+         md = paste0(month, " ", day),
+         mdy = paste0(month, " ", day, ", ", year),
+         date = as.Date(mdy, "%b %e, %Y")) |> 
+  # Add indicator column and remove bad coordinates
+  remove_points() |> 
+  select(id, latitudeE7, longitudeE7, timestamp, month, year, my, md, mdy, date) 
+	
+t <- travel_ |> 
+  filter(mdy == "Aug 17, 2023",
+         latitudeE7 < 31.99) |> 
+  # mutate(year = year("2023-12-27"),
+  #        month = month("2023-12-27", label = TRUE),
+  #        day = day("2023-12-27")) |>
+  # mutate(my = paste0(month, " ", year),
+  #        md = paste0(month, " ", day),
+  #        mdy = paste0(month, " ", day, ", ", year),
+  #        date = as.Date(mdy, "%b %e, %Y")) |> 
+  arrange(desc(timestamp)) |> 
+  mutate(timestamp = seq(as_datetime("2023-12-27 20:30:20"), 
+                         by = 10, 
+                         length.out = 398)) |> 
+  select(id, latitudeE7, longitudeE7, timestamp, month, year, my, md, mdy, date) 
+
+travel <- travel_ |> 
+  rbind(t)
+
+saveRDS(travel, "travel.RDS")
+# travel <- readRDS("travel.RDS")
+write_csv(travel, "travelmap/oct24/travel1.csv")
+
+bustravel <- travel |> 
+  filter(date > as.Date("2023-06-11"))
+write_csv(bustravel, "travelmap/oct24/bustravel.csv")
+
+sym <- readRDS("sym.RDS")
+
+# Tagging and removing bad pings at rainbow
+tag_rb <- sym |> 
+  select(date, rainbow) |> 
+  mutate(no = ifelse(rainbow == 1 & 
+                       lag(rainbow) == 1 & 
+                       lead(rainbow) == 1, 
+                     1, 0))
+  
+track <- travel |> 
+  left_join(tag_rb, by = "date") |> 
+  mutate(lat_diff = latitudeE7 - lag(latitudeE7),
+         long_diff = longitudeE7 - lag(longitudeE7),
+         time_diff = timestamp - lag(timestamp)) |> 
+  mutate(time_diff = round(time_diff, 0),
+         hr = as.numeric(substr(timestamp, 12, 13))) |> 
+  filter(no != 1,
+         hr > 6) #|> 
+  # mutate(tag = ifelse(lat_diff > .0001 | long_diff > .0001 & time_diff < 300,
+  #                     1, 0)) |>
+  # filter(tag != 1)
+
+# track <- as_tbl_time(track, index = timestamp)
+# 
+# track <- track |> 
+#   as_period(period = "hour")
+# track <- filter_time(track, '2024-03-07 0' ~ '2024-03-07 6')
+
+saveRDS(track, "track.RDS")
+# travel <- readRDS("track.RDS")
+write_csv(track, "travelmap/oct24/track.csv")
+
+```
+
+```{r groups_gis, eval=FALSE}
+
+travel0prior <- travel |>
+  filter(timestamp < as.Date("2023-06-15"))
+write_csv(travel0prior, "travelmap/oct24/travel0prior.csv")
+
+travel1broke <- travel |>
+  filter(timestamp >= as.Date("2023-06-15"),
+         timestamp < as.Date("2023-07-29"))
+write_csv(travel1broke, "travelmap/oct24/travel1broke.csv")
+
+travel2nobus <- travel |>
+  filter(timestamp >= as.Date("2023-07-29"),
+         timestamp < as.Date("2023-08-26"))
+write_csv(travel2nobus, "travelmap/oct24/travel2nobus.csv")
+
+travel3fl <- travel |>
+  filter(timestamp >= as.Date("2023-08-26"),
+         timestamp < as.Date("2024-03-13"))
+write_csv(travel3fl, "travelmap/oct24/travel3fl.csv")
+
+travel4tx <- travel |>
+  filter(timestamp >= as.Date("2024-03-13"),
+         timestamp < as.Date("2024-05-22"))
+write_csv(travel4tx, "travelmap/oct24/travel4tx.csv")
+
+travel5oz <- travel |>
+  filter(timestamp >= as.Date("2024-05-21"),
+         timestamp < as.Date("2024-06-12"))
+write_csv(travel5oz, "travelmap/oct24/travel5oz.csv")
+
+travel6lakes <- travel |>
+  filter(timestamp >= as.Date("2024-06-12"),
+         timestamp < as.Date("2024-09-05"))
+write_csv(travel6lakes, "travelmap/oct24/travel6lakes3.csv")
+
+travel7south <- travel |>
+  filter(timestamp >= as.Date("2024-09-05"))
+write_csv(travel7south, "travelmap/oct24/travel7south3.csv")
+
+```
+
+```{r places, eval=FALSE}
+
+# Computer friendly timezones like America/New_York work for computers, but I
+# want to sometimes show them as US-standard abbreviations like EDT (Eastern
+# Daylight Time), so here's a little lookup table we can use to join to bigger
+# datasets for better abbreviations
+tz_abbreviations <- tribble(
+  ~tz,                ~tz_abb,
+  "America/New_York", "EDT",
+  "America/Chicago",  "CDT",
+  "America/Denver",   "MDT",
+  "America/Phoenix",  "MST",
+  "America/Los_Angeles", "PDT"
+)
+
+years <- "data/Semantic Location History"
+history <- list.files(years)
+
+for(y in history) {
+  folder <- paste0("data/Semantic Location History/", y)
+  files <- list.files(folder, pattern = "*.json")
+
+  for (m in files) {
+    file_path <- file.path(folder, m)
+    newData <- fromJSON(file_path)
+
+    place_visits_raw <- read_json(file_path,
+                         simplifyVector = FALSE) |>
+      # Extract the timelineObjects JSON element
+      pluck("timelineObjects") |>
+      # Filter the list to only keep placeVisits
+      # { More verbose function-based approach: map(~ .x[["placeVisit"]]) }
+      # Neat selection-based approach with just the name!
+      map("placeVisit") |>
+      # Discard all the empty elements (i.e. the activitySegments)
+      compact()
+
+    place_visits <- place_visits_raw |>
+      # Extract parts of the nested list
+      map(~{
+        tibble(
+          id = .x$location$placeId,
+          latitudeE7 = .x$location$latitudeE7 / 1e7,
+          longitudeE7 = .x$location$longitudeE7 / 1e7,
+          name = .x$location$name,
+          address = .x$location$address,
+          startTimestamp = ymd_hms(.x$duration$startTimestamp, tz = "UTC"),
+          endTimestamp = ymd_hms(.x$duration$endTimestamp, tz = "UTC")
+        )
+      }) |>
+      list_rbind() |>
+      # Calculate the duration of the stop
+      mutate(duration = endTimestamp - startTimestamp) |>
+      # Make a geometry column
+      st_as_sf(coords = c("longitudeE7", "latitudeE7"), crs = st_crs("EPSG:4326")) |>
+      # Make a column with the time zone for each point
+      mutate(tz = tz_lookup(., method = "accurate")) |>
+      # Create a version of the timestamp in local time, but in UTC
+      group_by(tz) |>
+      mutate(
+        startTimestamp_local = force_tz(with_tz(startTimestamp, tz), "UTC"),
+        endTimestamp_local = force_tz(with_tz(endTimestamp, tz), "UTC")
+      ) |>
+      ungroup() |>
+      # Add some helper columns for filtering, grouping, etc.
+      mutate(
+        year = year(startTimestamp_local),
+        month = month(startTimestamp_local),
+        day = day(startTimestamp_local)
+      ) |>
+      mutate(
+        day_month = strftime(startTimestamp_local, "%B %e"),
+        # With %e, there's a leading space for single-digit numbers, so we remove
+        # any double spaces and replace them with single spaces
+        # (e.g., "June  3" becomes "June 3")
+        day_month = str_replace(day_month, "  ", " "),
+        day_month = fct_inorder(day_month)
+      ) |>
+      # Bring in abbreviated time zones
+      left_join(tz_abbreviations, by = join_by(tz))
+
+    assign(paste0("place_visits_", substr(m, 1, 8)), place_visits)
+  }
+}
+
+place_visits_ <- readRDS("place_visits.RDS")
+
+place_visits <- place_visits_ |>
+  rbind(place_visits_2024_JAN,
+        place_visits_2024_FEB,
+        place_visits_2024_MAR,
+        place_visits_2024_APR,
+        place_visits_2024_MAY,
+        place_visits_2024_JUN,
+        place_visits_2024_JUL,
+        place_visits_2024_AUG,
+        place_visits_2024_SEP) |>
+  distinct()
+
+saveRDS(place_visits, "place_visits.RDS")
+
+place <- place_visits |>
+  as_tibble(spatial = FALSE) |>
+  mutate(date = as.Date(substr(startTimestamp, 1, 10))) |>
+  select(date, address) |>
+  distinct() |>
+  pm_identify(var = address) |>
+  pm_parse(input = "full",
+           address = address,
+           output = "full",
+           keep_parsed = "limited") |>
+  rename(state = pm.state) |>
+  select(date, state)
+
+saveRDS(place, "place.RDS")
+write_csv(place_visits, "travelmap/oct24/place_visits.csv")
+
+```
+
+```{r waterfalls, eval=FALSE}
+
+miners <- travel |> 
+  filter(date == as.Date("2024-07-21"))
+
+place_visits <- readRDS("place_visits.RDS")
+
+seent <- read_csv("data/lists/seent.csv") |> 
+  rename(name = Title) |> 
+  mutate(seent = "yes") |> 
+  select(name, seent)
+
+waterfalls <- read_csv("data/lists/waterfalls.csv") |> 
+  select(Title) |> 
+  rename(name = Title) |> 
+  mutate(label = case_when(str_detect(name, "State Park") ~ 
+                             substr(name, 1, str_length(name) - str_length(" State Park")), 
+                           str_detect(name, "National Park") ~
+                             substr(name, 1, str_length(name) - str_length(" National Park")),
+                           str_detect(name, "Metropolitan Park") ~
+                             substr(name, 1, str_length(name) - str_length(" Metropolitan Park")),
+                           str_detect(name, "Scenic Site") ~
+                             substr(name, 1, str_length(name) - str_length(" Scenic Site")),
+                           str_detect(name, "Parking") ~
+                             substr(name, 1, str_length(name) - str_length(" Parking")),
+                           str_detect(name, "Park") ~
+                             substr(name, 1, str_length(name) - str_length(" Park")),
+                           str_detect(name, "Trailhead") ~
+                             substr(name, 1, str_length(name) - str_length(" Trailhead")),
+                           str_detect(name, "Trail") ~
+                             substr(name, 1, str_length(name) - str_length(" Trail")),
+                           TRUE ~ str_to_title(name))) |> 
+  inner_join(seent, by = "name") |> 
+  mutate(name = case_when(str_detect(name, "Canyon Falls") ~ "Canyon Falls Roadside Park",
+                          TRUE ~ name)) 
+
+
+ 
+write_csv(waterfalls, "travelmap/oct24/waterfalls.csv")
+write_csv(place_visits, "travelmap/oct24/place_visits.csv")
+
+```
+
+```{r points, eval=FALSE}
+
+points_all <- place_visits |> 
+  drop_na(name, address) |>
+  filter(startTimestamp > as.Date("2023-06-29"),
+         duration > 15) |> 
+  mutate(state_park = ifelse(str_detect(name, "State Park"), 1, 0),
+         park = case_when(str_detect(name, "Park") ~ 1, 
+                          str_detect(name, "Nature") ~ 1, 
+                          str_detect(name, "Wildlife") ~ 1, 
+                          str_detect(name, "Camp") ~ 1, 
+                          str_detect(name, "Visitor") ~ 1, 
+                          str_detect(name, "Forest") ~ 1,  
+                          str_detect(name, "Beach") ~ 1, 
+                          str_detect(name, "Conservation") ~ 1, 
+                          str_detect(name, "Beach") ~ 1, 
+                          str_detect(name, "Spring") ~ 1, 
+                          str_detect(name, "Lake") ~ 1, 
+                          str_detect(name, "River") ~ 1, 
+                          str_detect(name, "Trail") ~ 1, 
+                          str_detect(name, "Falls") ~ 1, 
+                          str_detect(name, "Red Star Access") ~ 1, 
+                          str_detect(name, "Woods") ~ 1, 
+                          TRUE ~ 0),
+         camp = ifelse(str_detect(name, "Camp"), 1, 0),
+         lake = ifelse(str_detect(name, "Lake"), 1, 0),
+         river = ifelse(str_detect(name, "River"), 1, 0),
+         bank = ifelse(str_detect(name, "Bank"), 1, 0),
+         museum = case_when(str_detect(name, "Museum") ~ 1, 
+                            str_detect(name, "Histor") ~ 1, 
+                            TRUE ~ 0),
+         books = case_when(str_detect(name, "Book") ~ 1, 
+                            str_detect(name, "Women & Children First") ~ 1, 
+                            TRUE ~ 0),
+         school = case_when(str_detect(name, "GSU") ~ 1, 
+                            str_detect(name, "University") ~ 1,  
+                            str_detect(name, "Library") ~ 1,  
+                            str_detect(name, "Aderhold") ~ 1,  
+                            str_detect(name, "College") ~ 1,  
+                            TRUE ~ 0),
+         parkinglot = case_when(str_detect(name, "Walmart") ~ 1, 
+                                str_detect(name, "Lowe's") ~ 1, 
+                                str_detect(name, "Whole Foods") ~ 1, 
+                                str_detect(name, "CVS") ~ 1, 
+                                str_detect(name, "AutoZone") ~ 1, 
+                                str_detect(name, "H-E-B") ~ 1, 
+                                str_detect(name, "Walgreens") ~ 1, 
+                                str_detect(name, "Home Depot") ~ 1, 
+                                str_detect(name, "Mall") ~ 1, 
+                                str_detect(name, "Harbor Freight Tools") ~ 1, 
+                                str_detect(name, "Shop") ~ 1, 
+                                str_detect(name, "Meijer") ~ 1, 
+                                str_detect(name, "Centre") ~ 1, 
+                                str_detect(name, "Publix") ~ 1, 
+                                str_detect(name, "Market") ~ 1, 
+                                str_detect(name, "Plaza") ~ 1, 
+                                str_detect(name, "Lot") ~ 1, 
+                                str_detect(name, "Deck") ~ 1, 
+                                str_detect(name, "Auto Parts") ~ 1, 
+                                str_detect(name, "Huebner Oaks") ~ 1, 
+                                str_detect(name, "Take 5") ~ 1, 
+                                str_detect(name, "CANDLER MCAFEE") ~ 1, 
+                                str_detect(name, "Precision") ~ 1, 
+                                str_detect(name, "NAPA") ~ 1, 
+                                str_detect(name, "Kroger") ~ 1, 
+                                str_detect(name, "Target") ~ 1, 
+                                str_detect(name, "Laund") ~ 1, 
+                                str_detect(name, "Planet K") ~ 1, 
+                                str_detect(name, "Verizon") ~ 1, 
+                                str_detect(name, "Airport") ~ 1, 
+                                str_detect(name, "Family Dollar") ~ 1, 
+                                str_detect(name, "Village") ~ 1, 
+                                str_detect(name, "Fitness") ~ 1, 
+                                str_detect(name, "Town Center") ~ 1, 
+                                str_detect(name, "FedEx") ~ 1, 
+                                str_detect(name, "Public Storage") ~ 1, 
+                                str_detect(name, "Supermarket") ~ 1, 
+                                str_detect(name, "UPS Store") ~ 1, 
+                                str_detect(name, "Dispensary") ~ 1, 
+                                str_detect(name, "Regency Court") ~ 1, 
+                                str_detect(name, "Car Care") ~ 1, 
+                                str_detect(name, "Tire") ~ 1, 
+                                str_detect(name, "Dollar General") ~ 1, 
+                                str_detect(name, "Tow") ~ 1, 
+                                str_detect(name, "AT&T Learning Center") ~ 1, 
+                                str_detect(name, "Office") ~ 1, 
+                                str_detect(name, "Green Ford") ~ 1, 
+                                str_detect(name, "Square") ~ 1, 
+                                str_detect(name, "Landfill") ~ 1, 
+                                str_detect(name, "Enterprise") ~ 1, 
+                                str_detect(name, "Staples") ~ 1, 
+                                str_detect(name, "Goodwill Store") ~ 1, 
+                                str_detect(name, "REI") ~ 1,  
+                                str_detect(name, "Transmission") ~ 1, 
+                                str_detect(name, "Lube") ~ 1, 
+                                str_detect(name, "Diesel") ~ 1, 
+                                str_detect(name, "Auto Care") ~ 1, 
+                                str_detect(name, "Winn-Dixie") ~ 1, 
+                                str_detect(name, "KIA") ~ 1, 
+                                str_detect(name, "office") ~ 1, 
+                                str_detect(name, "Mandarin Landing") ~ 1, 
+                                str_detect(name, "Baymeadows") ~ 1, 
+                                str_detect(name, "Commons") ~ 1, 
+                                str_detect(name, "Best Bedroom") ~ 1, 
+                                str_detect(name, "Tax") ~ 1, 
+                                str_detect(name, "Postal Service") ~ 1, 
+                                str_detect(name, "Main Event") ~ 1, 
+                                str_detect(name, "Chevrolet") ~ 1, 
+                                str_detect(name, "City Base Landing") ~ 1, 
+                                str_detect(name, "Academy Sports") ~ 1, 
+                                str_detect(name, "Tanger") ~ 1, 
+                                str_detect(name, "Police") ~ 1, 
+                                str_detect(name, "Dollar Tree") ~ 1, 
+                                str_detect(name, "Machesney Crossing") ~ 1, 
+                                str_detect(name, "Gateway District") ~ 1, 
+                                str_detect(name, "District") ~ 1, 
+                                str_detect(name, "AC&T") ~ 1, 
+                                str_detect(name, "West Marine") ~ 1, 
+                                str_detect(name, "SuperStore") ~ 1, 
+                                str_detect(name, "Rest Area") ~ 1, 
+                                str_detect(name, "Southpark Meadows") ~ 1, 
+                                str_detect(name, "YMCA") ~ 1, 
+                                str_detect(name, "The Rim") ~ 1, 
+                                str_detect(name, "Turners Crossing") ~ 1, 
+                                str_detect(name, "Cannabis") ~ 1, 
+                                str_detect(name, "Gordon Food") ~ 1, 
+                                TRUE ~ 0),
+         movie = case_when(str_detect(name, "AMC") ~ 1,
+                           str_detect(name, "Theater") ~ 1,
+                           str_detect(name, "Cinemark") ~ 1, 
+                           str_detect(name, "Cinema") ~ 1, 
+                           TRUE ~ 0),
+         gas = case_when(str_detect(name, "Chevron") ~ 1,
+                         str_detect(name, "Gas") ~ 1,
+                         str_detect(name, "Casey's") ~ 1, 
+                         str_detect(name, "Truck") ~ 1, 
+                         str_detect(name, "Travel") ~ 1, 
+                         str_detect(name, "Fuel") ~ 1, 
+                         str_detect(name, "Wawa") ~ 1, 
+                         str_detect(name, "Shell") ~ 1, 
+                         str_detect(name, "Exxon") ~ 1, 
+                         str_detect(name, "Stripes") ~ 1, 
+                         str_detect(name, "Valero") ~ 1, 
+                         str_detect(name, "Citgo") ~ 1, 
+                         str_detect(name, "Circle K") ~ 1, 
+                         str_detect(name, "RaceTrac") ~ 1, 
+                         str_detect(name, "Mart") ~ 1, 
+                         str_detect(name, "Wash") ~ 1, 
+                         str_detect(name, "Flying J") ~ 1, 
+                         str_detect(name, "7-Eleven") ~ 1, 
+                         str_detect(name, "Kwik Trip") ~ 1, 
+                         str_detect(name, "Kum") ~ 1, 
+                         str_detect(name, "bp") ~ 1, 
+                         str_detect(name, "BP") ~ 1, 
+                         str_detect(name, "Texaco") ~ 1, 
+                         str_detect(name, "QuikTrip") ~ 1, 
+                         str_detect(name, "Sheetz") ~ 1, 
+                         str_detect(name, "TA") ~ 1, 
+                         str_detect(name, "Buc-ee's") ~ 1, 
+                         str_detect(name, "Mobil") ~ 1,  
+                         str_detect(name, "Speedway") ~ 1, 
+                         str_detect(name, "CHEVRON") ~ 1, 
+                         TRUE ~ 0),
+         drs = case_when(str_detect(name, "Pain") ~ 1,
+                         str_detect(name, "Med") ~ 1,
+                         str_detect(name, "Clinic") ~ 1,
+                         str_detect(name, "Hospital") ~ 1, 
+                         str_detect(name, "Ortho") ~ 1, 
+                         str_detect(name, "Dermatology") ~ 1, 
+                         str_detect(name, "Plasma") ~ 1, 
+                         str_detect(name, "Neurology") ~ 1,  
+                         str_detect(name, "MRI") ~ 1, 
+                         str_detect(name, "Spine") ~ 1, 
+                         str_detect(name, "Pharmacy") ~ 1,  
+                         str_detect(name, "Counseling") ~ 1,  
+                         str_detect(name, "MD") ~ 1,  
+                         str_detect(name, "PA") ~ 1,   
+                         str_detect(name, "Urgent") ~ 1,    
+                         str_detect(name, "Urology") ~ 1,  
+                         str_detect(name, "Biomat") ~ 1,  
+                         str_detect(name, "Surgery") ~ 1,  
+                         TRUE ~ 0),
+         hotel = case_when(str_detect(name, "Inn") ~ 1,
+                           str_detect(name, "Suites") ~ 1,
+                           str_detect(name, "Marriott") ~ 1,
+                           str_detect(name, "Motel") ~ 1, 
+                           str_detect(name, "Hotel") ~ 1, 
+                           str_detect(name, "Hyatt") ~ 1,   
+                           str_detect(name, "Super 8") ~ 1,   
+                           TRUE ~ 0),
+         badfood = case_when(str_detect(name, "McDon") ~ 1,
+                             str_detect(name, "Whataburger") ~ 1,
+                             str_detect(name, "Taco Bell") ~ 1,
+                             str_detect(name, "Waffle House") ~ 1,
+                             str_detect(name, "Zaxby") ~ 1,
+                             str_detect(name, "Panera") ~ 1,
+                             str_detect(name, "Applebee") ~ 1,
+                             str_detect(name, "Wendy") ~ 1,
+                             str_detect(name, "Taco Cabana") ~ 1,
+                             str_detect(name, "Freddy") ~ 1,
+                             str_detect(name, "Chick-fil-A") ~ 1,
+                             str_detect(name, "Popeyes") ~ 1,
+                             str_detect(name, "Steak 'n Shake") ~ 1,
+                             str_detect(name, "Burger King") ~ 1,
+                             str_detect(name, "Dunkin") ~ 1,
+                             str_detect(name, "Sonic") ~ 1,
+                             str_detect(name, "Dairy Queen") ~ 1,
+                             str_detect(name, "Little Caesars") ~ 1,
+                             str_detect(name, "Wingstop") ~ 1,
+                             str_detect(name, "Subway Restaurants") ~ 1,
+                             str_detect(name, "Cook Out") ~ 1,
+                             str_detect(name, "Jack in the Box") ~ 1,
+                             str_detect(name, "Bojangles") ~ 1,
+                             str_detect(name, "Del Taco") ~ 1,
+                             str_detect(name, "Captain D's") ~ 1,
+                             str_detect(name, "BURGER WIN") ~ 1,
+                             str_detect(name, "In-N-Out") ~ 1,
+                             str_detect(name, "Frozen Custard") ~ 1,
+                             str_detect(name, "Culver’s") ~ 1,
+                             str_detect(name, "Church's") ~ 1,
+                             str_detect(name, "KFC") ~ 1,
+                             str_detect(name, "Taco Palenque") ~ 1,
+                             str_detect(name, "IHOP") ~ 1,	
+                             str_detect(name, "Olive Garden") ~ 1,
+                             str_detect(name, "Hungry Howie's Pizza") ~ 1,
+                             TRUE ~ 0),
+         goodfood = case_when(str_detect(name, "Gourmet") ~ 1,
+                              str_detect(name, "The Cove") ~ 1,
+                              str_detect(name, "Chicago Bagel & Deli") ~ 1,
+                              str_detect(name, "SoHill") ~ 1,
+                              str_detect(name, "Ford's BBQ") ~ 1,
+                              str_detect(name, "EARL") ~ 1,
+                              str_detect(name, "Vortex") ~ 1,
+                              str_detect(name, "Grindhouse") ~ 1,
+                              str_detect(name, "Flatiron") ~ 1,
+                              str_detect(name, "Pizza Classics") ~ 1,
+                              str_detect(name, "Savage Pizza") ~ 1,
+                              str_detect(name, "Home grown") ~ 1,
+                              str_detect(name, "ParkGrounds") ~ 1,
+                              TRUE ~ 0)) |> 
+  mutate(name = case_when(str_detect(name, "Palmetto Leaves Regional Park") ~ 
+                                       "Palmetto Leaves Regional Park",
+                          str_detect(name, "Merritt Island National Wildlife Refuge") ~ 
+                                       "Merritt Island National Wildlife Refuge",
+                          TRUE ~ name))	
+
+write_csv(points_all, "travelmap/oct24/points_all.csv")
+
+points <- points_all |> 
+  filter(badfood == 0,
+         parkinglot == 0,
+         drs == 0,
+         gas == 0,
+         movie == 0,
+         bank == 0,
+         school == 0,
+         hotel == 0)
+
+write_csv(points, "travelmap/oct24/points.csv")
+
+```
+
+```{r faves, eval=FALSE}
+
+faves_ <- read_csv("faves.csv")
+
+faves <- faves_ |> 
+  left_join(points_all, by = "name")
+
+write_csv(faves, "faves_gis.csv")
+
+```
+
+```{r elevation, eval=FALSE}
+
+elevation_data <- all_locations |> 
+  mutate(elevation = meters_to_feet(altitude)) |> 
+  mutate(m_y = paste0(year, "-", month)) |> 
+  mutate(remove = case_when(timestamp > as.Date("2023-12-23") & 
+                              timestamp < as.Date("2023-12-26") & 
+                              elevation < 2500 ~ 1, 
+                            md == "Dec 19" & elevation > 500 ~ 1,
+                            md == "Dec 19" & elevation < 0 ~ 1,
+                            TRUE ~ 0)) |> 
+  filter(#timestamp > as.Date("2023-06-29"),
+         # elevation < 3500,
+         # elevation > -750,
+         formFactor == "PHONE",
+         # month == 9,
+         remove == 0)
+
+# elev_points <- points |> 
+#   filter(year > 2022) |> 
+#   filter(name == "Garner State Park" |
+#            name == "Davis Family Lodge")
+# 
+# stops_to_show <- points |> 
+#   st_drop_geometry() |> 
+#   filter(id %in% elev_points$id) |> 
+#   left_join(elev_points, by = "id") #|> 
+#   # Magical new join_by(closest(...)) syntax for inexact, approximate matching
+#   # to get the closest elevation for the stop(!)
+#   # left_join(elevation_data, by = join_by(closest(startTimestamp_local >= timestamp_local))) |> 
+# stops <- stops_to_show |> 
+#   left_join(elevation_data, by = "day_month") #|> 
+#   # Get rid of duplicate ids
+#   group_by(id) |> 
+#   slice(1) |> 
+#   ungroup()
+
+elevation_data |> 
+  filter(!is.na(elevation)) |> 
+  ggplot(aes(timestamp_local, elevation, color = m_y)) +
+  geom_line(linewidth = 0.3) +
+  # geom_text_repel(
+  #   data = filter(stops_to_show, nudge_direction == "up"),
+  #   aes(x = startTimestamp_local, label = stop_label),
+  #   nudge_y = 2500, direction = "y", lineheight = 1, family = "Overpass ExtraBold",
+  #   color = clrs[8], segment.color = clrs[7], seed = 1234
+  # ) +
+  # geom_text_repel(
+  #   data = filter(stops_to_show, nudge_direction == "down"),
+  #   aes(x = startTimestamp_local, label = stop_label),
+  #   nudge_y = -1000, lineheight = 1, family = "Overpass ExtraBold",
+  #   color = clrs[8], segment.color = clrs[7], seed = 1234
+  # ) +
+  scale_x_datetime(date_breaks = "1 month", 
+                   labels = date_format("%B"),
+                   expand = c(0.01,0.01)) +
+  scale_y_continuous(
+    breaks = seq(0, 8000, by = 500),
+    labels = label_comma(suffix = " ft.")
+  ) +
+  scale_color_manual(values = colors, guide = "none") +
+  # coord_cartesian(ylim = c(0,2500)) +
+  labs(x = NULL, 
+       y = "Elevation") +
+  theme_roadtrip()
+
+```
+
+
+```{r activities, eval=FALSE}
+
+# activity_segments_raw <- read_json(
+#   "data/Semantic Location History/2023/2023_JUNE.json",
+#   simplifyVector = FALSE
+# ) |>
+#   # Extract the timelineObjects JSON element
+#   pluck("timelineObjects") |>
+#   # Filter the list to only keep activitySegments
+#   map("activitySegment") |>
+#   # Discard all the empty elements (i.e. the placeVisits)
+#   compact()
+#  
+# activity_segments_not_clean <- activity_segments_raw |>
+#   # Extract parts of the nested list
+#   map(~{
+#     tibble(
+#       distance_m = .x$distance,
+#       activity_type = .x$activityType,
+#       start_latitudeE7 = .x$startLocation$latitudeE7 / 1e7,
+#       start_longitudeE7 = .x$startLocation$longitudeE7 / 1e7,
+#       end_latitudeE7 = .x$endLocation$latitudeE7 / 1e7,
+#       end_longitudeE7 = .x$endLocation$longitudeE7 / 1e7,
+#       startTimestamp = ymd_hms(.x$duration$startTimestamp, tz = "UTC"),
+#       endTimestamp = ymd_hms(.x$duration$endTimestamp, tz = "UTC")
+#     )
+#   }) |>
+#   list_rbind()
+# 
+# # ↑ that needs to be a separate data frame so that we can refer to it to make a
+# # geometry column for the end latitude/longitude
+# activity_segments <- activity_segments_not_clean |>
+#   # Calculate the duration and distance and speed of the segment
+#   mutate(duration = endTimestamp - startTimestamp) |>
+#   mutate(distance_miles = meters_to_miles(distance_m)) |>
+#   mutate(
+#     hours = as.numeric(duration) / 60,
+#     avg_mph = distance_miles / hours
+#   ) |>
+#   # Make two geometry columns
+#   st_as_sf(coords = c("start_longitudeE7", "start_latitudeE7"), crs = st_crs("EPSG:4326")) |>
+#   rename("geometry_start" = "geometry") |>
+#   mutate(geometry_end = st_geometry(
+#     st_as_sf(
+#       activity_segments_not_clean,
+#       coords = c("end_longitudeE7", "end_latitudeE7"),
+#       crs = st_crs("EPSG:4326"))
+#     )
+#   ) |>
+#   select(-end_longitudeE7, -end_latitudeE7) |>
+#   # Make a column with the time zone for each point
+#   mutate(tz_start = tz_lookup(geometry_start, method = "accurate")) |>
+#   mutate(tz_end = tz_lookup(geometry_end, method = "accurate")) |>
+#   # Create a version of the timestamps in local time, but in UTC
+#   group_by(tz_start) |>
+#   mutate(startTimestamp_local = force_tz(with_tz(startTimestamp, tz_start), "UTC")) |>
+#   ungroup() |>
+#   group_by(tz_end) |>
+#   mutate(endTimestamp_local = force_tz(with_tz(endTimestamp, tz_end), "UTC")) |>
+#   ungroup() |>
+#   # Add some helper columns for filtering, grouping, etc.
+#   mutate(
+#     year = year(startTimestamp_local),
+#     month = month(startTimestamp_local),
+#     day = day(startTimestamp_local)
+#   ) |>
+#   mutate(
+#     day_month = strftime(startTimestamp_local, "%B %e"),
+#     # With %e, there's a leading space for single-digit numbers, so we remove
+#     # any double spaces and replace them with single spaces
+#     # (e.g., "June  3" becomes "June 3")
+#     day_month = str_replace(day_month, "  ", " "),
+#     day_month = fct_inorder(day_month)
+#   ) |>
+#   # Bring in abbreviated time zones for both the start and end time zones
+#   left_join(
+#     rename(tz_abbreviations, "tz_start_abb" = "tz_abb"),
+#     by = join_by(tz_start == tz)
+#   ) |>
+#   left_join(
+#     rename(tz_abbreviations, "tz_end_abb" = "tz_abb"),
+#     by = join_by(tz_end == tz)
+#   ) |>
+#   # Create an id column so we can better reference individual activities
+#   # Make it a character so it can combine with the place visit id column
+#   mutate(id = as.character(1:n()))
+# 
+# all_stops_activities <- bind_rows(
+#   list(visit = place_visits, segment = activity_segments),
+#   .id = "type"
+# ) |>
+#   arrange(startTimestamp)
+# 
+# saveRDS(all_stops_activities, "all_stops_activities.RDS")
+
+```

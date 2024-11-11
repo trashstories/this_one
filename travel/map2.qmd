@@ -1,0 +1,379 @@
+---
+title: "Travel Map"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE, eval=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE, eval=FALSE)
+
+library(tidyverse)     # ggplot, dplyr, and friends
+library(jsonlite)      # Read JSON files
+library(sf)            # Handle spatial data in a tidy way
+library(tigris)        # Access deographic data from the US Census
+library(ggrepel)       # Nicer non-overlapping labels
+library(glue)          # Easier string interpolation
+library(scales)        # Nicer labeling functions
+library(patchwork)     # Combine plots nicely
+library(ggspatial)     # Nicer map features like scale bars
+library(leaflet)       # Make interactive maps
+library(lutz)          # Look up time zones for lat/lon coordinates
+library(gt)            # Make fancy tables
+library(rcartocolor)   # Use CARTO colors (https://carto.com/carto-colors/)
+library(ggnewscale)    # Use multiple scales for the same aesthetic in ggplot
+library(extrafont)
+library(colorspace)
+
+colors <- c("#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#0ACCC5", "#CCAC14", "#CC1F14", "#1471CC", 
+            "#805713", "#4F008C", "#B785DD", "black",
+            "#7400CC", "#CC0AA4", "#0E0ACC", "#3ACC14", 
+            "#0ACCC5", "#CCAC14", "#CC1F14", "#1471CC", 
+            "#805713", "#4F008C", "#B785DD", "black")
+
+# Custom ggplot themes to make pretty plots
+# Get the font at https://fonts.google.com/specimen/Overpass
+theme_roadtrip <- function() {
+  theme_light(base_family = "Changa") +
+    theme(panel.grid.major.y = element_line(color = "#FFD1F9", 
+                                            linewidth = .5, 
+                                            linetype = "longdash"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          axis.ticks = element_blank(),
+          axis.text.x = element_text(color = "#310873", 
+                                     family = "Changa"),
+          axis.text.y = element_text(color = "#310873", 
+                                     family = "Cambria"),
+          axis.title = element_text(color = "#310873", 
+                                    family = "Changa"),
+          plot.title = element_text(color = "#310873", 
+                                    size = 14, 
+                                    face = "bold", 
+                                    family = "Changa"),
+          plot.subtitle = element_text(color = "#310873", 
+                                       size = 12, 
+                                       family = "Changa"),
+          legend.text = element_text(color = "#310873", 
+                                     family = "Changa"),
+          plot.caption = element_text(color = "#310873", 
+                                      family = "Cambria"))
+    
+  
+}
+
+theme_roadtrip_map <- function() {
+  theme_void(base_family = "Changa") +
+    theme(
+      plot.title = element_text(color = "#310873", 
+                                size = 14, 
+                                face = "bold", 
+                                family = "Changa"),
+      strip.text = element_text(family = "Changa", 
+                                face = "plain",
+                                size = rel(1.1), 
+                                hjust = 0.5)
+    )
+}
+
+# Make labels use Changa by default
+update_geom_defaults("label_repel", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+update_geom_defaults("label", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+
+update_geom_defaults("text_repel", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+update_geom_defaults("text", 
+                     list(family = "Changa",
+                          fontface = "plain"))
+
+```
+
+```{r help, eval=FALSE}
+
+#' Format difftime in minutes and hours
+#'
+#' This function takes a difftime input \code{x} and formats the result as a 
+#' string indicating the number of hours and minutes in the duration.
+#'
+#' @param x A difftime input.
+#' @return A character vector of formatted duration strings.
+#' @examples
+#' x <- as.difftime(c(93, 1007, 3056), units = "secs")
+#' fmt_duration(x)
+fmt_difftime <- function(x) {
+  n_seconds <- seconds(as.double(x, units = "secs"))
+  n_seconds <- seconds_to_period(n_seconds)
+  
+  out <- map_chr(n_seconds, \(n) {
+    if (as.numeric(n) < 3600) {
+      # If this is less than an hour, don't format anything with hours
+      glue::glue("{MM} minutes", MM = minute(n))
+    } else {
+      # I only want to format this as a number of hours. If the duration is
+      # longer than 24 hours, seconds_to_period() rolls over into days (i.e.
+      # seconds_to_period(60 * 60 * 24) returns "1d 0H 0M 0S"), and it shows
+      # zero hours. So we extract the day part of the period, multiply it by 24,
+      # and add it to the hour component that we want to display
+      extra_day_hours <- day(n) * 24
+      
+      glue::glue("{HH} hour{s} {MM} minutes",
+        HH = scales::label_comma()(hour(n) + extra_day_hours),
+        MM = minute(n),
+        s = ifelse(hour(n) == 1, "", "s")
+      )
+    }
+  })
+  
+  return(out)
+}
+
+fmt_miles <- scales::label_number(accuracy = 10, suffix = " miles", big.mark = ",")
+
+miles_to_meters <- function(x) {
+  x * 1609.344
+}
+
+meters_to_miles <- function(x) {
+  x / 1609.344
+}
+
+meters_to_feet <- function(x) {
+  x * 3.28084
+}
+
+km_to_miles <- function(x) {
+  meters_to_miles(x * 1000)
+}
+
+```
+
+```{r load, eval=FALSE}
+
+sts <- readRDS("sts.rds") %>% 
+  rename(STUSPS = state)
+
+us_states <- states(resolution = "20m", year = 2022, cb = TRUE)
+
+lower_48 <- us_states %>% 
+  # filter(!(NAME %in% c("Alaska", "Hawaii", "Puerto Rico")))
+  filter(!(NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "California",
+                       "Oregon", "Nevada", "Washington", "Idaho", 
+                       "Colorado", "Kansas", "Delaware", "New Mexico",
+                       "Montana", "Utah", "Arizona", "South Dakota", 
+                       "North Dakota", "Maine", "Wyoming",
+                       "New Hampshire", "Vermont", 
+                       "Massachusetts", "Rhode Island", "Connecticut",
+                       "New York", "New Jersey", "Nebraska"))) %>% 
+  left_join(sts, by = "STUSPS")
+
+# all_locations <- readRDS("all_locations.RDS")
+# year_routes <- readRDS("year_routes.RDS")
+# month_routes <- readRDS("month_routes.RDS")
+# place_visits <- readRDS("place_visits.RDS")
+
+# # I used https://www.openstreetmap.org/export to make this window
+trip_window <- st_sfc(
+  st_point(c(-106.699, 24.567)),  # left (west), bottom (south)
+  st_point(c(-74.795, 50.077)),   # right (east), top (north)
+  crs = st_crs("EPSG:4326")  # WGS 84
+) %>%
+  st_coordinates()
+
+```
+
+```{r years, eval=FALSE}
+
+ggplot() +
+  geom_sf(data = lower_48) +
+  geom_sf(data = year_routes, aes(color = factor(year)),
+    linewidth = 1) +
+  geom_label_repel(
+    data = year_routes,
+    aes(label = factor(year), fill = factor(year), geometry = path),
+    stat = "sf_coordinates", seed = 12345,
+    color = "white", size = 3, segment.color = "grey30",
+    min.segment.length = 0, box.padding = 1,
+    show.legend = FALSE, family = "Changa"
+  ) +
+  scale_color_manual(values = colors, name = NULL, guide = "none") +
+  scale_fill_manual(values = colors, name = NULL, guide = "none") +
+  coord_sf(
+    xlim = trip_window[, "X"],
+    ylim = trip_window[, "Y"]) +
+  theme_roadtrip_map()
+
+```
+
+```{r points_plot, eval=FALSE}
+
+parktime <- points %>% 
+  filter(park == 1) %>% 
+  group_by(year) %>% 
+  summarise(time = sum(duration)) %>% 
+  mutate(hrs = as.numeric(time / 60))
+
+drstime <- points %>% 
+  filter(drs == 1) %>% 
+  group_by(year) %>% 
+  summarise(time = sum(duration)) %>% 
+  mutate(hrs = as.numeric(time / 60))
+
+gastime <- points %>% 
+  filter(gas == 1) %>% 
+  group_by(year) %>% 
+  summarise(time = sum(duration)) %>% 
+  mutate(hrs = as.numeric(time / 60))
+
+parkinglottime <- points %>% 
+  filter(parkinglot == 1) %>% 
+  group_by(year) %>% 
+  summarise(time = sum(duration)) %>% 
+  mutate(hrs = as.numeric(time / 60))
+
+parktime %>% 
+  ggplot(aes(factor(year), hrs, fill = factor(year))) +
+  geom_col() + 
+  scale_y_continuous(breaks = seq(0,1000,50)) +
+  scale_fill_manual(values = colors, guide = "none") +
+  labs(x = NULL,
+       y = "Hours",
+       title = "Total Hours Spent in Parks") +
+  theme_roadtrip()
+
+ggsave("parktime.png", width = 7, height = 7 / 1.618,
+       device = png, type = "cairo", dpi = 300)
+
+```
+
+```{r map, eval=FALSE}
+
+ggplot() +
+  geom_sf(data = lower_48, aes(fill = mean_mood)) +
+  scale_fill_steps2(low = "#FFF4FB",
+                    mid = "#CC0AA4",
+                    high = "black",
+                    midpoint = 7.5,
+                    na.value = lighten("#1471CC", .95),
+                     breaks = seq(0,10,2)) +
+  geom_sf(data = year_routes %>% filter(year > 2022), 
+          aes(color = factor(year)), 
+          linewidth = 2,
+          color = "#FFF4FB") +
+  geom_sf(data = year_routes %>% filter(year > 2022), 
+          aes(color = factor(year)), 
+          linewidth = 1.5) +
+  scale_color_manual(values = colors, guide = "none") +
+  annotation_scale(
+    location = "bl", bar_cols = c("#310873", "white"),
+    unit_category = "imperial", text_family = "Cambria"
+  ) +
+  labs(fill = "Average Depression Severity",
+       caption = "filled states are where I spent more than 2 days") +
+  coord_sf(crs = st_crs("ESRI:102003")) +  # Albers
+  theme_roadtrip_map() +
+  theme(legend.position = "top",
+        plot.background = element_rect(fill = "white",
+                                       color = "white"))
+
+ggsave("moodmap.png", width = 12, height = 12 / 1.618,
+       device = png, type = "cairo", dpi = 300)
+
+```
+
+```{r elevation, eval=FALSE}
+
+elevation_data <- all_locations %>% 
+  mutate(elevation = meters_to_feet(altitude)) %>% 
+  mutate(m_y = paste0(year, "-", month)) %>% 
+  mutate(remove = case_when(timestamp > as.Date("2023-12-23") & 
+                              timestamp < as.Date("2023-12-26") & 
+                              elevation < 2500 ~ 1, 
+                            md == "Dec 19" & elevation > 500 ~ 1,
+                            md == "Dec 19" & elevation < 0 ~ 1,
+                            TRUE ~ 0)) %>% 
+  filter(timestamp > as.Date("2023-06-29"),
+         elevation < 3500,
+         elevation > -750,
+         formFactor == "PHONE",
+         # month == 12,
+         remove == 0)
+
+# elev_points <- points %>% 
+#   filter(year > 2022) %>% 
+#   filter(name == "Garner State Park" |
+#            name == "Davis Family Lodge")
+# 
+# stops_to_show <- points %>% 
+#   st_drop_geometry() %>% 
+#   filter(id %in% elev_points$id) %>% 
+#   left_join(elev_points, by = "id") #%>% 
+#   # Magical new join_by(closest(...)) syntax for inexact, approximate matching
+#   # to get the closest elevation for the stop(!)
+#   # left_join(elevation_data, by = join_by(closest(startTimestamp_local >= timestamp_local))) %>% 
+# stops <- stops_to_show %>% 
+#   left_join(elevation_data, by = "day_month") #%>% 
+#   # Get rid of duplicate ids
+#   group_by(id) %>% 
+#   slice(1) %>% 
+#   ungroup()
+
+elevation_data %>% 
+  filter(!is.na(elevation)) %>% 
+ggplot(aes(x = timestamp_local, y = elevation, color = m_y)) +
+  geom_line(linewidth = 0.3) +
+  # geom_text_repel(
+  #   data = filter(stops_to_show, nudge_direction == "up"),
+  #   aes(x = startTimestamp_local, label = stop_label),
+  #   nudge_y = 2500, direction = "y", lineheight = 1, family = "Overpass ExtraBold",
+  #   color = clrs[8], segment.color = clrs[7], seed = 1234
+  # ) +
+  # geom_text_repel(
+  #   data = filter(stops_to_show, nudge_direction == "down"),
+  #   aes(x = startTimestamp_local, label = stop_label),
+  #   nudge_y = -1000, lineheight = 1, family = "Overpass ExtraBold",
+  #   color = clrs[8], segment.color = clrs[7], seed = 1234
+  # ) +
+  scale_x_datetime(date_breaks = "1 month", 
+                   date_labels = "%B",
+                   expand = c(0,0)) +
+  scale_y_continuous(
+    breaks = seq(0, 8000, by = 500),
+    labels = label_comma(suffix = " ft.")
+  ) +
+  scale_color_manual(values = colors, guide = "none") +
+  # coord_cartesian(ylim = c(0,2500)) +
+  labs(x = NULL, 
+       y = "Elevation") +
+  theme_roadtrip()
+
+```
+
+```{r distance, eval=FALSE}
+
+mo_miles <- read_csv("travelmap/mo_miles.csv") %>% 
+  mutate(miles = as.numeric(miles),
+         yr = ifelse(str_detect(my, "2023"), "2023", "2024")) %>% 
+  filter(miles > 1000)
+
+mo_miles %>% 
+  ggplot(aes(reorder(my, desc(miles)), miles, fill = yr)) +
+  geom_col() +
+  scale_y_continuous(breaks = seq(0,10000,1000),
+                     labels = label_comma()) +
+  scale_fill_manual(values = colors) +
+  labs(x = NULL,
+       y = "Miles",
+       fill = "Year",
+       title = "Miles Travels") +
+  theme_roadtrip()
+
+
+```

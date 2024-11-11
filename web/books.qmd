@@ -11,48 +11,23 @@ format:
     title-block-banner-color: "#9D60F0"
     template-partials:
       - "_layouts/sidebar.html"
-    include-in-header: 
-    - file: submit_form.md
-form:
-  id: books
-  submit: "Send"
-  action: "https://hooks.airtable.com/workflows/v1/genericWebhook/appBUIoApeyWu4Qvr/wflVosqXHyEMFKvK8/wtr8iHCjnnDgQGfcb"
-  method: "POST"
-  fields:
-  - name: fiction
-    type: radio
-    id: fiction
-    label: "Fiction or Non-Fiction?"
-    values:
-    - text: "Fiction"
-      value: 1
-    - text: "Non-fiction"
-      value: 0
-  - name: title
-    type: text
-    id: title
-    label: "Title"
-    required: true
-  - name: author
-    type: text
-    id: author
-    label: "Author"
-  - name: link
-    type: text
-    id: link
-    label: "Link to read"
 editor_options: 
   chunk_output_type: console
 ---
 
 ## Fiction
 
+- [*Octavia's Brood: Science Fiction Stories from Social Justice Movements*](https://www.akpress.org/octavia-s-brood.html) (2015) edited by adrienne maree brown and Walidah Imarisha
 - [*Ceremony*](https://www.thriftbooks.com/w/ceremony-by-leslie-marmon-silko/246068/?resultid=2139b961-64fd-4936-b826-e90541a9094c#isbn=0143104918) (1986) by Leslie Silko
-- [*Mind of My Mind*](https://www.octaviabutler.com/patternist-series) (1977) by Octavia Butler
+- [*The Patternist* Series](https://www.octaviabutler.com/patternist-series) (1976-1984) by Octavia Butler
+- [*A People's Future of the United States: Speculative Fiction from 25 Extraordinary Writers*](https://www.akpress.org/a-people-s-future-of-the-united-states.html) (2019) edited by Victor LaValle and John Joseph Adams
 - [*The Moon is a Harsh Mistress*](https://www.thriftbooks.com/w/the-moon-is-a-harsh-mistress-by-robert-a-heinlein/255464/?resultid=057aff7c-2261-4b07-b9cb-26ee0489fbe6#edition=20399737&idiq=28665707) (1966) by Robert A. Heinlein
-- [*Parable of the Sower*](https://www.octaviabutler.com/parableseries) (1993) by Octavia Butler
+- [*Parable of the Sower*](https://www.octaviabutler.com/parableseries) (1993) and [*Parable of the Talents*](https://www.octaviabutler.com/parableseries) (1998) by Octavia Butler
 - [*Never Whistle at Night: An Indigenous Dark Fiction Anthology*](https://birchbarkbooks.com/products/never-whistle-at-night) (2023) edited by Shane Hawk, Theodore C. Van Alst Jr.
 - [*Kindred*](https://www.octaviabutler.com/kindred) (1979) by Octavia Butler
+- [*Annie Bot*](https://www.harpercollins.com/products/annie-bot-sierra-greer?variant=41059550855202) (2024) by Sierra Greer
+- [*Broken Earth* series](https://rep.club/products/broken-earth-trilogy-box-set?srsltid=AfmBOorDHwm4OkhS7k2O20qJGRV27M72p-cgT1BudSG2UB_TgtA-PtZM) (2015-2017) by N. K. Jemisin
+- [*Teixcalaan* series](https://us.macmillan.com/series/teixcalaan) (2019-2021) by Arkady Martine
 
 ## Non-fiction
 
@@ -65,13 +40,20 @@ editor_options:
 - [*How We Get Free: Black Feminism and the Combahee River Collective*](https://www.haymarketbooks.org/books/1108-how-we-get-free) (2012) edited by Keeanga-Yamahtta Taylor
 - [*How Nonviolence Protects the State*](https://theanarchistlibrary.org/library/peter-gelderloos-how-nonviolence-protects-the-state) (2007) by Peter Gelderloos
 - [*Women, Race & Class*](https://www.thriftbooks.com/w/women-race--class_angela-y-davis/252357/#edition=2384754&idiq=10330589) (1981) by Angela Davis
+- [*Healing Resistance: A Radically Different Response to Harm*](https://www.parallax.org/product/healing-resistance/) (2020) by Kazu Haga
+- [*Loving Corrections*](https://www.akpress.org/loving-corrections.html) (2024) by adrienne maree brown
+- [*How We Show Up: Reclaiming Family, Friendship, and Community*](https://miabirdsong.com/how-we-show-up) (2020) by Mia Birdsong
+- [*Pleasure Activism: The Politics of Feeling Good*](https://www.akpress.org/pleasure-activism.html) (2019) written and gathered by adrienne maree brown
+- [*American Whitelash: A Changing Nation and the Cost of Progress*](https://www.akpress.org/american-whitelash.html) (2023) by Wesley Lowery
 
 ### History
 
 - [*Not "A Nation of Immigrants": Settler Colonialism, White Supremacy, and a History of Erasure and Exclusion*](https://www.beacon.org/Not-A-Nation-of-Immigrants-P1641.aspx) (2021) by Roxanne Dunbar-Ortiz
 - [*An Indigenous Peoples History of the United States*](https://www.beacon.org/An-Indigenous-Peoples-History-of-the-United-States-P1164.aspx) (2015) by Roxanne Dunbar-Ortiz
 - [*Black AF History: The Un-Whitewashed Story of America*](https://www.akpress.org/black-af-history.html) (2023) by Michael Harriot (fantastic audiobook!)
-
+- [*A Disability History of the United States*](https://www.beacon.org/A-Disability-History-of-the-United-States-P1018.aspx) (2018) by Kim E. Nielsen
+- [Rooted: The American Legacy of Land Theft and the Modern Movement for Black Land Ownership](https://www.breabaker.com/rooted) (2024) by Brea Baker
+- [*By the Fire We Carry: The Generations-Long Fight for Justice on Native Land*](https://www.harpercollins.com/products/by-the-fire-we-carry-rebecca-nagle?variant=41322925359138) (2024) by Rebecca Nagle
   
 ### Aboliton
 
@@ -82,6 +64,8 @@ editor_options:
 - [*Are Prisons Obsolete?*](https://collectiveliberation.org/wp-content/uploads/2013/01/Are_Prisons_Obsolete_Angela_Davis.pdf) (2003) by Angela Davis
 - [*Prison by Any Other Name: The Harmful Consequences of Popular Reforms*](https://www.akpress.org/prisonbyanyothername.html) (2020) by Maya Schenwar and Victoria Law
 - [*An Abolitionist's Handbook: 12 Steps to Changing Yourself and the World*](https://www.akpress.org/an-abolitionist-s-handbook.html) (2021) by Patrisse Cullors 
+- [*Imagination: A Manifesto*](https://www.ruhabenjamin.com/imagination-a-manifesto) (2024) by Ruha Benjamin
+- [*Border and Rule: Global Migration, Capitalism, and the Rise of Racist Nationalism*](https://www.haymarketbooks.org/books/1553-border-and-rule) (2021) by Harsha Walia
 
 ### Technology
 
@@ -90,35 +74,31 @@ editor_options:
 - [*Automating Inequality: How High-Tech Tools Profile, Police, and Punish the Poor*](https://virginia-eubanks.com/automating-inequality/) (2018) by Virginia Eubanks
 - [*Artificial Unintelligence: How Computers Misunderstand the World*](https://mitpress.mit.edu/9780262537018/artificial-unintelligence/) (2018) by Meredith Broussard
 - [*Algorithms of Oppression*](https://nyupress.org/9781479837243/algorithms-of-oppression/) (2018) by Safiya Umoja Noble
+- [*More than a Glitch: Confronting Race, Gender, and Ability Bias in Tech*](https://mitpress.mit.edu/9780262548328/more-than-a-glitch/) (2024) by Meredith Broussard
+- [*Design Justice: Community-Led Practices to Build the Worlds We Need*](https://direct.mit.edu/books/oa-monograph/4605/Design-JusticeCommunity-Led-Practices-to-Build-the) (2020) by Sasha Costanza-Chock (open access)
+- [*Against Technoableism: Rethinking Who Needs Improvement*](https://www.akpress.org/against-technoableism.html) (2023) by Ashley Shew
 
-### Mental Health and Relationships
+### Mental Health, Relationships, and Survival
 
 - [*Mad in America: Bad Science, Bad Medicine, and the Enduring Mistreatment of the Mentally Ill*](https://www.hachettebookgroup.com/titles/robert-whitaker/mad-in-america/9781541618060/?lens=basic-books) (2019) by Robert Whitaker
-- [*The Shame Machine: Who Profits in the New Age of Humiliation*](https://www.penguinrandomhouse.com/books/606203/the-shame-machine-by-cathy-oneil/) by Cathy O'Neil (Author of the groundbreaking book, *Weapons of Math Destruction*)
+- [*The Shame Machine: Who Profits in the New Age of Humiliation*](https://www.penguinrandomhouse.com/books/606203/the-shame-machine-by-cathy-oneil/) by Cathy O'Neil (author of the groundbreaking book, *Weapons of Math Destruction*)
 - [*The Will to Change: Men, Masculinity, and Love*](https://bellhooksbooks.com/product/the-will-to-change/) (2004) by bell hooks
 - [*An Abolitionist's Handbook: 12 Steps to Changing Yourself and the World*](https://www.akpress.org/an-abolitionist-s-handbook.html) (2021) by Patrisse Cullors (I know this is on several lists, but it is really good and applicable to so many facets.)
+- [*Medical Gaslighting: How to Get the Care You Deserve in a System that Makes You Fight for Your Life*](https://www.penguinrandomhouse.com/books/759706/medical-gaslighting-by-ilana-jacqueline/) (2024) by Ilana Jacqueline
 
-### Memoirs and Biographies
+### Memoirs, Biographies, and Essay Collections 
 
 - [*Assata*](https://www.akpress.org/assata.html) (1998) by Assata Shakur
 - [*A Taste of Power: A Black Woman's Story*](https://www.penguinrandomhouse.com/books/19424/a-taste-of-power-by-elaine-brown/) (1992) by Elaine Brown
+- [*Belonging: A Culture of Place*](https://bellhooksbooks.com/product/belonging/) (1990) by bell hooks
 - [*When They Call You a Terrorist: A Black Lives Matter Memoir*](https://www.akpress.org/whentheycallyouaterrorist.html) (2018) by Patrisse Khan-Cullors and asha bandele
 - [*Carry: A Memoir of Survival on Stolen Land*](https://www.penguinrandomhouse.com/books/608247/carry-by-toni-jensen/) (2020) by Toni Jensen
+- [*Survival Is a Promise: The Eternal Life of Audre Lorde*](https://us.macmillan.com/books/9780374603274/survivalisapromise) (2024) by Alexis Pauline Gumbs
+- [*The Future Is Disabled: Prophecies, Love Notes and Mourning Songs*](https://arsenalpulp.com/Books/T/The-Future-Is-Disabled) (2022) by Leah Lakshmi Piepzna-Samarasinha
+- [*Belly of the Beast: The Politics of Anti-Fatness as Anti-Blackness*](https://www.akpress.org/belly-of-the-beast.html) (2021) by Da’Shaun L. Harrison
+- [*The Message*](https://ta-nehisicoates.com/books/the-message/) (2024) by Ta-Nehisi Coates
+- [*How to Tell When We Will Die: On Pain, Disability, and Doom*](https://www.charisbooksandmore.com/book/9781638931164) (2024) by Johanna Hedva
 
-## Articles and Reports
-
-- [The AI Lawyer is Here
-How Artificial Intelligence is making its way into the legal system](https://www.themarshallproject.org/2024/02/10/ai-artificial-intelligence-attorney-court) by Jamiles Lartey - 02-10-2024
-- [Artificial intelligence doesn’t have to be inhumane](https://thehill.com/opinion/technology/4047323-artificial-intelligence-doesnt-have-to-be-inhumane/) by Rumman Chowdhury - 06-14-2023
-- [AI Desperately Needs Global Oversight](https://www.wired.com/story/ai-desperately-needs-global-oversight/) by Rumman Chowdhury - 04-06-2023
-- [Mass Incarceration: The Whole Pie 2023](https://www.prisonpolicy.org/reports/pie2023.html) by Wendy Sawyer and Peter Wagner - 03-14-2023
-- [Praying for Hand Soap and Masks: Health and Human Rights Violations in U.S. Immigration Detention during the COVID-19 Pandemic](https://phr.org/our-work/resources/praying-for-hand-soap-and-masks/) from Physicians for Human Rights - 01-12-2021
-- [In the Shadows: A Review of the Research on Plea Bargaining](https://www.vera.org/downloads/publications/in-the-shadows-plea-bargaining.pdf) by Ram Subramanian, Léon Digard, Melvin Washington II, and Stephanie Sorage - 09-2020 
-- [Shadow Prisons: Immigrant Detention in the South](https://www.splcenter.org/20161121/shadow-prisons-immigrant-detention-south) by Eunice Hyunhye Cho and Paromita Shah
-
-<!-- ## Recommend Something! -->
-
-<!-- {{< form >}} -->
 
 # On My Shelf
 
@@ -136,8 +116,11 @@ library(googlesheets4)
 library(gt)
 library(colorspace)
 library(lubridate)
+library(ggrepel)
+library(ggnewscale)
 
 colors <- c("#0E0ACC", "#CC0AA4", "#7400CC", "#3ACC14")
+lighten <- lighten(colors, .9)
 
 th_book <- theme_light() + 
   theme(plot.title = element_text(family = "Changa",
@@ -169,11 +152,11 @@ th_book <- theme_light() +
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.y = element_line(color = "#FFD1F9", 
-                                        linewidth = .35, 
-                                        linetype = "longdash"),
+                                          linewidth = .35, 
+                                          linetype = "longdash"),
         panel.grid.minor.y = element_line(color = lighten("#FFD1F9", .5), 
-                                        linewidth = .3, 
-                                        linetype = "dashed"),
+                                          linewidth = .3, 
+                                          linetype = "dashed"),
         legend.position = "bottom")
 
 ```
@@ -187,11 +170,11 @@ booklist_ <- read_sheet("https://docs.google.com/spreadsheets/d/1moyOGAkx7BfEeaZ
 
 b <- booklist_ %>% 
   group_by(fiction, gender, race) %>% 
-  summarise(n = n())
+  summarise(n_gender = n())
 
 b_ <- booklist_ %>% 
   group_by(race) %>% 
-  summarise(n = n())
+  summarise(n_race = n())
 
 booklist <- b_ %>% 
   left_join(booklist_, by = "race", 
@@ -246,18 +229,17 @@ booklist %>%
               columns = everything()) %>% 
   cols_label(title = md("**Title**"),
              author = md("**Author**"),
-             genre = md("**Genre**"),
+             genre = md("**Genre/Subject**"),
              year = md("**Year**")) %>% 
-  tab_row_group(label = md("**Finished Books**"),
-                rows = read > 0 ) %>% 
-  tab_row_group(label = md("**Books in Progress**"),
-                rows = read < 1) %>% 
-  tab_row_group(label = md("**Short Story Collections in Rotation**"),
-                rows = shorts > 0 & read < 1) %>% 
-  row_group_order(groups = c("**Finished Books**",
-                             "**Books in Progress**",
-                             "**Short Story Collections in Rotation**"
-                             )) %>% 
+  # tab_row_group(label = md("**Finished Books**"),
+  #               rows = read > 0 ) %>% 
+  # tab_row_group(label = md("**Books in Progress**"),
+  #               rows = read < 1) %>% 
+  # tab_row_group(label = md("**Short Story Collections in Rotation**"),
+  #               rows = shorts > 0 & read < 1) %>% 
+  # row_group_order(groups = c("**Finished Books**",
+  #                            "**Books in Progress**",
+  #                            "**Short Story Collections in Rotation**")) %>% 
   cols_width(title ~ pct(42.5),
              author ~ pct(25),
              genre ~ pct(25),
@@ -275,18 +257,20 @@ booklist %>%
 
 ```
 
+# CHARTS!
 
 ```{r plot, eval=FALSE}
 #| fig-height: 4.944376
 #| fig-width: 8
 
 booklist %>% 
+  filter(race != str_wrap("Multiple Authors", 9)) %>% 
   ggplot(aes(reorder(race, -n), fill = gender)) +
   geom_bar(width = .75) + 
   facet_grid(~fiction, 
              scales = "free_x",
              space = "free_x") +
-  scale_y_continuous(breaks = seq(2,30,2)) +
+  scale_y_continuous(breaks = seq(4,50,4)) +
   scale_fill_manual(values = colors) +
   labs(x = "Author's Race",
        y = "Number of Books",
@@ -317,7 +301,9 @@ booklist %>%
                               "May",
                               "June",
                               "July",
-                              "August")) +
+                              "August",
+                              "September",
+                              "October")) +
   scale_y_continuous(breaks = seq(2,30,2)) +
   scale_fill_manual(values = colors) +
   labs(x = NULL,
@@ -336,10 +322,10 @@ ggsave("months.png", width = 6, height = 6,
 booklist %>% 
   ggplot(aes(decade, fill = gender)) +
   geom_bar() +
-  facet_grid(~fiction, 
+  facet_grid(cols = vars(fiction), 
              scales = "free_x",
              space = "free_x") +
-  scale_y_continuous(breaks = seq(2,30,2)) +
+  scale_y_continuous(breaks = seq(6,50,6)) +
   scale_fill_manual(values = colors) +
   labs(x = "Decade Published",
        y = "Number of Books",
@@ -410,47 +396,221 @@ ggsave("authors.png", width = 8, height = 8 / 1.618,
 
 ```
 
-```{r summer}
+```{r labeled, eval=FALSE}
 #| fig-height: 6
 #| fig-width: 8
 
+set.seed(05062023)
+
+b_ <- booklist %>% 
+  group_by(race) %>% 
+  summarise(n = n())
+
 bb <- booklist %>% 
   drop_na(time) %>% 
-  mutate(len = as.numeric(time) - as.numeric(min(time)))
+  mutate(len = as.numeric(time) - as.numeric(min(time))) %>% 
+  mutate(l_text = ifelse(is.na(series), 
+                         ifelse(short_title == "...", 
+                                str_wrap(title, 50),
+                                short_title), 
+                         paste0(title, " (", series, ")")))
+
+bb_labels <- bb %>% 
+  # filter(finished > as.Date("2024-06-01")) %>%
+  filter(label == TRUE) %>% 
+  mutate(l_text = ifelse(is.na(series), 
+                         ifelse(short_title == "...", 
+                                str_wrap(title, 50),
+                                short_title), 
+                         paste0(series, " series"))) 
 
 bb %>% 
-  filter(finished > as.Date("2024-06-01")) %>%
-  ggplot(aes(as.Date(finished), race, 
-             color = gender, shape = fiction, size = len)) +
-  geom_point(#size = 3, 
-             position = position_jitter(height = .4, width = 0)) +
+  mutate(len = ifelse(fiction == "Fiction", len / 1.35, len)) %>% 
+  ggplot(aes(as.Date(finished), len,
+             shape = fiction)) +
+  # geom_point(aes(fill = gender), size = 5, color = "white") +
+  geom_label_repel(aes(label = l_text,
+                       color = gender),
+                   family = "Changa",
+                   size = 3,
+                   force = 100,
+                   force_pull = 0,
+                   max.overlaps = 100,
+                   point.padding = unit(10, "inches"),
+                   label.padding = 0.15,
+                   show.legend = TRUE) +
+  facet_grid(rows = vars(fiction),
+             # cols = 1,
+             scales = "free_y",
+             space = "free_y",
+             # strip.position = "left"
+             ) +
   scale_x_date(date_breaks = "1 month",
-               date_labels = "%B") +
+               date_labels = "%B",
+               position = "top") +
+  scale_fill_manual(values = colors, guide = "none") +
+  scale_color_manual(values = colors) +
+  scale_shape_manual(values = c(21,24), guide = "none") +
+  labs(x = NULL,
+       y = NULL,
+       color = NULL,
+       title = "2024 books") +
+  th_book +
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_line(color = "#FFD1F9", 
+                                          linewidth = .35, 
+                                          linetype = "longdash"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.y = element_blank())
+
+ggsave("labels.png", 
+       width = 12, height = 12 / 1.618,
+       device = png, type = "cairo", dpi = 300)
+ggsave("labels.pdf",
+       width = 11, height = 11 / 1.618,
+       device = cairo_pdf)
+```
+
+```{r summer, eval=FALSE}
+#| fig-height: 6
+#| fig-width: 8
+
+bb %>% 
+  # filter(finished > as.Date("2024-06-01")) %>%
+  ggplot() +
+  geom_point(aes(as.Date(finished), race,
+                 shape = fiction,
+                 fill = gender,
+                 color = gender,
+                 size = len),
+             position = position_jitter(height = .35, 
+                                        width = 0,
+                                        seed = 56)) +
+  scale_fill_manual(values = colors) +
+  scale_color_manual(values = lighten, guide = "none") +
+  scale_shape_manual(values = c(21,24)) +
+  scale_size_continuous(breaks = c(10000, 20300, 31440, 42300),
+                        labels = c("~3 hours",
+                                   "~9 hours",
+                                   "~12 hours",
+                                   "~15 hours")) +
+  labs(color = str_wrap("Author's Gender", 8),
+       fill = str_wrap("Author's Gender", 8),
+       shape = str_wrap("Fiction or Non-fiction", 10),
+       size = str_wrap("Audiobook Duration", 10)) +
+  new_scale_color() +
+  geom_label_repel(data = bb_labels,
+                   aes(as.Date(finished), race,
+                       label = l_text,
+                       color = gender),
+                   family = "Changa",
+                   size = 2.5,
+                   force_pull = 10,
+                   max.overlaps = 100,
+                   point.padding = unit(.5, "inches"),
+                   label.padding = 0.1,
+                   show.legend = FALSE,
+                   position = position_jitter(height = .35, 
+                                              width = 0,
+                                              seed = 56)) +
+  scale_color_manual(values = colors, guide = "none") +
+  scale_x_date(date_breaks = "1 month",
+               date_labels = "%B %e",
+               position = "top") +
   scale_y_discrete(limits = c(str_wrap("Multiple Authors", 9),
                               "White",
-                              str_wrap("South Asian", 9),
                               "Latin",
                               "Indigenous",
-                              "Black")) +
-  scale_color_manual(values = colors) +
-  scale_size_continuous(breaks = c(10000, 20300, 31440, 42300),
-                        labels = c("~ 3 hours",
-                                   "~ 9 hours",
-                                   "~ 12 hours",
-                                   "~ 15 hours")) +
+                              "Black",
+                              "Asian")) +
   labs(x = NULL,
        y = "Author's Race",
-       color = str_wrap("Author's Gender", 8),
-       shape = str_wrap("Fiction or Non-fiction", 10),
-       size = str_wrap("Audiobook Duration", 10),
        title = "Summer Reading",
        subtitle = "Someone owes me a personal pan pizza!") +
   th_book +
   theme(legend.position = "right",
+        panel.grid.major.x = element_line(color = "#FFD1F9", 
+                                          linewidth = .75, 
+                                          linetype = "longdash"),
         panel.grid.major.y = element_blank())
 
-ggsave("summer.png", width = 8, height = 8 / 1.618,
+ggsave("summer.png", 
+       width = 10, height = 10 / 1.618,
        device = png, type = "cairo", dpi = 300)
+ggsave("summer.pdf",
+       width = 10, height = 10 / 1.618,
+       device = cairo_pdf)
+```
+
+![](summer_.png){width=100%}
+
+```{r one_hundred, eval=FALSE}
+
+books <- booklist %>% 
+  drop_na(finished) %>% 
+  mutate(cat = case_when(together == TRUE ~ "Books We Read Together",
+                         rec == TRUE ~ "Other Great Reads",
+                         TRUE ~ "Everything Else")) %>% 
+  mutate(cat = factor(cat, levels = c("Books We Read Together",
+                                      "Other Great Reads",
+                                      "Everything Else"))) %>% 
+  mutate(len = as.numeric(time) - as.numeric(min(time))) %>% 
+  mutate(l_text = ifelse(is.na(series), 
+                         ifelse(short_title == "...", 
+                                str_wrap(title, 50),
+                                short_title), 
+                         paste0(series, " series"))) %>% 
+  select(l_text, author, len, cat, year, gender, finished, fiction, label)
+
+books_labels <- books %>% 
+  filter(label == TRUE)
+
+books %>% 
+  ggplot() +
+  geom_point(aes(as.Date(finished), len,
+                 color = gender,
+                 shape = fiction),
+             size = 4) +
+  geom_label_repel(data = books_labels,
+                   aes(as.Date(finished), len,
+                       label = l_text,
+                       color = gender),
+                   family = "Changa",
+                   size = 2.5,
+                   force_pull = 10,
+                   max.overlaps = 20,
+                   point.padding = unit(.5, "inches"),
+                   label.padding = 0.1,
+                   show.legend = FALSE) +
+  facet_wrap(vars(cat), ncol = 4) +
+  scale_x_date(date_breaks = "3 months",
+               date_labels = "%b",
+               expand = c(.25,0)) +
+  scale_y_continuous(breaks = c(10000, 20300, 31440, 42300),
+                     labels = c("~3 hours",
+                                "~9 hours",
+                                "~12 hours",
+                                "~15 hours")) +
+  scale_color_manual(values = colors) +
+  labs(x = NULL,
+       y = "Audiobook Length",
+       color = "Author's Gender",
+       shape = NULL,
+       title = "100 Books & Counting") +
+  th_book +
+  theme(panel.grid.major.x = element_line(color = "#FFD1F9", 
+                                          linewidth = .35, 
+                                          linetype = "longdash"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank())
+
+ggsave("books100.png", 
+       width = 12, height = 6.5,
+       device = png, type = "cairo", dpi = 300)
+ggsave("books100.pdf",
+       width = 10, height = 5.5,
+       device = cairo_pdf)
 
 ```
 

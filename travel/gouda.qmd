@@ -1,0 +1,78 @@
+---
+title: "Gouda Cheese Dog!"
+format: 
+  html: 
+    toc: false
+---
+
+## because Gouda just needs his own page
+
+![](pics\bus\20230907_215048.jpg){width="100%"}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](pics\bus\20230617_134051.jpg){width="100%"}
+![](pics\bus\20230617_135337.jpg){width="100%"}
+![](pics\bus\20230619_232745.jpg){width="100%"}
+![](pics\bus\20230626_084605.jpg){width="100%"}
+![](pics\bus\20230630_004344.jpg){width="100%"}
+![](pics\bus\20230701_200130.jpg){width="100%"}
+![](pics\bus\20230704_071954.jpg){width="100%"}
+![](pics\bus\Screenshot_20230922_204930_Photos.jpg){width="100%"}
+![](pics\bus\20230704_094006.jpg){width="100%"}
+![](pics\bus\20230704_133849.jpg){width="100%"}
+![](pics\bus\20230704_203711.jpg){width="100%"}
+![](pics\bus\20230704_205255.jpg){width="100%"}
+![](pics\bus\20230705_083131.jpg){width="100%"}
+![](pics\bus\20230705_083322.jpg){width="100%"}
+![](pics\bus\20231009_143011.jpg){width="100%"}
+![](pics\bus\20231020_175014.jpg){width="100%"}
+![](pics\bus\20240302_145034.jpg){width="100%"}
+![](pics\bus\20240304_12165.jpg){width="100%"}
+![](pics\bus\20240729_083703.jpg){width="100%"}
+![](pics\bus\20240803_121200.jpg){width="100%"}
+![](pics\bus\20240809_184732.jpg){width="100%"}
+![](pics\bus\PXL_20230706_005034169.jpg){width="100%"}
+![](pics\bus\PXL_20230917_152710976.jpg){width="100%"}
+![](pics\bus\received_161143610337460.jpg){width="100%"}
+
+:::
+
+::: {.column width="50%"}
+
+
+![](pics\bus\20230711_164315.jpg){width="100%"}
+![](pics\bus\20230705_083304.jpg){width="100%"}
+![](pics\bus\20230715_194901.jpg){width="100%"}
+![](pics\bus\20230718_092114.jpg){width="100%"}
+![](pics\bus\20230722_151717.jpg){width="100%"}
+![](pics\bus\20230822_190251.jpg){width="100%"}
+![](pics\bus\20230830_135110.jpg){width="100%"}
+![](pics\bus\20230901_002436.jpg){width="100%"}
+![](pics\bus\20230908_232544.jpg){width="100%"}
+![](pics\bus\20230923_125857.jpg){width="100%"}
+![](pics\bus\20230927_094718.jpg){width="100%"}
+![](pics\bus\20231008_133516.jpg){width="100%"}
+![](pics\bus\20231008_204724.jpg){width="100%"}
+![](pics\bus\20240303_084824.jpg){width="100%"}
+![](pics\bus\20240304_152010.jpg){width="100%"}
+![](pics\bus\20240324_003153.jpg){width="100%"}
+![](pics\bus\20240803_125324.jpg){width="100%"}
+![](pics\bus\20240809_184548.jpg){width="100%"}
+![](pics\bus\20240803_125714.jpg){width="100%"}
+![](pics\bus\Screenshot_20231017_104718_Photos.jpg){width="100%"}
+![](pics\bus\PXL_20230712_152537396.jpg){width="100%"}
+![](pics\bus\PXL_20230904_112635368.jpg){width="100%"}
+![](pics\bus\received_1021416298854779.jpeg){width="100%"}
+![](pics\bus\20230628_000854.jpg){width="100%"}
+
+:::
+
+::::
+
+![](pics\bus\PXL_20230705_230623382.jpg){width="100%"}
+
+
+# end

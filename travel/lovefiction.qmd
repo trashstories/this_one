@@ -1,0 +1,39 @@
+---
+title: "Love & Fiction"
+author: "jamie pantazi (berry foray) and roman wander (david bower)"
+format: 
+  html: 
+    toc: true
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    fig-align: "center"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+---
+
+# Just Married!
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](pics\wedding\IMG-9791.jpg){width="100%"}
+![](pics\wedding\health.png){width="100%"}
+![](pics\wedding\action.png){width="100%"}
+![](pics\wedding\us.png){width="100%"}
+
+:::
+
+::: {.column width="50%"}
+
+![](pics\wedding\vows.png){width="100%"}
+![](pics\wedding\stuff.png){width="100%"}
+![](pics\wedding\sibs.png){width="100%"}
+![](pics\wedding\kiss.png){width="100%"}
+![](pics\wedding\us3.png){width="100%"}
+
+:::
+
+::::
+
+# Honeymoon Adventures

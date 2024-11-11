@@ -4,10 +4,105 @@ title: "rainbows"
 
 ## Carson (nationals 2021)
 
-## Blue Ridge (summer 2023)
 
-## Ocala (winter 2024)
+:::: {.columns}
 
-## Apalachacola (winter 2024)
+::: {.column width="50%"}
 
-## Great Lakes (summer 2024)
+![](pics\maps\rb_nm.png){width="100%"}
+![](pics\rainbows\20210703_091543.jpg){width="100%"}
+
+:::
+
+::: {.column width="50%"}
+
+![](pics\rainbows\20210703_175507.jpg){width="100%"}
+![](pics\rainbows\20210702_125904.jpg){width="100%"}
+![](pics\rainbows\20210702_125755.jpg){width="100%"}
+
+:::
+
+::::
+
+## Blue Ridge regional (summer 2023)
+
+:::: {.columns}
+
+::: {.column width="68.75%"}
+
+![](pics\rainbows\20230819_194221.jpg){width="100%"}
+![](pics\rainbows\20230819_114512.jpg){width="100%"}
+![](pics\rainbows\PXL_20230819_122421800.jpg){width="100%"}
+![](pics\rainbows\20230818_183815.jpg){width="100%"}
+
+:::
+
+::: {.column width="31.25%"}
+
+![](pics\rainbows\20230818_192300.jpg){width="100%"}
+![](pics\rainbows\20230819_194503.jpg){width="100%"}
+![](pics\rainbows\20230819_194205.jpg){width="100%"}
+
+
+:::
+
+::::
+
+![](pics\rainbows\20230819_115204.jpg){width="100%"}
+
+## Ocala regional (winter 2024)
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](pics\rainbows\20240209_201917.jpg){width="100%"}
+
+:::
+
+::: {.column width="50%"}
+
+![](pics\rainbows\20240203_163354.jpg){width="100%"}
+
+:::
+
+::::
+
+## Apalachacola regional (winter 2024)
+
+<!-- :::: {.columns} -->
+
+<!-- ::: {.column width="50%"} -->
+
+<!-- ![](pics\rainbows\20230819_194221.jpg){width="100%"} -->
+<!-- ![](pics\rainbows\20230819_114512.jpg){width="100%"} -->
+<!-- ![](pics\rainbows\20230819_194503.jpg){width="100%"} -->
+
+<!-- ::: -->
+
+<!-- ::: {.column width="50%"} -->
+
+<!-- ![](pics\rainbows\20230818_192300.jpg){width="100%"} -->
+<!-- ![](pics\rainbows\20230819_115204.jpg){width="100%"} -->
+
+<!-- ::: -->
+
+<!-- :::: -->
+
+## Great Lakes regional (summer 2024)
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](pics\rainbows\20240702_200517.jpg){width="100%"}
+
+:::
+
+::: {.column width="50%"}
+
+![](pics\rainbows\20240703_154245.jpg){width="100%"}
+
+:::
+
+::::

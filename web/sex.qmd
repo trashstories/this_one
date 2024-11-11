@@ -1,0 +1,9 @@
+---
+title: "sex"
+bibliography: sexualities.bib
+csl: "https://raw.githubusercontent.com/citation-style-language/styles/master/apa.csl"
+---
+
+
+[@horswellDecolonizingSodomiteQueer2005]
+

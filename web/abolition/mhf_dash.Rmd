@@ -1,0 +1,348 @@
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(scales)
+library(patchwork)
+library(ggpmisc)
+
+MD <- readRDS("MD.RDS")
+MDrural <- readRDS("MDrural.RDS")
+
+```
+
+Row {data-height=300}
+-----------------------------------------------------------------------
+
+### Distribution of Imprisonment Rate by Race
+
+```{r histogramMD, include = TRUE, fig.align='center', fig.height=(8/1.618), fig.width=8, fig.cap="Distribution of Imprisonment Rate by Race"}
+
+my_mean <- label_number(accuracy = 1, prefix = "mean = ")
+black_dif <- t.test(Imprisonment_Rate ~ black, data = MD)
+
+MD %>%
+  ggplot(aes(Imprisonment_Rate, fill = black_cat)) +
+    geom_histogram(color = "white", binwidth = 100, boundary = 0) +
+    geom_text(aes(x = ifelse(black == 1, 1036, 462), 
+                  y = ifelse(black == 1, 45, 435), 
+                  label = ifelse(black == 1, my_mean(black_dif$estimate[2]), 
+                                 my_mean(black_dif$estimate[1]))), 
+              color = ifelse(MD$black == 1, "#4FADD0", "#DE4FA6"), size = 3.5,) +
+    geom_vline(aes(xintercept = ifelse(MD$black == 1, black_dif$estimate[2], 
+                                       black_dif$estimate[1]), 
+                   color = black_cat), 
+               linetype = "longdash",
+               linewidth = 1) +
+    facet_wrap(vars(black_cat), ncol = 1, scales = "free_y") +
+    scale_fill_manual(values = c("#8CE0FF", "#FF87D1"), guide = "none") +
+    scale_color_manual(values = c("#4FADD0", "#DE4FA6"), guide = "none") +
+    scale_x_continuous(labels = label_comma(), 
+                       expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Imprisonment Rate per 100,000",
+         y = "Number of Census Tracts",
+         caption = "Note: 'Majority Black' rescaled to show distribution. Top: N = 369; Bottom: N = 1086; Total N = 1455") +
+    theme_light() +
+    theme(panel.border = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          text = element_text(family = "serif", 
+                              color = "#310873"),
+          axis.text = element_text(color = "#310873"),
+          strip.text = element_text(color = "#310873", 
+                                    face = "bold", 
+                                    family = "serif"),
+          strip.background = element_blank(),
+          strip.placement = "outside")
+```
+
+
+### Inpatient Accessibility
+
+```{r MHF, include = TRUE, fig.align='center', fig.cap="Inpatient Accessibility", fig.height=(8/1.618), fig.width=8}
+
+md_sum <- MD %>% 
+  group_by(white_cat, crisis) %>% 
+  summarise(imp = mean(Imprisonment_Rate))
+
+mhf <- MD %>%  
+  ggplot(aes(Driving_Miles, Imprisonment_Rate, color = crisis, fill = crisis)) +
+    geom_point(aes(shape = white_cat), size = 4) + 
+    geom_hline(yintercept = md_sum$imp, 
+               linewidth = 1.5,
+               color = case_when(md_sum$crisis == "No Crisis Intervention" & 
+                                   md_sum$white_cat == "Not Majority White" ~ "#8CE0FF",
+                                 md_sum$crisis == "Crisis Intervention" & 
+                                   md_sum$white_cat == "Not Majority White" ~ "#FF87D1",
+                                 md_sum$crisis == "No Crisis Intervention" & 
+                                   md_sum$white_cat == "Majority White" ~ "#4FADD0",
+                                 md_sum$crisis == "Crisis Intervention" & 
+                                   md_sum$white_cat == "Majority White" ~ "#DE4FA6")) +
+    geom_text(data =  md_sum, 
+              aes(x = 82, 
+                  y = ifelse(md_sum$crisis == "Crisis Intervention" &
+                               md_sum$white_cat == "Majority White", 
+                             md_sum$imp - 100, md_sum$imp + 100),
+                  label = my_mean(md_sum$imp)), 
+                  color = case_when(md_sum$crisis == "No Crisis Intervention" &
+                                      md_sum$white_cat == "Not Majority White" ~ "#8CE0FF",
+                                    md_sum$crisis == "Crisis Intervention" &
+                                      md_sum$white_cat == "Not Majority White" ~ "#FF87D1",
+                                    md_sum$crisis == "No Crisis Intervention" &
+                                      md_sum$white_cat == "Majority White" ~ "#4FADD0",
+                                    md_sum$crisis == "Crisis Intervention" &
+                                      md_sum$white_cat == "Majority White" ~ "#DE4FA6"),
+              size = 3) +
+    labs(x = "Driving Miles to Nearest Inpatient Facility",
+         y = "Imprisonment Rate (per 100,000)",
+         fill = NULL,
+         color = NULL,
+         shape = NULL,
+         title = "All Maryland",
+         caption = "N = 1455") +
+    scale_fill_manual(values = c("#8CE0FF", "#FF87D1"),
+                      labels = str_wrap(c("No Crisis Intervention",
+                                          "Crisis Intervention"), width = 10)) +
+    scale_color_manual(values = c("#4FADD0","#DE4FA6"),
+                      labels = str_wrap(c("No Crisis Intervention",
+                                          "Crisis Intervention"), width = 10)) +
+    scale_y_continuous(labels = label_comma(), 
+                       expand = expansion(mult = 0.01, add = 0)) +
+    scale_x_continuous(labels = label_comma(suffix = " mi"), 
+                       breaks = seq(15,75,15),
+                       limits = c(0,93),
+                       expand = expansion(mult = 0.01, add = 0)) +
+    scale_shape_manual(values = c(21,23), guide = "legend", 
+                       labels = str_wrap(c("Majority White", 
+                                           "Not Majority White"), width = 12)) +
+    theme_light() +
+    theme(panel.border = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(color = "#FFD1F9"),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          text = element_text(family = "serif"),
+          strip.text = element_text(color = "#310873", 
+                                    face = "bold", 
+                                    family = "serif"),
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text = element_text(color = "#310873"),
+          axis.title.y = element_text(size = 10, 
+                                      color = "#310873"),
+          axis.title.x = element_text(size = 9.5, 
+                                      color = "#310873"),
+          axis.ticks = element_blank(),
+          legend.position = "bottom",
+          legend.text = element_text(color = "#310873"))
+
+rural_sum <- MDrural %>% 
+  group_by(white_cat, crisis) %>% 
+  summarise(imp = mean(Imprisonment_Rate))
+
+rmhf <- MDrural %>%  
+  ggplot(aes(Driving_Miles, Imprisonment_Rate, color = crisis, fill = crisis)) +
+    geom_point(aes(shape = white_cat), size = 4) + 
+    geom_hline(yintercept = rural_sum$imp, 
+               linewidth = 1.5,
+               color = case_when(rural_sum$crisis == "No Crisis Intervention" & 
+                                   rural_sum$white_cat == "Not Majority White" ~ "#8CE0FF",
+                                 rural_sum$crisis == "Crisis Intervention" & 
+                                   rural_sum$white_cat == "Not Majority White" ~ "#FF87D1",
+                                 rural_sum$crisis == "No Crisis Intervention" & 
+                                   rural_sum$white_cat == "Majority White" ~ "#4FADD0",
+                                 rural_sum$crisis == "Crisis Intervention" & 
+                                   rural_sum$white_cat == "Majority White" ~ "#DE4FA6")) +
+    geom_text(data =  rural_sum, 
+              aes(x = 82, 
+                  y = ifelse(rural_sum$crisis == "Crisis Intervention" &
+                                      rural_sum$white_cat == "Majority White", 
+                             rural_sum$imp - 25, rural_sum$imp + 32),
+                  label = my_mean(rural_sum$imp)), 
+                  color = case_when(rural_sum$crisis == "No Crisis Intervention" &
+                                      rural_sum$white_cat == "Not Majority White" ~ "#8CE0FF",
+                                    rural_sum$crisis == "Crisis Intervention" &
+                                      rural_sum$white_cat == "Not Majority White" ~ "#FF87D1",
+                                    rural_sum$crisis == "No Crisis Intervention" &
+                                      rural_sum$white_cat == "Majority White" ~ "#4FADD0",
+                                    rural_sum$crisis == "Crisis Intervention" &
+                                      rural_sum$white_cat == "Majority White" ~ "#DE4FA6"),
+              size = 3) +
+    labs(x = "Driving Miles to Nearest Inpatient Facility",
+         y = "Imprisonment Rate (per 100,000)",
+         fill = NULL,
+         color = NULL,
+         shape = NULL,
+         title = "Rural Maryland",
+         caption = "Note: 'Rural Maryland' rescaled to show distribution. N = 505") +
+    scale_fill_manual(values = c("#8CE0FF", "#FF87D1"),
+                      labels = str_wrap(c("No Crisis Intervention",
+                                          "Crisis Intervention"), width = 12)) +
+    scale_color_manual(values = c("#4FADD0", "#DE4FA6"),
+                       labels = str_wrap(c("No Crisis Intervention",
+                                           "Crisis Intervention"), width = 12)) +
+    scale_y_continuous(labels = label_comma(), 
+                       expand = expansion(mult = 0.01, add = 0)) +
+    scale_x_continuous(labels = label_comma(suffix = " mi"), 
+                       breaks = seq(15,75,15),
+                       limits = c(0,93),
+                       expand = expansion(mult = 0.01, add = 0)) +
+    scale_shape_manual(values = c(21,23), guide = "legend", 
+                       labels = str_wrap(c("Majority White", 
+                                           "Not Majority White"), width = 12)) +
+    theme_light() +
+    theme(panel.border = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(color = "#FFD1F9"),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          text = element_text(family = "serif"),
+          strip.text = element_text(color = "#310873", 
+                                    face = "bold", 
+                                    family = "serif"),
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text = element_text(color = "#310873"),
+          axis.title.y = element_blank(),
+          axis.title.x = element_text(size = 9.5, 
+                                      color = "#310873"),
+          axis.ticks = element_blank(),
+          legend.position = "bottom",
+          legend.text = element_text(color = "#310873"))
+
+(mhf + rmhf) +
+  plot_layout(guides = "collect") + 
+  plot_annotation() & 
+  theme(legend.position = 'bottom') 
+
+```
+### Distance to Crisis Intervention from Rural Tracts
+
+```{r plotRural, include = TRUE, fig.align='center', fig.height=(8/1.618), fig.width=8, fig.cap="Distance to Crisis Intervention from Rural Tracts"}
+
+crisis_dif <- t.test(Imprisonment_Rate ~ crisis, data = MDrural)
+
+formula <- y ~ x
+ip <- MDrural %>%
+  ggplot(aes(Total_TravelTime, Imprisonment_Rate, color = crisis, fill = crisis)) +
+    geom_point(pch = 21, size = 3.5, alpha = .75) +
+    geom_smooth(method = "lm", formula = formula) +
+    geom_text(aes(x = 75, y = 550, 
+                  label = my_mean(crisis_dif$estimate[1])), 
+              color = "#8CE0FF", size = 2.5,) +
+    geom_text(aes(x = 75, y = 485, 
+                  label = my_mean(crisis_dif$estimate[2])), 
+              color = "#FF87D1", size = 2.5) +
+    scale_fill_manual(values = c("#8CE0FF", "#FF87D1"),
+                      labels = str_wrap(c("No Crisis Intervention",
+                                          "Crisis Intervention"), width = 10)) +
+    scale_color_manual(values = c("#4FADD0","#DE4FA6"),
+                      labels = str_wrap(c("No Crisis Intervention",
+                                          "Crisis Intervention"), width = 10)) +
+    scale_y_continuous(labels = label_comma(), 
+                       expand = expansion(mult = 0.01, add = 0)) +
+    scale_x_continuous(labels = label_comma(suffix = " min"), 
+                       breaks = seq(30,200,30),
+                       expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Travel Time to Nearest Inpatient Facility",
+         y = "Imprisonment Rate per 100,000",
+         fill = NULL,
+         color = NULL,
+         title = "Nearest Inpatient",
+         caption = " ") +
+    theme_light() +
+    theme(panel.border = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(color = "#FFD1F9"),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          text = element_text(family = "serif"),
+          strip.text = element_text(color = "#310873", 
+                                    face = "bold", 
+                                    family = "serif"),
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text = element_text(color = "#310873"),
+          axis.title.y = element_text(size = 10, 
+                                      color = "#310873"),
+          axis.title.x = element_text(size = 9.5, 
+                                      color = "#310873"),
+          axis.ticks = element_blank(),
+          legend.position = "bottom",
+          legend.text = element_text(color = "#310873"))
+
+cr <- MDrural %>%
+  ggplot(aes(Total_TravelTime_Crisis, Imprisonment_Rate, 
+             color = crisis_pay, fill = crisis_pay)) +
+    geom_point(pch = 21, size = 3.5, alpha = .75) +
+    geom_smooth(method = "lm", formula = formula) +
+    stat_poly_eq(aes(label = after_stat(rr.label)), label.x = .83, vstep = -1,
+                 label.y = "bottom", formula = formula, parse = TRUE, size = 2.5) +
+    scale_fill_manual(values = c("#8CE0FF", "#FF87D1"),
+                      labels = str_wrap(c("No Payment Assistance",
+                                          "Payment Assistance"), width = 10)) +
+    scale_color_manual(values = c("#4FADD0","#DE4FA6"), 
+                       labels = str_wrap(c("No Payment Assistance",
+                                           "Payment Assistance"), width = 10)) +
+    scale_y_continuous(labels = label_comma(), 
+                       expand = expansion(mult = 0.01, add = 0)) +
+    scale_x_continuous(labels = label_comma(suffix = " min"), 
+                       breaks = seq(30,200,30),
+                       expand = expansion(mult = 0.01, add = 0)) +
+    labs(x = "Travel Time to Nearest Inpatient Facility w/ Crisis Intervention",
+         y = "Imprisonment Rate per 100,000",
+         fill = NULL,
+         color = NULL,
+         title = "Nearest Crisis Intervention",
+         caption = "N = 505") +
+    theme_light() +
+    theme(panel.border = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(color = "#FFD1F9"),
+          panel.grid.minor.x = element_blank(),
+          panel.grid.minor.y = element_blank(),
+          text = element_text(family = "serif"),
+          strip.text = element_text(color = "#310873", 
+                                    face = "bold", 
+                                    family = "serif"),
+          strip.background = element_blank(),
+          strip.placement = "outside",
+          axis.text = element_text(color = "#310873"),
+          axis.text.y = element_blank(),
+          axis.title.y = element_blank(),
+          axis.title.x = element_text(size = 9.5, 
+                                      color = "#310873"),
+          axis.ticks = element_blank(),
+          legend.position = "bottom",
+          legend.text = element_text(color = "#310873"))
+
+ip + cr
+
+```
+
+Row {data-height=500}
+-----------------------------------------------------------------------
+
+### Imprisonment Rates and Mental Health Facilities
+
+```{r}
+knitr::include_graphics("figures/Facilities_wide.png")
+```
+
+
+### Distance to Inpatient Facilities with Crisis Intervention
+
+```{r}
+knitr::include_graphics("figures/Crisis_wide.png")
+```
+

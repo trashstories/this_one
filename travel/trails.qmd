@@ -1,0 +1,147 @@
+---
+title: "trail fun"
+---
+
+Roman Wander loves the trails, Gouda loves the trails, and when the wheelchair can make it on the trail, jamie loves the trails too!
+
+# biking
+
+
+
+# walking
+
+## Paradise Pathways
+
+:::: {.columns}
+
+::: {.column width="47.5%"}
+
+**Paradise Pathways**  
+Paradise, MI  
+1.1 miles  
+200 ft elevation change  
+July 15, 2024
+
+<div style="text-align: justify">
+
+birbs  
+chipmunks  
+...  
+...  
+...  
+...  
+
+</div>
+
+[![](pics\bus\PXL_20240715_133241948.jpg){width="100%"}](pics\bus\PXL_20240715_133241948.jpg)
+[![](pics\bus\PXL_20240715_135528841.jpg){width="100%"}](pics\bus\PXL_20240715_135528841.jpg)
+
+:::
+
+::: {.column width="2.5%"}
+
+:::
+
+::: {.column width="50%"}
+
+[![](pics\bus\PXL_20240715_135242629.jpg){width="100%"}](pics\bus\PXL_20240715_135242629.jpg)
+[![](pics\bus\PXL_20240715_134524758.jpg){width="100%"}](pics\bus\PXL_20240715_134524758.jpg)
+[![](pics\bus\PXL_20240715_135819995.jpg){width="100%"}](pics\bus\PXL_20240715_135819995.jpg)
+
+:::
+
+::::
+
+## Tahquamenon Falls State Park
+
+:::: {.columns}
+
+::: {.column width="47.5%"}
+
+**Upper Falls Nature Trail**  
+Paradise, MI  
+3 miles  
+July 15, 2024
+
+<div style="text-align: justify">
+
+...  
+...  
+...  
+...  
+
+</div>
+
+[![](pics\bus\PXL_20240715_175800033.jpg){width="100%"}](pics\bus\PXL_20240715_175800033.jpg)
+[![](pics\bus\PXL_20240715_183317797.jpg){width="100%"}](pics\bus\PXL_20240715_183317797.jpg)
+
+:::
+
+::: {.column width="2.5%"}
+
+:::
+
+::: {.column width="50%"}
+
+<br>
+{{< video https://youtu.be/8kzzXk0Jecs >}}
+
+[![](pics\bus\PXL_20240717_172640511.jpg){width="100%"}](pics\bus\PXL_20240717_172640511.jpg)
+
+:::
+
+::::
+
+# rolling
+
+## Headlands Dark Sky Park
+
+:::: {.columns}
+
+::: {.column width="47.5%"}
+
+**Orange & Brown trails**  
+Mackinaw City, MI  
+~ 3 miles (but it felt like so much longer!)  
+July 13, 2024  
+
+<div style="text-align: justify">
+
+This hike had it all! The orange trail was extremely accessible with wonderful views. It lulled us into a false sense of what the brown trail would hold for us. What was a well manicured, wide and mostly flat trail at the beginning quickly turned into a narrow, rooted, up and down winding trail that was impossible for the wheelchair at times.
+
+</div>
+
+[![](pics\bus\headland_darksky\20240713_202933.jpg){width="100%"}](pics\bus\headland_darksky\20240713_202933.jpg)
+[![](pics\bus\headland_darksky\20240713_204031.jpg){width="100%"}](pics\bus\headland_darksky\20240713_204031.jpg)
+[![](pics\bus\headland_darksky\20240713_210922.jpg){width="100%"}](pics\bus\headland_darksky\20240713_210922.jpg)
+
+:::
+
+::: {.column width="2.5%"}
+
+:::
+
+::: {.column width="50%"}
+
+<br>
+{{< video https://youtu.be/tC-8mjDZ97k >}}
+
+[![](pics\bus\headland_darksky\20240713_202919.jpg){width="100%"}](pics\bus\headland_darksky\20240713_202919.jpg)
+[![](pics\bus\headland_darksky\20240713_210604.jpg){width="100%"}](pics\bus\headland_darksky\20240713_210604.jpg)
+
+:::
+
+::::
+
+[![](pics\bus\headland_darksky\20240713_212008.jpg){width="100%"}](pics\bus\headland_darksky\20240713_212008.jpg)
+
+[![](pics\bus\headland_darksky\20240713_212130.jpg){width="100%"}](pics\bus\headland_darksky\20240713_212130.jpg)
+
+[![](pics\bus\headland_darksky\20240713_224940.jpg){width="100%"}](pics\bus\headland_darksky\20240713_224940.jpg)
+
+[![](pics\bus\headland_darksky\20240713_224948.jpg){width="100%"}](pics\bus\headland_darksky\20240713_224948.jpg)
+
+
+## Effigy Mounds National Monument
+
+{{< video https://youtu.be/hJj5ArhKpa8 >}}

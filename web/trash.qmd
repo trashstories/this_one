@@ -1,5 +1,46 @@
 ---
 title: "trash"
+format: 
+  html:
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    fig-align: "center"
+    title-block-banner: true
+    title-block-banner-color: "#9D60F0"
+    template-partials:
+      - "_layouts/sidebar.html"
+    include-in-header: 
+    - file: submit_form.md
+form:
+  id: books
+  submit: "Send"
+  action: "https://hooks.airtable.com/workflows/v1/genericWebhook/appBUIoApeyWu4Qvr/wflVosqXHyEMFKvK8/wtr8iHCjnnDgQGfcb"
+  method: "POST"
+  fields:
+  - name: fiction
+    type: radio
+    id: fiction
+    label: "Fiction or Non-Fiction?"
+    values:
+    - text: "Fiction"
+      value: 1
+    - text: "Non-fiction"
+      value: 0
+  - name: title
+    type: text
+    id: title
+    label: "Title"
+    required: true
+  - name: author
+    type: text
+    id: author
+    label: "Author"
+  - name: link
+    type: text
+    id: link
+    label: "Link to read"
 editor: visual
 ---
 
@@ -47,3 +88,16 @@ diffs <- focus %>%
                                                "black", "white"))) 
 ```
 
+## Articles and Reports
+
+-   [The AI Lawyer is Here How Artificial Intelligence is making its way into the legal system](https://www.themarshallproject.org/2024/02/10/ai-artificial-intelligence-attorney-court) by Jamiles Lartey - 02-10-2024
+-   [Artificial intelligence doesn’t have to be inhumane](https://thehill.com/opinion/technology/4047323-artificial-intelligence-doesnt-have-to-be-inhumane/) by Rumman Chowdhury - 06-14-2023
+-   [AI Desperately Needs Global Oversight](https://www.wired.com/story/ai-desperately-needs-global-oversight/) by Rumman Chowdhury - 04-06-2023
+-   [Mass Incarceration: The Whole Pie 2023](https://www.prisonpolicy.org/reports/pie2023.html) by Wendy Sawyer and Peter Wagner - 03-14-2023
+-   [Praying for Hand Soap and Masks: Health and Human Rights Violations in U.S. Immigration Detention during the COVID-19 Pandemic](https://phr.org/our-work/resources/praying-for-hand-soap-and-masks/) from Physicians for Human Rights - 01-12-2021
+-   [In the Shadows: A Review of the Research on Plea Bargaining](https://www.vera.org/downloads/publications/in-the-shadows-plea-bargaining.pdf) by Ram Subramanian, Léon Digard, Melvin Washington II, and Stephanie Sorage - 09-2020
+-   [Shadow Prisons: Immigrant Detention in the South](https://www.splcenter.org/20161121/shadow-prisons-immigrant-detention-south) by Eunice Hyunhye Cho and Paromita Shah
+
+<!-- ## Recommend Something! -->
+
+<!-- {{< form >}} -->

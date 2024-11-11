@@ -32,35 +32,3 @@ We had gathered the gear and gone on many practice camping trips to prepare for 
 # pre-wedding travels
 
 ![](pics\wedding\journey.png){width="100%"}
-
-
-# Just Married!
-
-:::: {.columns}
-
-::: {.column width="33.33%"}
-
-![](pics\wedding\IMG-9791.jpg){width="100%"}
-![](pics\wedding\health.png){width="100%"}
-![](pics\wedding\us3.png){width="100%"}
-
-:::
-
-::: {.column width="33.33%"}
-
-![](pics\wedding\vows.png){width="100%"}
-![](pics\wedding\stuff.png){width="100%"}
-![](pics\wedding\us.png){width="100%"}
-
-:::
-
-::: {.column width="33.33%"}
-
-![](pics\wedding\sibs.png){width="100%"}
-![](pics\wedding\action.png){width="100%"}
-![](pics\wedding\kiss.png){width="100%"}
-
-:::
-
-::::
-# Honeymoon Adventures
