@@ -1,3 +1,8 @@
+/detention_map/interactive_files/
+
+*.RDS
+*.csv
+
 # History files
 .Rhistory
 .Rapp.history

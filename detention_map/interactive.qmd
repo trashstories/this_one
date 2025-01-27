@@ -1,0 +1,166 @@
+---
+title: "Interactive Detention Map"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    fig-align: "center"
+    title-block-banner: "#174337"
+    title-block-banner-color: "#F9DD2F"
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE)
+
+library(tidyverse)     # ggplot, dplyr, and friends
+library(sf)            # Handle spatial data in a tidy way
+library(leaflet)       # Make interactive maps
+library(tigris)        # Access demographic data from the US Census
+library(glue)          # Easier string interpolation
+library(scales)        # Nicer labeling functions
+# library(gt)            # Make fancy tables
+library(tidycensus)
+library(colorspace)
+library(highcharter)
+library(tidygeocoder)
+library(googlesheets4)
+
+source("NILRA_config_utils.R")
+source("detention_map.R")
+
+```
+
+```{r load, include=FALSE}
+
+# load additional map layers
+if (file.exists("data/hospitals.RDS")) {
+  hospitals <- readRDS("data/hospitals.RDS")
+} else {
+  hospitals <- read_csv("data/Hospital_General_Information.csv") |> 
+    mutate(addr = paste0(Address, ", ", `City/Town`, ", ", State, " ", `ZIP Code`)) |>
+    geocode(addr, method = 'arcgis',
+            lat = latitude , long = longitude)
+  
+  saveRDS(hospitals, "data/hospitals.RDS")
+}
+  
+sf_use_s2(FALSE)
+prisons <- read_sf("data/Prison_Boundaries/Prison_Boundaries.shp") |> 
+  st_centroid() |> 
+  mutate(longitude = st_coordinates(geometry)[,1],
+         latitude = st_coordinates(geometry)[,2]) |> 
+  st_drop_geometry() |> 
+  mutate(name = str_to_title(NAME),
+         type = str_to_title(TYPE)) |> 
+  select(latitude, longitude, name, type)
+
+```
+
+```{r labels}
+
+ero_labels <- sprintf("<b>ERO Field Office: </b>%s",
+                      ero_boundaries$field_office) |> 
+  lapply(htmltools::HTML)
+
+lsp_labels <- sprintf("<b>Legal Service Provider: </b>%s",
+                      lsp_boundaries$org) |> 
+  lapply(htmltools::HTML)
+
+place_labels <- sprintf("<b>Place Name: </b>%s<br><b>Type: </b>%s",
+                        str_to_title(fulllist_map_no_sf$name), fulllist_map_no_sf$type) |> 
+  lapply(htmltools::HTML)
+
+hospital_labels <- sprintf("<b>Hospital Name: </b>%s<br><b>Classification: </b>%s",
+                           hospitals$`Facility Name`, hospitals$`Hospital Type`) |> 
+  lapply(htmltools::HTML)
+
+prison_labels <- sprintf("<b>Facility Name: </b>%s<br><b>Type: </b>%s",
+                           prisons$name, prisons$type) |> 
+  lapply(htmltools::HTML)
+
+```
+
+::: column-page
+
+```{r map}
+
+leaflet(us_states,
+             width = "1000px",
+             height = "600px"
+             ) |>
+  setView(-96, 37.8, 4) |>
+  addTiles(group = "OpenStreetMap") |> 
+  addProviderTiles("MapBox", options = providerTileOptions(
+    id = "mapbox.light",
+    accessToken = Sys.getenv('MAPBOX_ACCESS_TOKEN')),
+    group = "MapBoxLight") |> 
+  addProviderTiles(providers$Esri.WorldTerrain) |> 
+  addPolygons(weight = .75,
+              fill = FALSE,
+              opacity = 1,
+              color = "#6D0EC1",
+              dashArray = "3") |> 
+  addScaleBar(position = c("bottomleft")) |> 
+  addPolygons(data = lsp_boundaries,
+              fillColor = "#08BFBF", 
+              weight = 1.5,
+              opacity = 0.7,
+              color = "#174337",
+              popup = lsp_labels,
+              group = "Legal Service Providers") |> 
+  addPolygons(data = ero_boundaries,
+              fillColor = colors, 
+              weight = 1.5,
+              opacity = 0.7,
+              color = "#174337",
+              popup = ero_labels,
+              group = "ERO Field Office Areas") |> 
+  addMarkers(data = fulllist_map_no_sf,
+             icon = icons(iconUrl = "icons/cuffs.svg",
+                          iconWidth = 20,
+                          iconHeight = 20),
+             popup = place_labels,
+             group = "Places of Detention",
+             clusterOptions = markerClusterOptions(removeOutsideVisibleBounds = FALSE)) |>
+  addMarkers(data = hospitals,
+             icon = icons(iconUrl = "icons/hospital.svg",
+                          iconWidth = 20,
+                          iconHeight = 20),
+             popup = hospital_labels,
+             group = "Hospitals",
+             clusterOptions = markerClusterOptions(removeOutsideVisibleBounds = FALSE)) |> 
+  addMarkers(data = prisons,
+             icon = icons(iconUrl = "icons/bars.svg",
+                          iconWidth = 20,
+                          iconHeight = 20),
+             popup = prison_labels,
+             group = "Prisons and Jails",
+             clusterOptions = markerClusterOptions(removeOutsideVisibleBounds = FALSE)) |>
+  hideGroup(c("ERO Field Office Areas",
+              "Places of Detention",
+              "Prisons and Jails",
+              "Hospitals")) |> 
+  addLegend(data = ero_boundaries,
+            position = "bottomleft",
+            pal = colorFactor(colors, domain = ero_boundaries$field_office),
+            values = ~field_office,
+            opacity = 0.7,
+            title = "ERO Field Office",
+            group = "ERO Field Offices") |>
+  addLayersControl(baseGroups = c("WorldTerrain", "OpenStreetMap"),
+                   overlayGroups = c("Legal Service Providers",
+                                     "ERO Field Office Areas", 
+                                     "Places of Detention",
+                                     "Prisons and Jails",
+                                     "Hospitals"),
+                   position = "topright",
+                   options = layersControlOptions(collapsed = FALSE))
+
+```
+
+::: 

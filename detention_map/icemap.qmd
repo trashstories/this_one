@@ -1,0 +1,479 @@
+---
+title: "ICE map"
+format: 
+  html: 
+    toc: true
+    theme: custom.scss
+    fig-cap-location: "top"
+    tbl-cap-location: "top"
+    fig-align: "center"
+    title-block-banner: "#174337"
+    title-block-banner-color: "#F9DD2F"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, cache = FALSE)
+
+library(tidyverse)     # ggplot, dplyr, and friends
+library(sf)            # Handle spatial data in a tidy way
+library(leaflet)       # Make interactive maps
+library(tigris)        # Access demographic data from the US Census
+library(glue)          # Easier string interpolation
+library(scales)        # Nicer labeling functions
+# library(gt)            # Make fancy tables
+library(tidycensus)
+library(colorspace)
+library(highcharter)
+library(tidygeocoder)
+library(ggrepel)
+library(ggnewscale)
+library(googlesheets4)
+library(lubridate)
+
+source("/workspaces/adhoc-analysis/ESP/detention_map/NILRA_config_utils.R")
+
+```
+
+```{r load}
+
+# ## load spatial data
+fips_codes <- fips_codes
+
+# state fips codes
+st_fips_codes <- fips_codes |> 
+  group_by(state, state_name) |> 
+  summarise(n = n())
+
+# county fips codes
+cty_fips_codes <- fips_codes |> 
+  mutate(county_name = gsub(" County", "", county),
+         fips_county = paste0(state_code, county_code))
+
+# shapefiles
+state_boundaries <- states(resolution = "20m",
+                           year = 2022, cb = TRUE) |>
+  filter(!(NAME %in% c("Alaska", "Hawaii", "Puerto Rico"))) |>
+  rename(state = STUSPS)
+
+us_counties <- counties(resolution = "20m",
+                        year = 2022, cb = TRUE) %>%
+  rename(fips_county = GEOID) %>%
+  rename(county = NAME,
+         state = STUSPS) |> 
+  mutate(county = ifelse(state == "MD" & NAMELSAD == "Baltimore city",
+                         "Baltimore City", county))
+
+ca_tx_counties <- counties(resolution = "20m",
+                        year = 2022, cb = TRUE) %>%
+  rename(fips_county = GEOID) %>%
+  filter(STATE_NAME %in% c("California", "Texas")) %>%
+  rename(county = NAME,
+         state = STUSPS)
+
+## load/create files
+# from ICE
+if (file.exists("/workspaces/adhoc-analysis/ESP/detention_map/data/ice_facilities.RDS")) {
+  ice_facilities <- readRDS("/workspaces/adhoc-analysis/ESP/detention_map/data/ice_facilities.RDS")
+} else {
+  ice_facilities <- read_csv("/workspaces/adhoc-analysis/ESP/detention_map/data/ice_facilities.csv") |>
+    mutate(addr = paste0(Address, ", ", City, ", ", State, " ", Zip)) |>
+    rename(name = Name) |>
+    mutate(adp = rowSums(across(`Level A`:`Level D`))) |>
+    rename(type_detailed = `Type Detailed`,
+           state = State) |>
+    geocode(addr, method = 'arcgis',
+            lat = latitude , long = longitude) |> 
+    select(name, addr, state, latitude, longitude, type_detailed) #|>
+    # drop_na(latitude) |>
+    # st_as_sf(coords = c("longitude", "latitude"),
+    #          crs = st_crs("EPSG:4326"))
+
+  saveRDS(ice_facilities,
+          "/workspaces/adhoc-analysis/ESP/detention_map/data/ice_facilities.RDS")
+}
+
+# from FOIA data
+if (file.exists("/workspaces/adhoc-analysis/ESP/detention_map/data/all.csv")) {
+  all <- read_csv("/workspaces/adhoc-analysis/ESP/detention_map/data/all.csv")
+} else {
+  source("/workspaces/adhoc-analysis/ESP/detention_map/detentions19-23.R")
+}
+
+# from Vera
+vera_facilities <- read_csv("/workspaces/adhoc-analysis/ESP/detention_map/data/facilities_vera.csv") |> 
+  mutate(name = toupper(detention_facility_name)) |> 
+  filter(!is.na(latitude)) |> 
+  select(name, city, state, latitude, longitude, type_detailed)
+
+# from Torn Apart - https://xpmethod.columbia.edu/torn-apart/credits.html
+if (file.exists("/workspaces/adhoc-analysis/ESP/detention_map/data/tornapart_geo.csv")) {
+  tornapart_geo <- read_csv("/workspaces/adhoc-analysis/ESP/detention_map/data/tornapart_geo.csv")
+} else {
+  tornapart_geo <- read_csv("/workspaces/adhoc-analysis/ESP/detention_map/data/tornapart.csv") |> 
+    mutate(name = toupper(Name),
+           addr = toupper(Address)) |> 
+    rename(state_name = State) |> 
+    left_join(st_fips_codes, by = "state_name") |> 
+    select(name, addr, state) |> 
+    geocode(addr, method = 'arcgis',
+            lat = latitude , long = longitude)
+  
+  write_csv(tornapart_geo, "/workspaces/adhoc-analysis/ESP/detention_map/data/tornapart_geo.csv")
+}
+
+# ERO data
+field_offices <- read_csv("/workspaces/adhoc-analysis/ESP/detention_map/data/field_offices.csv") |> 
+  rename(state = abbr_name)
+
+gs4_deauth()
+tx_ca <- read_sheet("1aPftRpzR-c8RqqwdFUVJ520TD9m3FZEh3C0z46HzvxA", sheet = "tx_ca")
+
+# LSP geo data
+lsps <- read_csv("/workspaces/adhoc-analysis/ESP/detention_map/data/lsp_rr.csv")
+
+```
+
+```{r full_list}
+
+fulllist <- all |> 
+  full_join(ice_facilities, by = "name") |> 
+  full_join(vera_facilities, by = "name",
+            suffix = c(".ice", ".vera")) |> 
+  full_join(tornapart_geo, by = "name",
+            suffix = c(".ice", ".tornapart")) |> 
+  rename(city.vera = city,
+         latitude.tornapart = latitude,
+         longitude.tornapart = longitude,
+         state.tornapart = state) |> 
+  rowwise() |> 
+  mutate(resolved = list(resolve_state(state.ice, state.vera, state.tornapart)),
+         state = resolved[[1]],
+         flag = as.logical(resolved[[2]])) |> 
+  select(!c(resolved, state.ice, state.vera, state.tornapart)) |> 
+  distinct()
+
+no_geo <- fulllist |> 
+  filter(is.na(addr.ice) & 
+           is.na(addr.tornapart) & 
+           is.na(latitude.ice) & 
+           is.na(latitude.vera) & 
+           is.na(latitude.tornapart)) |> 
+  select(name, mean_n)
+
+fulllist_geo <- fulllist |> 
+  filter(!name %in% no_geo$name,
+         flag == FALSE) |> 
+  select(name, mean_n, type_detailed.ice, type_detailed.vera, city.vera, state) |> 
+  rename(city = city.vera) |> 
+  distinct()
+
+write_csv(fulllist, "/workspaces/adhoc-analysis/ESP/detention_map/data/fulllist.csv")
+write_csv(fulllist_geo, "/workspaces/adhoc-analysis/ESP/detention_map/data/fulllist_geo.csv")
+write_csv(no_geo, "/workspaces/adhoc-analysis/ESP/detention_map/data/no_geo.csv")
+
+fulllist_map_no_sf <- fulllist |> 
+  mutate(latitude = ifelse(is.na(latitude.ice), 
+                           ifelse(is.na(latitude.vera), 
+                                  latitude.tornapart, 
+                                  latitude.vera),
+                           latitude.ice)) |> 
+  mutate(longitude = ifelse(is.na(longitude.ice), 
+                           ifelse(is.na(longitude.vera), 
+                                  longitude.tornapart, 
+                                  longitude.vera),
+                           longitude.ice)) |> 
+  mutate(type = ifelse(is.na(type_detailed.ice), 
+                       type_detailed.vera,
+                       type_detailed.ice)) |> 
+  select(name, mean_n, latitude, longitude, type, state) |> 
+  distinct() |> 
+  drop_na(latitude) 
+
+saveRDS(fulllist_map_no_sf, "/workspaces/adhoc-analysis/ESP/detention_map/data/fulllist_map_no_sf.RDS")
+
+fulllist_map <- fulllist |> 
+  mutate(latitude = ifelse(is.na(latitude.ice), 
+                           ifelse(is.na(latitude.vera), 
+                                  latitude.tornapart, 
+                                  latitude.vera),
+                           latitude.ice)) |> 
+  mutate(longitude = ifelse(is.na(longitude.ice), 
+                           ifelse(is.na(longitude.vera), 
+                                  longitude.tornapart, 
+                                  longitude.vera),
+                           longitude.ice)) |> 
+  mutate(type = ifelse(is.na(type_detailed.ice), 
+                       type_detailed.vera,
+                       type_detailed.ice)) |> 
+  select(name, mean_n, latitude, longitude, type, state) |> 
+  distinct() |> 
+  drop_na(latitude) |> 
+  st_as_sf(coords = c("longitude", "latitude"),
+           crs = st_crs("EPSG:4326")) |> 
+  filter(!str_detect(name, "HAGATNA"),
+         !str_detect(name, "HONOLULU"),
+         !str_detect(name, "SAIPAN"),
+         !str_detect(name, "GUAYNABO"),
+         name != "SAN JUAN STAGING",
+         state != "AK",
+         state != "HI",
+         state != "GU",
+         state != "PR",
+         state != "MP",
+         state != "VI") |> 
+  group_by(type) |> 
+  mutate(type_label = paste0(type, ' (', n(), ')'),
+         count = n())
+
+saveRDS(fulllist_map, "/workspaces/adhoc-analysis/ESP/detention_map/data/fulllist_map.RDS")
+  
+```
+
+```{r}
+
+
+
+```
+
+```{r field_offices}
+
+state_map <- state_boundaries |> 
+  left_join(field_offices, by = "state")
+
+map_ca_tx <- ca_tx_counties %>% 
+  left_join(tx_ca, by = c("state", "county"), 
+            relationship = "one-to-one")
+
+```
+
+```{r lsps}
+
+library(tidyverse)     # ggplot, dplyr, and friends
+library(sf)            # Handle spatial data in a tidy way
+library(tigris)        # Access demographic data from the US Census
+
+# LSP geo data
+lsps <- read_csv("/workspaces/adhoc-analysis/ESP/detention_map/data/lsp_rr.csv")
+
+# shapefiles
+state_boundaries <- states(resolution = "20m",
+                           year = 2022, cb = TRUE) |>
+  filter(!(NAME %in% c("Alaska", "Hawaii", "Puerto Rico"))) |>
+  rename(state = STUSPS)
+
+us_counties <- counties(resolution = "20m",
+                        year = 2022, cb = TRUE) %>%
+  rename(fips_county = GEOID) %>%
+  rename(county = NAME,
+         state = STUSPS) |> 
+  mutate(county = ifelse(state == "MD" & NAMELSAD == "Baltimore city",
+                         "Baltimore City", county))
+
+lsp_no_states <- lsps |> 
+  pivot_longer(AL:WY,
+               names_to = "state",
+               values_to = "counties") |> 
+  filter(!is.na(counties),
+         counties != "All counties") |> 
+  select(!states) |> 
+  separate_longer_delim(counties, ",") |> 
+  rename(county = counties)
+
+lsp_counties <- us_counties %>% 
+  left_join(lsp_no_states, 
+            by = c("state", "county"),
+            relationship = "one-to-many") |>
+  drop_na(org) |> 
+  group_by(org) |> 
+  summarise(geometry = sf::st_union(geometry)) |> 
+  ungroup()
+
+whole_states <- lsps |> 
+  pivot_longer(AL:WY,
+               names_to = "state",
+               values_to = "counties") |> 
+  filter(counties == "All counties") |> 
+  select(org, state)
+
+lsp_states <- state_boundaries %>% 
+  left_join(whole_states, by = "state") |>
+  drop_na(org) |> 
+  group_by(org) |> 
+  summarise(geometry = sf::st_union(geometry)) |> 
+  ungroup()
+
+lsp_boundaries <- lsp_states |> 
+  rbind(lsp_counties) |> 
+  group_by(org) |> 
+  summarise(geometry = sf::st_union(geometry)) |> 
+  ungroup()
+
+```
+
+```{r map}
+
+
+ggplot() +
+  # geom_sf(data = state_map |> drop_na(field_office),
+  #         aes(fill = field_office,
+  #             color = field_office)) +
+  # geom_sf(data = map_ca_tx,
+  #         aes(fill = ero,
+  #             color = ero)) +
+  geom_sf(data = lsp_boundaries,
+          aes(fill = org,
+              color = org),
+          alpha = .5) +
+  geom_sf(data = state_map,
+          color = "black",
+          fill = NA) +
+  scale_fill_manual(values = more_colors,
+                    na.value = "white",
+                     guide = "none") +
+  scale_color_manual(values = darken(more_colors, .5),
+                     na.value = "white",
+                     guide = "none") +
+  # guides(fill = guide_legend(nrow = 3,
+  #                            position = "bottom")) +
+  labs(fill = "Field Office",
+       color = "Field Office") +
+  # new_scale_fill() +
+  # new_scale_color() +
+  # geom_sf(data = fulllist_map,
+  #         aes(fill = reorder(type_label, -count),
+  #             color = reorder(type_label, -count)),
+  #         shape = 21,
+  #         size = 3) +
+  # scale_fill_manual(values = more_colors) +
+  # scale_color_manual(values = whites) +
+  # guides(size = guide_legend(position = "right"),
+  #        color = guide_legend(ncol = 1, 
+  #                             position = "right"),
+  #        fill = guide_legend(ncol = 1, 
+  #                            position = "right")) +
+  coord_sf(crs = st_crs("ESRI:102003")) + # Albers
+  # labs(color = "Facility Type",
+  #      fill = "Facility Type",
+  #      title = "Places of Detention",
+  #      subtitle = "by facility type") +
+  theme_acj_map()
+
+ggsave("/workspaces/adhoc-analysis/ESP/detention_map/lsps.png", 
+       height = 14 / 1.618, width = 14,
+       device = png, type = "cairo", dpi = 180)
+
+```
+
+```{r ca}
+
+fulllist_ca <- fulllist_map |>
+  filter(state == "CA") |> 
+  group_by(type) |> 
+  mutate(type_label = paste0(type, ' (', n(), ')'),
+         count = n())
+
+ggplot() +
+  geom_sf(data = state_map |> 
+            drop_na(field_office) |> 
+            filter(state == "CA"),
+          aes(fill = field_office,
+              color = field_office)) +
+  geom_sf(data = map_ca_tx |> filter(state == "CA"),
+          aes(fill = ero,
+              color = ero)) +
+  geom_sf(data = state_map |> filter(state == "CA"),
+          color = "#0B320C",
+          fill = NA) +
+  scale_fill_manual(values = more_colors,
+                    na.value = "white") +
+  scale_color_manual(values = more_colors,
+                     na.value = "white", guide = "none") +
+  guides(fill = guide_legend(nrow = 1,
+                             position = "bottom")) +
+  labs(fill = "Field Office",
+       color = "Field Office") +
+  new_scale_fill() +
+  new_scale_color() +
+  geom_sf(data = fulllist_ca,
+          aes(fill = reorder(type_label, -count),
+              color = reorder(type_label, -count)),
+          shape = 21,
+          size = 5) +
+  scale_fill_manual(values = more_colors) +
+  scale_color_manual(values = whites) +
+  guides(size = guide_legend(position = "right"),
+         color = guide_legend(ncol = 1, 
+                              position = "right"),
+         fill = guide_legend(ncol = 1, 
+                             position = "right")) +
+  coord_sf(crs = st_crs("EPSG:3310")) +  # California Albers
+  labs(color = "Facility Type",
+       fill = "Facility Type",
+       title = "Places of Detention",
+       subtitle = "by facility type") +
+  theme_acj_map()
+
+ggsave("/workspaces/adhoc-analysis/ESP/detention_map/ca_facilities.png", 
+       height = 8, width = 8,
+       device = png, type = "cairo", dpi = 180)
+
+```
+
+```{r tx}
+
+
+fulllist_tx <- fulllist_map |>
+  filter(state == "TX") |> 
+  group_by(type) |> 
+  mutate(type_label = paste0(type, ' (', n(), ')'),
+         count = n())
+
+ggplot() +
+  geom_sf(data = state_map |> 
+            drop_na(field_office) |> 
+            filter(state == "TX"),
+          aes(fill = field_office,
+              color = field_office)) +
+  geom_sf(data = map_ca_tx |> filter(state == "TX"),
+          aes(fill = ero,
+              color = ero)) +
+  geom_sf(data = state_map |> filter(state == "TX"),
+          color = "#0B320C",
+          fill = NA) +
+  scale_fill_manual(values = more_colors,
+                    na.value = "white") +
+  scale_color_manual(values = more_colors,
+                     na.value = "white", guide = "none") +
+  guides(fill = guide_legend(nrow = 1,
+                             position = "bottom")) +
+  labs(fill = "Field Office",
+       color = "Field Office") +
+  new_scale_fill() +
+  new_scale_color() +
+  geom_sf(data = fulllist_tx,
+          aes(fill = reorder(type_label, -count),
+              color = reorder(type_label, -count)),
+          shape = 21,
+          size = 5) +
+  scale_fill_manual(values = more_colors) +
+  scale_color_manual(values = whites) +
+  guides(size = guide_legend(position = "right"),
+         color = guide_legend(ncol = 1, 
+                              position = "right"),
+         fill = guide_legend(ncol = 1, 
+                             position = "right")) +
+  coord_sf(crs = st_crs("EPSG:6577")) + # NAD83(2011) / Texas Central
+  labs(color = "Facility Type",
+       fill = "Facility Type",
+       title = "Places of Detention",
+       subtitle = "by facility type") +
+  theme_acj_map()
+
+ggsave("/workspaces/adhoc-analysis/ESP/detention_map/tx_facilities.png", 
+       height = 8, width = 10,
+       device = png, type = "cairo", dpi = 180)
+
+```
+
